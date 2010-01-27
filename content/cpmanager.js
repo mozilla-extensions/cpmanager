@@ -662,14 +662,6 @@ function cpmanager_checkAddonUpdates(){
 								},
 							},
 							{
-							    label: strbundle.getString("notification1.no"),
-							    accessKey: "L",
-							    popup: null,
-							    callback: function (){
-									gBrowser.getNotificationBox().removeCurrentNotification();
-								},
-							},
-							{
 							    label: strbundle.getString("notification1.nountilnexttime"),
 							    accessKey: "N",
 							    popup: null,
@@ -678,7 +670,15 @@ function cpmanager_checkAddonUpdates(){
 									cpmanager_saveAddonList(cpmanager_addonListNew,cpmanager_getFilePath(CPMANAGER_ADDON_LIST_FILE_NAME));
 									gBrowser.getNotificationBox().removeCurrentNotification();
 								},
-							}
+							},
+							{
+							    label: strbundle.getString("notification1.no"),
+							    accessKey: "L",
+							    popup: null,
+							    callback: function (){
+									gBrowser.getNotificationBox().removeCurrentNotification();
+								},
+							},
 						];
 						var notificationBox = gBrowser.getNotificationBox();
 						var priority = notificationBox.PRIORITY_INFO_MEDIUM;
