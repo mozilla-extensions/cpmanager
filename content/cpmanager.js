@@ -115,7 +115,7 @@ function cpmanager_getXMLFromLocalFile(filePath) {
 		var req = new XMLHttpRequest();
 		req.open("GET", filePath, false); 
 		req.send(null);
-	// print the name of the root element or error message
+		// print the name of the root element or error message
 		var dom = req.responseXML;
 		// alert(req.responseText);
 		// alert(dom);
@@ -162,7 +162,7 @@ function cpmanager_openAndReuseOneTabPerURL(url) {
   // Our URL isn't open. Open it now.
   if (!found) {
 	if (gBrowser){
-		gBrowser.selectedTab = gBrowser.addTab(url,null);
+		gBrowser.selectedTab = gBrowser.addTab(url);
 	} else {
 		window.open(url,"_blank",null);
 	}
