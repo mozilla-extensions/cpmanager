@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>cpmanager@mozillaonline.com</em:id>
-		<em:version>0.3.2</em:version>
+		<em:version>0.3.3</em:version>
 		<em:name>China Edition Addons Manager</em:name>
 		<em:description>To manage the addons package in Firefox China Edition.</em:description>
 		<em:creator>Amax Guan @ Mozilla Online Limited</em:creator>
