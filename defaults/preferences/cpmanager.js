@@ -1,3 +1,4 @@
 pref("browser.tabs.autoHide", false);
 pref("browser.download.useDownloadDir", false);
-pref("flashgot.version", "1.2");
+
+pref("xpinstall.whitelist.add", "addons.mozilla.org,17huohu.cn,17huohu.com,g-fox.cn,mozilla.com.cn");
