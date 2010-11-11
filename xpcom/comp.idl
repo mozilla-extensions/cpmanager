@@ -1,0 +1,10 @@
+#include "nsISupports.idl"
+
+[scriptable, uuid(e2e98646-8d35-45aa-ba12-efca38052748)]
+interface IUidGenerator : nsISupports
+{
+  AString getID();
+  AString getActivationKey(in wstring sn);
+  AString getCommonAppdataFolder();
+};
+

@@ -1,0 +1,11 @@
+*.swp
+*~
+Thumbs.db
+*.o
+*.xpi
+.DS_Store
+*.mo
+*.pyc
+*.ncb
+*.idb
+*.pdb
