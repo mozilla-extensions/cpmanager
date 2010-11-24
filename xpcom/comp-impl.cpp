@@ -24,6 +24,8 @@
 #define  IDE_ATA_IDENTIFY    0xEC  //  Returns ID sector for ATA.
 #define  DFP_RECEIVE_DRIVE_DATA   0x0007c088
 
+#define NET_CARD_KEY TEXT("System\CurrentControlSet\Control\Network\{4D36E972-E325-11CE-BFC1-08002BE10318}")
+
 using namespace std;
 
 NS_IMPL_ISUPPORTS1(CUidGenerator, IUidGenerator)
@@ -234,6 +236,48 @@ BOOL CUidGenerator::getMacByCmd(char *lpszMac, int length)
 	return TRUE;
 }
 
+bool isLocalAdapter(const char * pAdapterName)
+{
+	BOOL ret_value = FALSE;
+	TCHAR szDataBuf[MAX_PATH+1];
+	DWORD dwDataLen = MAX_PATH;
+	DWORD dwType = REG_SZ;
+	HKEY hNetKey = NULL;
+	HKEY hLocalNet = NULL;
+	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, NET_CARD_KEY, 0, KEY_READ, &hNetKey))
+		return FALSE;
+//	sprintf(szDataBuf, "%s\Connection", pAdapterName);
+	if (ERROR_SUCCESS != RegOpenKeyEx(hNetKey ,szDataBuf ,0 ,KEY_READ, &hLocalNet))
+	{
+		RegCloseKey(hNetKey);
+		return FALSE;
+	}
+	if (ERROR_SUCCESS != RegQueryValueEx(hLocalNet, TEXT("MediaSubType"), 0, &dwType, (BYTE *)szDataBuf, &dwDataLen))
+	{
+		goto ret;
+	}
+	if (*((DWORD *)szDataBuf)!=0x01)
+	{
+		goto ret;
+	}
+	dwDataLen = MAX_PATH;
+	if (ERROR_SUCCESS != RegQueryValueEx(hLocalNet, TEXT("PnpInstanceID"), 0, &dwType, (BYTE *)szDataBuf, &dwDataLen))
+	{
+		goto ret;
+	}
+	if (wcsncmp(szDataBuf, TEXT("PCI"), strlen("PCI")))
+		goto ret;
+	
+	ret_value = TRUE;
+
+ret:
+	RegCloseKey(hLocalNet);
+	RegCloseKey(hNetKey);
+
+	return ret_value!=0;
+
+}
+
 void getdMacAddresses(std::vector<std::string> &vMacAddresses)
 {
     vMacAddresses.clear();
@@ -246,7 +290,9 @@ void getdMacAddresses(std::vector<std::string> &vMacAddresses)
     //No network card? Other error?
     if(dwStatus != ERROR_SUCCESS)
         return;
-
+	char *adapterName = AdapterInfo->AdapterName;
+	if(!isLocalAdapter(adapterName))
+		return;
     PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
     char szBuffer[512];
     while(pAdapterInfo)
@@ -293,13 +339,13 @@ BOOL getMacAddress(char *lpszMac, int length){
 	std::vector<std::string> addresses;
 	getdMacAddresses(addresses);
 	for (int i=0; i< addresses.size(); i++){
-		if (addresses[i].find("00-05-56") == 0){
-			continue;
-		}
-		for(int j=0; j< addresses[i].length(); j++)		{
+//		if (addresses[i].find("00-05-56") == 0){
+//			continue;
+//		}
+		for(int j=0,k=0; j< addresses[i].length(); j++)		{
 			if(addresses[i][j] != '-') {
-				lpszMac[j] = addresses[i][j];
-				j++;
+				lpszMac[k] = addresses[i][j];
+				k++;
 			}
 		}
 		return TRUE;
