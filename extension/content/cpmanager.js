@@ -298,7 +298,7 @@ function cpmanager_checkFirstTime(){
 			cpmanager_setPrefValue("init_time",initTime);
 // if it's windows	
 			if (navigator.appVersion.indexOf("Win")!=-1 && cp_mod.antiCheating) {
-				cpmanager_getSN();
+				cpmanager_getActivateCode();
 			} else {
 				cpmanager_startUpdate();
 			}
@@ -549,7 +549,19 @@ function cpmanager_getSNStateChange(){
 	
 }
 
-
+function cpmanager_getActivateCode() {
+	try{
+		cpmanager_LOG("cpmanager: cpmanager_getActivateCode ");
+		var actCode = cpmanager_getActCode();
+		//set act code as preference
+		cpmanager_setPrefValue("actcode",actCode);
+		//continue live
+		cpmanager_startUpdate();
+	}
+	catch(e){
+		cpmanager_LOG("cpmanager: getSNStateChange: "+ e.toString());
+	}
+}
 
 //comparing the new addonlist with the old one, install the new ones, upgrade the updated ones, and leave the uninstalled ones alone.
 //first read from the old list, then compareing with the new list, install/update editionages.when it's over, save the modifications to the list file on the disk
