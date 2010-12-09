@@ -30,8 +30,8 @@ class NS_NO_VTABLE NS_SCRIPTABLE IUidGenerator : public nsISupports {
   /* AString getID (); */
   NS_SCRIPTABLE NS_IMETHOD GetID(nsAString & _retval NS_OUTPARAM) = 0;
 
-  /* AString getActivationKey (in wstring sn); */
-  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(const PRUnichar *sn, nsAString & _retval NS_OUTPARAM) = 0;
+  /* AString getActivationKey (); */
+  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(nsAString & _retval NS_OUTPARAM) = 0;
 
   /* AString getCommonAppdataFolder (); */
   NS_SCRIPTABLE NS_IMETHOD GetCommonAppdataFolder(nsAString & _retval NS_OUTPARAM) = 0;
@@ -43,19 +43,19 @@ class NS_NO_VTABLE NS_SCRIPTABLE IUidGenerator : public nsISupports {
 /* Use this macro when declaring classes that implement this interface. */
 #define NS_DECL_IUIDGENERATOR \
   NS_SCRIPTABLE NS_IMETHOD GetID(nsAString & _retval NS_OUTPARAM); \
-  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(const PRUnichar *sn, nsAString & _retval NS_OUTPARAM); \
+  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(nsAString & _retval NS_OUTPARAM); \
   NS_SCRIPTABLE NS_IMETHOD GetCommonAppdataFolder(nsAString & _retval NS_OUTPARAM); 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object. */
 #define NS_FORWARD_IUIDGENERATOR(_to) \
   NS_SCRIPTABLE NS_IMETHOD GetID(nsAString & _retval NS_OUTPARAM) { return _to GetID(_retval); } \
-  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(const PRUnichar *sn, nsAString & _retval NS_OUTPARAM) { return _to GetActivationKey(sn, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(nsAString & _retval NS_OUTPARAM) { return _to GetActivationKey(_retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetCommonAppdataFolder(nsAString & _retval NS_OUTPARAM) { return _to GetCommonAppdataFolder(_retval); } 
 
 /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
 #define NS_FORWARD_SAFE_IUIDGENERATOR(_to) \
   NS_SCRIPTABLE NS_IMETHOD GetID(nsAString & _retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetID(_retval); } \
-  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(const PRUnichar *sn, nsAString & _retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetActivationKey(sn, _retval); } \
+  NS_SCRIPTABLE NS_IMETHOD GetActivationKey(nsAString & _retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetActivationKey(_retval); } \
   NS_SCRIPTABLE NS_IMETHOD GetCommonAppdataFolder(nsAString & _retval NS_OUTPARAM) { return !_to ? NS_ERROR_NULL_POINTER : _to->GetCommonAppdataFolder(_retval); } 
 
 #if 0
@@ -96,8 +96,8 @@ NS_IMETHODIMP _MYCLASS_::GetID(nsAString & _retval NS_OUTPARAM)
     return NS_ERROR_NOT_IMPLEMENTED;
 }
 
-/* AString getActivationKey (in wstring sn); */
-NS_IMETHODIMP _MYCLASS_::GetActivationKey(const PRUnichar *sn, nsAString & _retval NS_OUTPARAM)
+/* AString getActivationKey (); */
+NS_IMETHODIMP _MYCLASS_::GetActivationKey(nsAString & _retval NS_OUTPARAM)
 {
     return NS_ERROR_NOT_IMPLEMENTED;
 }

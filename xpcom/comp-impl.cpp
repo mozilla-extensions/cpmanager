@@ -918,7 +918,8 @@ NS_IMETHODIMP CUidGenerator::GetID(nsAString & _retval)
 }
 
 /* AString getActivationKey (); */
-NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _retval)
+//NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _retval)
+NS_IMETHODIMP CUidGenerator::GetActivationKey(nsAString & _retval)
 {
 	SYSTEMTIME time;
 	GetSystemTime(&time);
@@ -928,26 +929,27 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _
 	char lpszMac[256];
 	md5wrapper * md5 = new md5wrapper();
 	string md5_1;
-	string md5_2;
+//	string md5_2;
 	string actCode;
 	wchar_t w_ret[1024];
-	char lpszSN[1024];
-	WideCharToMultiByte(CP_UTF8,0,sn,wcslen(sn)+1,lpszSN,1023,NULL,NULL);
+//	char lpszSN[1024];
+//	WideCharToMultiByte(CP_UTF8,0,sn,wcslen(sn)+1,lpszSN,1023,NULL,NULL);
 	char * random2 = "mozilla";
 	if ((!getHDSN(lpszCPUHD,1023)) && (!getCPUID(lpszCPUHD,1023))){
 		md5_1 = md5->getHashFromString("");
 	} else {
 		md5_1 = md5->getHashFromString(lpszCPUHD);
 	}
-	if (!getMacAddress(lpszMac,255)){
+/*	if (!getMacAddress(lpszMac,255)){
 		md5_2 = md5->getHashFromString("");
 	} else {
 		md5_2 = md5->getHashFromString(lpszMac);
-	}
+	}*/
 	actCode = "time=";
 	actCode += lpszTime;
 	actCode += "&key1=";
-	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
+//	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
+	actCode += md5_1 + "&random2=" + random2;
 	Encrypt enc;
 	char key[25];
 	key[0] = '8';key[1] = '7';key[2] = '6';key[3] = '5';

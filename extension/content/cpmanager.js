@@ -496,10 +496,10 @@ function cpmanager_getUid(){
 	return uidGenerator.getID();
 }
 
-function cpmanager_getActCode(sn){
+function cpmanager_getActCode(){
 	var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
 	uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-	return uidGenerator.getActivationKey(sn);
+	return uidGenerator.getActivationKey();
 }
 
 function cpmanager_getSN(){
@@ -533,7 +533,9 @@ function cpmanager_getSNStateChange(){
 		// if "OK"  , 0 is ok when is a local file
 			if (cpmanager_snXmlHttp.status==200 || cpmanager_snXmlHttp.status==0){
 				var SN = cpmanager_snXmlHttp.responseText;
-				var actCode = cpmanager_getActCode(SN);
+//				var actCode = cpmanager_getActCode(SN);
+//do not use SN
+				var actCode = cpmanager_getActCode();
 		//set act code as preference
 				cpmanager_setPrefValue("actcode",actCode);
 		//continue live

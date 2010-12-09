@@ -4,7 +4,8 @@
 interface IUidGenerator : nsISupports
 {
   AString getID();
-  AString getActivationKey(in wstring sn);
+//  AString getActivationKey(in wstring sn);
+    AString getActivationKey();
   AString getCommonAppdataFolder();
 };
 
