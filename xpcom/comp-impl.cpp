@@ -24,7 +24,7 @@
 #define  IDE_ATA_IDENTIFY    0xEC  //  Returns ID sector for ATA.
 #define  DFP_RECEIVE_DRIVE_DATA   0x0007c088
 
-#define NET_CARD_KEY TEXT("System\CurrentControlSet\Control\Network\{4D36E972-E325-11CE-BFC1-08002BE10318}")
+#define NET_CARD_KEY TEXT("System\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}")
 
 using namespace std;
 
@@ -244,9 +244,13 @@ bool isLocalAdapter(const char * pAdapterName)
 	DWORD dwType = REG_SZ;
 	HKEY hNetKey = NULL;
 	HKEY hLocalNet = NULL;
+
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, NET_CARD_KEY, 0, KEY_READ, &hNetKey))
 		return FALSE;
-//	sprintf(szDataBuf, "%s\Connection", pAdapterName);
+	//sprintf(szDataBuf, "%s\Connection", pAdapterName);
+	int len = MultiByteToWideChar(CP_UTF8,0,pAdapterName,-1,NULL,0);
+	MultiByteToWideChar(CP_UTF8,0,pAdapterName,len,szDataBuf,len);
+	wcscat(szDataBuf,TEXT("\\Connection"));
 	if (ERROR_SUCCESS != RegOpenKeyEx(hNetKey ,szDataBuf ,0 ,KEY_READ, &hLocalNet))
 	{
 		RegCloseKey(hNetKey);
@@ -256,7 +260,7 @@ bool isLocalAdapter(const char * pAdapterName)
 	{
 		goto ret;
 	}
-	if (*((DWORD *)szDataBuf)!=0x01)
+	if (*((DWORD *)szDataBuf)!=0x01 && *((DWORD *)szDataBuf)!=0x02)  // wire or wireless netadapter
 	{
 		goto ret;
 	}
@@ -904,7 +908,7 @@ NS_IMETHODIMP CUidGenerator::GetID(nsAString & _retval)
 	}
 	id = "key1=";
 	id += md5_1 + "&key2=" + md5_2+"&random1=" + random1;
-	
+
 	string ret = md5->getHashFromString(id);
 	wchar_t w_ret[1024];
 	MultiByteToWideChar(CP_UTF8,0,ret.c_str(),ret.length() + 1, w_ret,1023);
@@ -914,7 +918,8 @@ NS_IMETHODIMP CUidGenerator::GetID(nsAString & _retval)
 }
 
 /* AString getActivationKey (); */
-NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _retval)
+//NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _retval)
+NS_IMETHODIMP CUidGenerator::GetActivationKey(nsAString & _retval)
 {
 	SYSTEMTIME time;
 	GetSystemTime(&time);
@@ -924,26 +929,27 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _
 	char lpszMac[256];
 	md5wrapper * md5 = new md5wrapper();
 	string md5_1;
-	string md5_2;
+//	string md5_2;
 	string actCode;
 	wchar_t w_ret[1024];
-	char lpszSN[1024];
-	WideCharToMultiByte(CP_UTF8,0,sn,wcslen(sn)+1,lpszSN,1023,NULL,NULL);
-	char * random2 = "mozilla";
+//	char lpszSN[1024];
+//	WideCharToMultiByte(CP_UTF8,0,sn,wcslen(sn)+1,lpszSN,1023,NULL,NULL);
+//	char * random2 = "mozilla";
 	if ((!getHDSN(lpszCPUHD,1023)) && (!getCPUID(lpszCPUHD,1023))){
 		md5_1 = md5->getHashFromString("");
 	} else {
 		md5_1 = md5->getHashFromString(lpszCPUHD);
 	}
-	if (!getMacAddress(lpszMac,255)){
+/*	if (!getMacAddress(lpszMac,255)){
 		md5_2 = md5->getHashFromString("");
 	} else {
 		md5_2 = md5->getHashFromString(lpszMac);
-	}
+	}*/
 	actCode = "time=";
 	actCode += lpszTime;
 	actCode += "&key1=";
-	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
+//	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
+	actCode += md5_1;
 	Encrypt enc;
 	char key[25];
 	key[0] = '8';key[1] = '7';key[2] = '6';key[3] = '5';
@@ -955,6 +961,7 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _
 	unsigned char iv[9];
 	iv[0] = 'l';iv[1] = 'a'; iv[2] = 'l'; iv[3] = 'a'; iv[4] = 's'; iv[5] = 'h'; iv[6] = 'i'; iv[7] = 't'; iv[8] = '\0';
 	char * temp = enc.encrypt((unsigned char*)key, iv, actCode.c_str(), actCode.length());
+//	char * temp2 = enc.decrypt((unsigned char*)key,iv,temp);
 	MultiByteToWideChar(CP_UTF8,0,temp,strlen(temp)+1,w_ret,1023);
 	_retval = w_ret;
 	delete md5;

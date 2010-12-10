@@ -29,7 +29,7 @@
 
 #define WIDE(x) (LPWSTR)L##x
 
-typedef __int8 int8;
+//typedef __int8 int8;
 typedef __int16 int16;
 typedef unsigned __int8 byte;
 typedef unsigned __int16 uint16;
