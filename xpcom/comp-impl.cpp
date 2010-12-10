@@ -934,7 +934,7 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(nsAString & _retval)
 	wchar_t w_ret[1024];
 //	char lpszSN[1024];
 //	WideCharToMultiByte(CP_UTF8,0,sn,wcslen(sn)+1,lpszSN,1023,NULL,NULL);
-	char * random2 = "mozilla";
+//	char * random2 = "mozilla";
 	if ((!getHDSN(lpszCPUHD,1023)) && (!getCPUID(lpszCPUHD,1023))){
 		md5_1 = md5->getHashFromString("");
 	} else {
@@ -949,7 +949,7 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(nsAString & _retval)
 	actCode += lpszTime;
 	actCode += "&key1=";
 //	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
-	actCode += md5_1 + "&random2=" + random2;
+	actCode += md5_1;
 	Encrypt enc;
 	char key[25];
 	key[0] = '8';key[1] = '7';key[2] = '6';key[3] = '5';
@@ -961,6 +961,7 @@ NS_IMETHODIMP CUidGenerator::GetActivationKey(nsAString & _retval)
 	unsigned char iv[9];
 	iv[0] = 'l';iv[1] = 'a'; iv[2] = 'l'; iv[3] = 'a'; iv[4] = 's'; iv[5] = 'h'; iv[6] = 'i'; iv[7] = 't'; iv[8] = '\0';
 	char * temp = enc.encrypt((unsigned char*)key, iv, actCode.c_str(), actCode.length());
+//	char * temp2 = enc.decrypt((unsigned char*)key,iv,temp);
 	MultiByteToWideChar(CP_UTF8,0,temp,strlen(temp)+1,w_ret,1023);
 	_retval = w_ret;
 	delete md5;
