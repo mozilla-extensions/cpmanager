@@ -105,9 +105,8 @@ function cpmanager_paramCEVersion(){
 
 function cpmanager_paramActCode() {
 	try {
-// return ActCode only for windows
 		if (navigator.appVersion.indexOf("Win")!=-1) {
-			return (cpmanager_getPrefValue("actcode","") == "")? "" : "&actcode=" + encodeURIComponent(cpmanager_getPrefValue("actcode",""));
+			return "&actcode=" + cpmanager_getActCode();
 		} else {
 			return "";
 		}
@@ -117,50 +116,14 @@ function cpmanager_paramActCode() {
   	}
 }
 
-function cpmanager_checkFirstTime(){
-	cpmanager_LOG ("cpmanager: Check First Time. ");
+//get the new list from internet
+function cpmanager_init(){
+	cpmanager_LOG("cpmanager: cpmanager inited");
   	try {
-		var prefName = "initialized";
-//		var partnerID = prefs.getCharPref("mozilla.partner.id");
-		var initialized = cpmanager_getPrefValue(prefName,false);
-//			this.log(prefName + " = " + initialized);  		
-  		if (!initialized) {
-//first time
-			cp_mod.firstTime = true;
-  			cpmanager_setPrefValue(prefName, true);
-			cpmanager_LOG ("cpmanager: First Run ");
-  			CPMANAGER_ADDON_LIST_NEW_URL = CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME;
-			
-//add for partner activate
-			var initTime = (new Date()).getTime().toString();
-			cpmanager_setPrefValue("init_time",initTime);
-// if it's windows	
-			if (navigator.appVersion.indexOf("Win")!=-1 && cp_mod.antiCheating) {
-				cpmanager_getActivateCode();
-			} else {
-				cpmanager_startUpdate();
-			}
-  		} else {
-			cpmanager_startUpdate();
-		}
+  		cpmanager_startUpdate();
   	} catch (e) {
   		Components.utils.reportError(e);
   	}
-}
-
-//get the new list from internet
-function cpmanager_init(){
-	// alert(cpmanager_getPrefValue("installing",false));
-	// alert(cp_mod.inited);
-	
-	// to tell whether it's the application start
-//	if (cp_mod.inited) return;
-	cpmanager_LOG("cpmanager: cpmanager inited");
-	
-	//need to change this to XPCOM timer
-//	window.setTimeout(function(){cp_mod.inited = false;},cpmanager_relive_delay-10000);
-//start the update chain	
-	cpmanager_checkFirstTime();
 }
 
 //get AddonListNew and start the installation check.
@@ -181,30 +144,10 @@ function cpmanager_startUpdate(){
 	}
 }
 
-function cpmanager_getUid(){
-	var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
-	uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-	return uidGenerator.getID();
-}
-
 function cpmanager_getActCode(){
 	var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
 	uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
 	return uidGenerator.getActivationKey();
-}
-
-function cpmanager_getActivateCode() {
-	try{
-		cpmanager_LOG("cpmanager: cpmanager_getActivateCode ");
-		var actCode = cpmanager_getActCode();
-		//set act code as preference
-		cpmanager_setPrefValue("actcode",actCode);
-		//continue live
-		cpmanager_startUpdate();
-	}
-	catch(e){
-		cpmanager_LOG("cpmanager: getSNStateChange: "+ e.toString());
-	}
 }
 
 function cpmanager_updateHandler(addonID){
@@ -243,4 +186,6 @@ function cpmanager_loadEventHandler(event){
 //	window.setTimeout(cpmanager_loadEventHandler,cpmanager_relive_delay);
 }
 
-window.addEventListener("load",cpmanager_loadEventHandler,false);
+window.addEventListener("load", function() {
+	cpmanager_loadEventHandler();
+}, false);
