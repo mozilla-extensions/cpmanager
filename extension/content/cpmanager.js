@@ -4,26 +4,51 @@ var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.php";
 var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.php";
 var cpmanager_xmlHttp = null;
 var cpmanager_init_delay_initial = 5000;
-var cpmanager_init_delay = 15*60*1000;
+var cpmanager_init_delay = 10*1000;
 var cpmanager_relive_delay = 24*60*60*1000;
 //var cpmanager_partner_activate_interval = 7*24*60*60*1000
 var cpmanager_partner_activate_interval = 0;
 
-function cpmanager_setPrefValue(name,value){
+//Application.extensions is nolonger available in Firefox 4, so it must be rewrited.
+  function cpmanager_setPrefValue(name,value){
 	try {
-		var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
-		prefs.setValue(name,value);
-	} catch (e){
-		Components.utils.reportError(e);
-	}
-}
+		if(Application.getExtensions) {
+			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
+			Application.getExtensions(function(list) {
+				if (list.has("cpmanager@mozillaonline.com")) {
+					var prefs = list.get("cpmanager@mozillaonline.com").prefs;
+					cpmanager_LOG("cpmanager: cpmanager_setPrefValue: " + prefs);
+					return prefs.setValue(name,value);
+				}				
+			});
+		} else {
+			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
+			cpmanager_LOG("cpmanager: cpmanager_setPrefValue: " + prefs + "   " + value);
+			return prefs.setValue(name,value);		
+		}
+	} catch (e) {
+  		Components.utils.reportError(e);
+  	}
+} 
 
-function cpmanager_getPrefValue(name,def_val){
+ function cpmanager_getPrefValue(name,def_val){
 	try {
-		cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
-		var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
-		cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
-		return prefs.getValue(name,def_val);
+		if(Application.getExtensions) {
+			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
+			Application.getExtensions(function(list) {
+				if (list.has("cpmanager@mozillaonline.com")) {
+					var prefs = list.get("cpmanager@mozillaonline.com").prefs;
+					cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
+					var result = prefs.getValue(name,def_val);
+					if (name == "actcode") { alert("11111111111"); alert(result);}
+					return result;
+				}				
+			});
+		} else {
+			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
+			cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
+			return prefs.getValue(name,def_val);		
+		}
 	} catch (e) {
   		Components.utils.reportError(e);
   	}
