@@ -128,7 +128,7 @@ function cpmanager_init(){
 
 //get AddonListNew and start the installation check.
 function cpmanager_startUpdate(){
-	var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.mozillaonline.com") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
+	var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
 	cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 	try {
 		if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
