@@ -120,6 +120,20 @@ function cpmanager_paramActCode() {
 function cpmanager_init(){
 	cpmanager_LOG("cpmanager: cpmanager inited");
   	try {
+  		var prefName = "initialized";
+		var initialized = cpmanager_getPrefValue(prefName,false);
+  		if (!initialized) {
+			//first time
+			cp_mod.firstTime = true;
+  			cpmanager_setPrefValue(prefName, true);
+			cpmanager_LOG ("cpmanager: First Run ");
+  			CPMANAGER_ADDON_LIST_NEW_URL = CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME;
+			
+			//add for partner activate
+			var initTime = (new Date()).getTime().toString();
+			cpmanager_setPrefValue("init_time",initTime);
+  		} 
+  		
   		cpmanager_startUpdate();
   	} catch (e) {
   		Components.utils.reportError(e);
