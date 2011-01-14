@@ -3,3 +3,6 @@ overlay	chrome://browser/content/browser.xul	chrome://cpmanager/content/cpmanage
 resource cpmanager modules/
 locale cpmanager zh-CN locale/zh-CN/
 locale cpmanager en-US locale/en-US/
+
+interfaces components/comp.xpt
+binary-component components/cpmanager-com.dll  ABI=WINNT_x86-msvc
