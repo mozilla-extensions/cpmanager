@@ -14,12 +14,12 @@ var cpmanager_partner_activate_interval = 0;
 	try {
 		if(Application.getExtensions) {
 			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
-			Application.getExtensions(function(list) {
-				if (list.has("cpmanager@mozillaonline.com")) {
-					var prefs = list.get("cpmanager@mozillaonline.com").prefs;
+			Application.getExtensions(function(exts) {
+				if (exts.has("cpmanager@mozillaonline.com")) {
+					var prefs = exts.get("cpmanager@mozillaonline.com").prefs;
 					cpmanager_LOG("cpmanager: cpmanager_setPrefValue: " + prefs);
 					return prefs.setValue(name,value);
-				}				
+				} 
 			});
 		} else {
 			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
@@ -35,14 +35,13 @@ var cpmanager_partner_activate_interval = 0;
 	try {
 		if(Application.getExtensions) {
 			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
-			Application.getExtensions(function(list) {
-				if (list.has("cpmanager@mozillaonline.com")) {
-					var prefs = list.get("cpmanager@mozillaonline.com").prefs;
+			Application.getExtensions(function(exts) {
+				if (exts.has("cpmanager@mozillaonline.com")) {
+					var prefs = exts.get("cpmanager@mozillaonline.com").prefs;
 					cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
 					var result = prefs.getValue(name,def_val);
-					if (name == "actcode") { alert("11111111111"); alert(result);}
 					return result;
-				}				
+				}	else {return value};			
 			});
 		} else {
 			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
