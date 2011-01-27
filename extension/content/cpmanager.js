@@ -10,47 +10,24 @@ var cpmanager_relive_delay = 24*60*60*1000;
 var cpmanager_partner_activate_interval = 0;
 
 //Application.extensions is nolonger available in Firefox 4, so it must be rewrited.
-  function cpmanager_setPrefValue(name,value){
-	try {
-		if(Application.getExtensions) {
-			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
-			Application.getExtensions(function(exts) {
-				if (exts.has("cpmanager@mozillaonline.com")) {
-					var prefs = exts.get("cpmanager@mozillaonline.com").prefs;
-					cpmanager_LOG("cpmanager: cpmanager_setPrefValue: " + prefs);
-					return prefs.setValue(name,value);
-				} 
-			});
-		} else {
-			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
-			cpmanager_LOG("cpmanager: cpmanager_setPrefValue: " + prefs + "   " + value);
-			return prefs.setValue(name,value);		
-		}
-	} catch (e) {
-  		Components.utils.reportError(e);
-  	}
-} 
 
- function cpmanager_getPrefValue(name,def_val){
+ function cpmanager_setPrefValue(prefName, value){
 	try {
-		if(Application.getExtensions) {
-			cpmanager_LOG("cpmanager: cpmanager_getPrefValue");
-			Application.getExtensions(function(exts) {
-				if (exts.has("cpmanager@mozillaonline.com")) {
-					var prefs = exts.get("cpmanager@mozillaonline.com").prefs;
-					cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
-					var result = prefs.getValue(name,def_val);
-					return result;
-				}	else {return value};			
-			});
-		} else {
-			var prefs = Application.extensions.get("cpmanager@mozillaonline.com").prefs;
-			cpmanager_LOG("cpmanager: cpmanager_getPrefValue: " + prefs);
-			return prefs.getValue(name,def_val);		
-		}
+		var prefs = Application.prefs;
+		var name = "extensions.cpmanager@mozillaonline.com." + prefName;
+		return prefs.setValue(name, value);
+	} catch(e) {
+		Components.utils.reportError(e);
+	}
+}
+ function cpmanager_getPrefValue(prefName, defValue) {
+	try {
+		var prefs = Application.prefs;
+		var name = "extensions.cpmanager@mozillaonline.com." + prefName;
+		return prefs.getValue(name, defValue);
 	} catch (e) {
-  		Components.utils.reportError(e);
-  	}
+		Components.utils.reportError(e);
+	}
 }
 
 /*
