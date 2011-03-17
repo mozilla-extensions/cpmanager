@@ -121,6 +121,20 @@ function cpmanager_paramActCode() {
 function cpmanager_init(){
 	cpmanager_LOG("cpmanager: cpmanager inited");
   	try {
+  		var prefName = "initialized";
+		var initialized = cpmanager_getPrefValue(prefName,false);
+  		if (!initialized) {
+			//first time
+			cp_mod.firstTime = true;
+  			cpmanager_setPrefValue(prefName, true);
+			cpmanager_LOG ("cpmanager: First Run ");
+  			CPMANAGER_ADDON_LIST_NEW_URL = CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME;
+			
+			//add for partner activate
+			var initTime = (new Date()).getTime().toString();
+			cpmanager_setPrefValue("init_time",initTime);
+  		} 
+  		
   		cpmanager_startUpdate();
   	} catch (e) {
   		Components.utils.reportError(e);
@@ -129,7 +143,7 @@ function cpmanager_init(){
 
 //get AddonListNew and start the installation check.
 function cpmanager_startUpdate(){
-	var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.mozillaonline.com") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
+	var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
 	cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 	try {
 		if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
