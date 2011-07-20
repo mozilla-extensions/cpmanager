@@ -18,7 +18,7 @@ skin cmsafeflag classic/1.0 safeflag/skin/
 overlay	chrome://browser/content/browser.xul	chrome://cmtracking/content/cpmanager.xul
 
 overlay	chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
-override chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
+override chrome://safeflag/content/overlay.xul chrome://cmsafeflag/content/safeflag_blank.xul
 style	chrome://global/content/customizeToolbar.xul	chrome://cmsafeflag/skin/overlay.css
 
 style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/linux/overlay.css os=Linux
