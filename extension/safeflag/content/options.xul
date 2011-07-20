@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://cmsafeflag/content/style.css" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://cmsafeflag/locale/safeflag.dtd">
+
+<window class="dialog"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        orient="vertical"
+        autostretch="always"
+        onload="init();"
+        title="&prefs.title;">
+
+    <script type="application/javascript">
+    <![CDATA[
+        Components.utils.import("resource://cmsafeflag/safeflag.jsm");
+
+        var prefs = null;
+
+        function init()
+        {
+            try
+            {
+                prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                                  .getService(Components.interfaces.nsIPrefBranch);
+
+                resizeSideDropdown();
+
+                /* Init general preference elements
+                   For each: 'id' corresponds to the preference name and its childrens' 'id' are possible values */
+                var checkboxes = document.getElementById("generalOptions").getElementsByTagName("checkbox");
+                for (var i=0; i < checkboxes.length; i++)
+                {
+                    let checkbox = checkboxes[i];
+                    checkbox.checked = prefs.getBoolPref(checkbox.id);
+                    checkbox.addEventListener("command", function() { prefs.setBoolPref(checkbox.id, checkbox.checked); }, false);
+                }
+                var menulists = document.getElementById("generalOptions").getElementsByTagName("menulist");
+                for (var i=0; i < menulists.length; i++)
+                {
+                    let menulist = menulists[i];
+                    menulist.selectedItem = document.getElementById(prefs.getCharPref(menulist.id));
+                    menulist.addEventListener("command", function() { prefs.setCharPref(menulist.id, menulist.selectedItem.id); }, false);
+                }
+                disableInvalidPositions();
+            }
+            catch (e) { safeflag.error("Failed to init options window",e); }
+        }
+
+        /* Can't rely on auto-sizing for side menulist/menupopup. If the "left most" string is longer than the "right most"
+           string in this locale then switching bars will change its size on hiding/showing "left most". Manually setting
+           the size including any hidden items works around this. (this doesn't work in Gecko older than 1.9.0) */
+        function resizeSideDropdown()
+        {
+            var side = document.getElementById("safeflag.position.side");
+            var sideItems = side.getElementsByTagName("menuitem");
+            for (var i=0; i < sideItems.length; i++)
+                if (side.boxObject.width < sideItems[i].boxObject.width)
+                    side.style.minWidth = side.firstChild.style.minWidth = sideItems[i].boxObject.width + "px";
+        }
+
+        function resetIconSide()  // Set side to default for newly chosen bar
+        {
+            var resetTo = (document.getElementById("safeflag.position.bar").selectedItem.id == "addressbar") ? "R" : "RM" ;
+            prefs.setCharPref("safeflag.position.side", resetTo);
+            document.getElementById("safeflag.position.side").selectedItem = document.getElementById(resetTo);
+        }
+
+        function disableInvalidPositions()  // Decides what menu options to disable based on what works in the detected browser
+        {
+            var inAddressBar = (document.getElementById("safeflag.position.bar").selectedItem.id == "addressbar");
+            document.getElementById("LM").hidden = inAddressBar;  // There is no addressbar-LM option
+        }
+
+    ]]>
+    </script>
+
+    <groupbox id="generalOptions">
+
+        <hbox>
+            <label value="&prefs.iconposlabel;" control="safeflag.position.bar"/>
+            <menulist sizetopopup="always" id="safeflag.position.bar" oncommand="resetIconSide(); disableInvalidPositions();">
+                <menupopup>
+                    <menuitem id="addressbar" label="&prefs.posAlabel;"/>
+                    <menuitem id="statusbar" label="&prefs.posSlabel;"/>
+                </menupopup>
+            </menulist>
+            <menulist sizetopopup="none" id="safeflag.position.side">
+                <menupopup>
+                    <menuitem id="LM" label="&prefs.posLMlabel;" tooltiptext="&prefs.posLMtooltip;"/>
+                    <menuitem id="L" label="&prefs.posLlabel;"/>
+                    <menuitem id="R" label="&prefs.posRlabel;"/>
+                    <menuitem id="RM" label="&prefs.posRMlabel;" tooltiptext="&prefs.posRMtooltip;"/>
+                </menupopup>
+            </menulist>
+        </hbox>
+
+        <separator class="thin"/>
+
+        <hbox>
+            <checkbox label="&prefs.background.safe.label;" id="safeflag.background.safe" oncommand=""/>
+        </hbox>
+
+        <separator class="thin"/>
+
+        <hbox>
+            <checkbox label="&prefs.background.unsafe.label;" id="safeflag.background.unsafe" oncommand=""/>
+        </hbox>
+
+    </groupbox>
+
+    <separator class="thin"/>
+
+
+    <hbox>
+        <button id="button-close" label="&close;" oncommand="window.close();" default="true"/>
+    </hbox>
+
+</window>

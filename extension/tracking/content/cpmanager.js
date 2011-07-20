@@ -1,5 +1,5 @@
 (function() {
-	Components.utils.import("resource://cpmanager/cpmanager_mod.js");
+	Components.utils.import("resource://cmtracking/cpmanager_mod.js");
 
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.php";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.php";
@@ -9,9 +9,9 @@
 	var cpmanager_relive_delay = 24*60*60*1000;
 	//var cpmanager_partner_activate_interval = 7*24*60*60*1000
 	var cpmanager_partner_activate_interval = 0;
-	
+
 	//Application.extensions is nolonger available in Firefox 4, so it must be rewrited.
-	
+
 	 function cpmanager_setPrefValue(prefName, value){
 		try {
 			var prefs = Application.prefs;
@@ -30,7 +30,7 @@
 			Components.utils.reportError(e);
 		}
 	}
-	
+
 	/*
 		return whether this is the first update of the day as a param.
 	*/
@@ -53,7 +53,7 @@
 			return "";
 	  	}
 	}
-	
+
 	/*
 		check partner Activate
 	*/
@@ -95,7 +95,7 @@
 			return "";
 	  	}
 	}
-	
+
 	function cpmanager_paramCEVersion(){
 	  	try {
 			return "&ceversion=" + Application.prefs.getValue("distribution.version","");
@@ -104,7 +104,7 @@
 			return "";
 	  	}
 	}
-	
+
 	function cpmanager_paramActCode() {
 		try {
 			if (navigator.appVersion.indexOf("Win")!=-1) {
@@ -117,7 +117,7 @@
 			return "";
 	  	}
 	}
-	
+
 	//get the new list from internet
 	function cpmanager_init(){
 		cpmanager_LOG("cpmanager: cpmanager inited");
@@ -130,18 +130,18 @@
 	  			cpmanager_setPrefValue(prefName, true);
 				cpmanager_LOG ("cpmanager: First Run ");
 	  			CPMANAGER_ADDON_LIST_NEW_URL = CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME;
-				
+
 				//add for partner activate
 				var initTime = (new Date()).getTime().toString();
 				cpmanager_setPrefValue("init_time",initTime);
-	  		} 
-	  		
+	  		}
+
 	  		cpmanager_startUpdate();
 	  	} catch (e) {
 	  		Components.utils.reportError(e);
 	  	}
 	}
-	
+
 	//get AddonListNew and start the installation check.
 	function cpmanager_startUpdate(){
 		var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
@@ -150,7 +150,7 @@
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
 				cpmanager_xmlHttp = new XMLHttpRequest();
 			}
-			
+
 			if (cpmanager_xmlHttp != null){
 				cpmanager_xmlHttp.open("GET", updateUrl, true);
 				cpmanager_xmlHttp.send(null);
@@ -159,18 +159,18 @@
 			Components.utils.reportError(e);
 		}
 	}
-	
+
 	function cpmanager_getActCode(){
 		var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
 		uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
 		return uidGenerator.getActivationKey();
 	}
-	
+
 	function cpmanager_updateHandler(addonID){
 		var em = Components.classes["@mozilla.org/extensions/manager;1"].getService(Components.interfaces.nsIExtensionManager);
 		em.addDownloads([em.getItemForID(addonID)],1,null);
 	}
-	
+
 	//Application.events.addListener("load",listener);
 	function cpmanager_loadEventHandler(event){
 		if (cp_mod.touched) return;
@@ -188,7 +188,7 @@
 		//switch to nsITimer, notice that, in order to use nsITimer, you have to know what is GCed when the window is closed.
 		cp_mod.timer = Components.classes["@mozilla.org/timer;1"]
 	       .createInstance(Components.interfaces.nsITimer);
-		cp_mod.event = { 
+		cp_mod.event = {
 					wm: Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator),
 					notify: function(timer) {
 						var win = this.wm.getMostRecentWindow("navigator:browser");
@@ -197,25 +197,25 @@
 							win.cpmanager_init();
 						}
 				} };
-	
+
 		cp_mod.timer.initWithCallback(cp_mod.event,cpmanager_relive_delay, Components.interfaces.nsITimer.TYPE_REPEATING_PRECISE);
 	//	window.setTimeout(cpmanager_loadEventHandler,cpmanager_relive_delay);
 	}
-	
+
 	function isFirefoxLowerThan4() {
 		return typeof Application.getExtensions == "undefined";
 	}
-	
+
 	function log(msg) {
 		// Components.utils.reportError(msg);
 	}
-	
+
 	function setXpinstallWhitelist() {
 		if (isFirefoxLowerThan4()) {
 			log("It is lower than 4.");
 			return;
 		}
-		
+
 		// Since ff4, xpinstall.whitelist.add does not work anymore.
 		// To make sure that all the ff4 user work again, import all the whitelist here.
 		Components.utils["import"]("resource://gre/modules/Services.jsm");
@@ -223,15 +223,15 @@
 			return;
 		}
 		Services.prefs.setBoolPref("extensions.cpmanager@mozillaonline.com.xpinstall.importlist", false);
-		
+
 		Components.utils["import"]("resource://gre/modules/NetUtil.jsm");
-		
+
 		var domains = Services.prefs.getCharPref("extensions.cpmanager@mozillaonline.com.xpinstall.whitelist.add", "").split(",");
 		domains.forEach(function(domain) {
 			try {
 				if (!domain.trim())
 					return;
-					
+
 				var uri = NetUtil.newURI("http://" + domain);
 				if (Services.perms.UNKNOWN_ACTION == Services.perms.testExactPermission(uri, "install")) {
 					Services.perms.add(uri, "install", Services.perms.ALLOW_ACTION);
@@ -241,7 +241,7 @@
 			}
 		});
 	}
-	
+
 	window.addEventListener("load", function() {
 		cpmanager_loadEventHandler();
 		setXpinstallWhitelist();

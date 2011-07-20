@@ -1,8 +1,25 @@
-content	cpmanager		content/	contentaccessible=yes
-overlay	chrome://browser/content/browser.xul	chrome://cpmanager/content/cpmanager.xul
-resource cpmanager modules/
-locale cpmanager zh-CN locale/zh-CN/
-locale cpmanager en-US locale/en-US/
+content	cmtracking		tracking/content/	contentaccessible=yes
+
+resource cmtracking tracking/modules/
+locale cmtracking zh-CN tracking/locale/zh-CN/
+locale cmtracking en-US tracking/locale/en-US/
 
 interfaces components/comp.xpt
 binary-component components/cpmanager-com.dll  ABI=WINNT_x86-msvc
+
+
+resource cmsafeflag safeflag/modules/
+
+content cmsafeflag safeflag/content/ contentaccessible=yes
+locale cmsafeflag	en-US	safeflag/locale/en-US/
+locale cmsafeflag	zh-CN	safeflag/locale/zh-CN/
+
+skin cmsafeflag classic/1.0 safeflag/skin/
+overlay	chrome://browser/content/browser.xul	chrome://cmtracking/content/cpmanager.xul
+
+overlay	chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
+override chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://cmsafeflag/skin/overlay.css
+
+style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/linux/overlay.css os=Linux
+style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/mac/overlay.css os=Darwin

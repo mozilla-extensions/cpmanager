@@ -1,6 +1,0 @@
-<?xml version='1.0'?>
-<!DOCTYPE window SYSTEM "chrome://cpmanager/locale/cpmanager.dtd">
-<overlay id='cpmanagerOverlay' 
-	xmlns='http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'>
-	<script type='application/x-javascript' src='chrome://cpmanager/content/cpmanager.js'></script>
-</overlay>

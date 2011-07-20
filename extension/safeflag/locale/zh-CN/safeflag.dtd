@@ -1,0 +1,30 @@
+<!ENTITY prefs.title "安全标识 选项">
+<!ENTITY prefs.iconposlabel "图标显示位置：">
+<!ENTITY prefs.posAlabel "地址栏">
+<!ENTITY prefs.posSlabel "状态栏">
+<!ENTITY prefs.posLMlabel "最左方">
+<!ENTITY prefs.posLlabel "左方">
+<!ENTITY prefs.posRlabel "右方">
+<!ENTITY prefs.posRMlabel "最右方">
+<!ENTITY prefs.background.safe.label "检测为安全的网址，当前地址栏使用绿色背景">
+<!ENTITY prefs.background.unsafe.label "检测为不安全的网址，当前地址栏使用红色背景">
+<!ENTITY close "关闭">
+
+<!ENTITY prefs.options "选项">
+
+<!ENTITY prefs.posLMtooltip "左侧的其他项目左移，如果有的话">
+<!ENTITY prefs.posRMtooltip "右侧的其他项目右移，如果有的话">
+<!ENTITY prefs.openinlabel "动作中打开页面于:">
+<!ENTITY prefs.tabBGlabel "后台新标签">
+<!ENTITY prefs.tabFGlabel "前台新标签">
+<!ENTITY prefs.winBGlabel "后台新窗口">
+<!ENTITY prefs.winFGlabel "前台新窗口">
+<!ENTITY prefs.currentTablabel "当前标签">
+<!ENTITY save "保存">
+<!ENTITY cancel "取消">
+
+<!ENTITY safeflag.keepYourBrowserSafe "Firefox浏览器，实时保护您的上网安全！" >
+<!ENTITY safeflag.safeJudgedByGoogle "经Google认证，网页安全！" >
+<!ENTITY safeflag.safeDescription "经Google提供的网站安全性数据库数据判定，本网页安全" >
+<!ENTITY safeflag.unSafeJudgedByGoogle "该网页存在较高安全风险！" >
+<!ENTITY safeflag.unSafeDescription "经Google提供的网站安全性数据库数据判定，本网页存在安全风险！" >

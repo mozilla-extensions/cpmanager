@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE window SYSTEM "chrome://cmsafeflag/locale/safeflag.dtd">
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://cmsafeflag/skin/overlay.css" type="text/css"?>
+
+<overlay id="safeflag" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<script src="chrome://cmsafeflag/content/moa.js"></script>
+	<script src="chrome://cmsafeflag/content/utils.js"></script>
+	<script src="chrome://cmsafeflag/content/safeflag.js"></script>
+	<script src="chrome://cmsafeflag/content/flaglayout.js"></script>
+    <script type="application/javascript">
+        function openSafeFlagOptions(){
+        	window.openDialog("chrome://cmsafeflag/content/options.xul", "safeflagOptions", "chrome,dialog,centerscreen,modal", 'new', '', '').focus();
+        }
+    </script>
+
+    <window id="main-window">
+        <box id="safeflag-iconbox" width="16" height="16" align="center" pack="center" hidden="true">
+            <image id="safeflag-icon" width="16" height="16" src="chrome://cmsafeflag/content/icons/special/default.png"
+                                     context="contextpopup"/>
+		    <popup id="contextpopup">
+		         <menuitem label="&prefs.options;" oncommand="openSafeFlagOptions();"/>
+		    </popup>
+        </box>
+
+		<popupset id="mainPopupSet">
+			<panel id="safeflag-popup">
+				<vbox id="safeflag-popup-safe">
+					<hbox>
+						<vbox>
+							<image src="chrome://cmsafeflag/skin/info-safe.png"></image>
+						</vbox>
+						<vbox>
+							<label class="safeflag-result" value="&safeflag.safeJudgedByGoogle;" />
+							<html:p class="safeflag-description">&safeflag.safeDescription;</html:p>
+						</vbox>
+					</hbox>
+					<hbox>
+						<spacer flex="1"></spacer>
+						<label value="&safeflag.keepYourBrowserSafe;" />
+					</hbox>
+				</vbox>
+				<vbox id="safeflag-popup-risk">
+					<hbox>
+						<vbox>
+							<image src="chrome://cmsafeflag/skin/info-risk.png"></image>
+						</vbox>
+						<vbox>
+							<label class="safeflag-result" value="&safeflag.unSafeJudgedByGoogle;" />
+							<html:p class="safeflag-description">&safeflag.unSafeDescription;</html:p>
+						</vbox>
+					</hbox>
+					<hbox>
+						<spacer flex="1"></spacer>
+						<label value="&safeflag.keepYourBrowserSafe;" />
+					</hbox>
+				</vbox>
+			</panel>
+		</popupset>
+    </window>
+</overlay>
