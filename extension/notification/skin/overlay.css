@@ -1,0 +1,109 @@
+@namespace html url(http://www.w3.org/1999/xhtml);
+
+/* This is just an example.  You shouldn't do this. */
+#addonnotification-hello
+{
+  color: red ! important;
+}
+#addonnotification-toolbar-button
+{
+  list-style-image: url("chrome://cmnotification/skin/toolbar-button.png");
+  -moz-image-region: rect(0px 24px 24px 0px);
+}
+#addonnotification-toolbar-button:hover
+{
+  -moz-image-region: rect(24px 24px 48px  0px);
+}
+[iconsize="small"] #addonnotification-toolbar-button
+{
+  -moz-image-region: rect( 0px 40px 16px 24px);
+}
+[iconsize="small"] #addonnotification-toolbar-button:hover
+{
+  -moz-image-region: rect(24px 40px 40px 24px);
+}
+
+.balloon-after-start {
+	-moz-border-image: url(chrome://cmnotification/skin/hud-panel-left-top.png) 18 9 7 37 / 18px 9px 7px 37px;
+}
+
+.balloon-after-start #balloon-tips-container {
+	margin: 3px -1px 0 -32px;
+}
+
+.balloon-after-end {
+	-moz-border-image: url(chrome://cmnotification/skin/hud-panel-right-top.png) 18 37 7 9 / 18px 37px 7px 9px;
+}
+
+.balloon-after-end #balloon-tips-container {
+	margin: 3px -32px 0 -1px;
+}
+
+.balloon-before-start {
+	-moz-border-image: url(chrome://cmnotification/skin/hud-panel-left-bottom.png) 7 9 18 37 / 7px 9px 18px 37px;
+}
+
+.balloon-before-start #balloon-tips-container {
+	margin: 0 -1px 3px -32px;
+}
+
+.balloon-before-end {
+	-moz-border-image: url(chrome://cmnotification/skin/hud-panel-right-bottom.png) 7 37 18 9 / 7px 37px 18px 9px;
+}
+
+.balloon-before-end #balloon-tips-container {
+	margin: 0 -32px 3px -1px;
+}
+
+#balloon-tips {
+	-moz-appearance: none !important;
+	-moz-window-shadow: none;
+	background-color: transparent;
+	margin-top: -4px;
+	-moz-margin-start: -13px;
+  	min-width : 120px;
+  	min-height: 100px;
+  	color: #000;
+}
+
+#balloon-tips button {
+	margin-top: 5px;
+}
+
+.balloon-tips-close {
+	cursor: pointer;
+}
+
+P#balloon-tips-content {
+	color: red;
+}
+
+#balloon-tips-content,
+#balloon-tips-inner-content,
+#balloon-tips-day-content {
+	width: 240px;
+	padding: 0 0 0 8px;
+	margin: 0;
+}
+
+#balloon-tips-container html|a{
+	color: #1111CC;
+	text-decoration: underline;
+	margin: 0 3px;
+}
+
+#balloon-tips-container .label-link,
+#balloon-tips-container .grey-label-link {
+	color: #1111CC;
+	text-decoration: underline;
+	margin-top: 5px;
+	cursor: pointer;
+}
+
+#balloon-tips-container .grey-label-link {
+	color: grey !important;
+}
+
+#balloon-tips-container .grey-label-link:hover {
+	color: #1111CC !important;
+}

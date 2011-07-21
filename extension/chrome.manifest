@@ -13,8 +13,18 @@ resource cmsafeflag safeflag/modules/
 content cmsafeflag safeflag/content/ contentaccessible=yes
 locale cmsafeflag	en-US	safeflag/locale/en-US/
 locale cmsafeflag	zh-CN	safeflag/locale/zh-CN/
-
 skin cmsafeflag classic/1.0 safeflag/skin/
+
+content   cmnotification                 notification/content/
+skin      cmnotification   classic/1.0   notification/skin/
+locale    cmnotification   en-US         notification/locale/en-US/
+locale    cmnotification   zh-CN         notification/locale/zh-CN/
+
+# components have to be defined in chrome manifest in FF4
+# The {classID} here must match the classID in mycomponent.js
+component {7cd7ccb6-bd40-4978-9c59-bbce9230cb6d} components/notifier-http-observer.js
+contract @mozilla.org/notifier-http-observer;1 {7cd7ccb6-bd40-4978-9c59-bbce9230cb6d}
+
 overlay	chrome://browser/content/browser.xul	chrome://cmtracking/content/cpmanager.xul
 
 overlay	chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
@@ -23,3 +33,6 @@ style	chrome://global/content/customizeToolbar.xul	chrome://cmsafeflag/skin/over
 
 style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/linux/overlay.css os=Linux
 style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/mac/overlay.css os=Darwin
+
+overlay   chrome://browser/content/browser.xul   chrome://cmnotification/content/ff-overlay.xul
+override chrome://addonnotification/content/ff-overlay.xul chrome://cmnotification/content/notification_blank.xul

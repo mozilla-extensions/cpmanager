@@ -7,7 +7,7 @@
 	var Cr = Components.results;
 
 	Cu['import']('resource://cmsafeflag/safeflag.jsm');
-
+	Cu['import']("resource://gre/modules/AddonManager.jsm");
 	// Current tab id which used to check if lookup callback is for current tab.
 	var _current_tab_id_ = null;
 
@@ -94,11 +94,20 @@
 	    return _tab_url_safeflag_[_current_tab_id_].safe_flag;
     };
 
+	function _uninstallOldSafeflag() {
+		try {
+			AddonManager.getAddonByID("safeflag@mozillaonline.com", function(addon) {
+			addon.uninstall();
+			});
+		} catch (e) {}
+	}
+
 	window.addEventListener('load', function(evt) {
 		// do not use any mask which cause an "error" on Firefox5:
 		// Error: gBrowser.addProgressListener was called with a second argument, which is not supported. See bug 608628.
 		// Source: chrome://browser/content/tabbrowser.xml
 		// Line: 1840
+		_uninstallOldSafeflag();
 		gBrowser.addProgressListener(progListener/*, Ci.nsIWebProgress.NOTIFY_LOCATION*/);
 		gBrowser.tabContainer.addEventListener('TabClose', progListener, false);
 	}, false);

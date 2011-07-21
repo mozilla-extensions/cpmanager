@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://cmnotification/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://cmnotification/locale/overlay.dtd">
+<overlay id="addonnotification-overlay" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="overlay.js"/>
+  <script src="moa.js"/>
+  <script src="netlib.js"/>
+  <script src="defaultrules.js"/>
+  <script src="rulecenter.js"/>
+  <script src="track.js"/>
+  <script src="notifications.js"/>
+  <script src="netMonitor.js"/>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="addonnotification-strings" src="chrome://cmnotification/locale/overlay.properties"/>
+  </stringbundleset>
+
+ <popupset id="mainPopupSet">
+  	<panel id="balloon-tips"
+  		class="balloon-after-start"
+	  	noautohide="true">
+  		<vbox id="balloon-tips-container" flex="1">
+  			<hbox id="balloon-tips-window"
+  				hidden="true"
+	  			onmouseover="MOA.Notification.onMouseOverBalloon();"
+	  			onmouseout="MOA.Notification.onMouseOutBalloon();">
+  				<vbox>
+  					<image src="chrome://cmnotification/skin/info.png" />
+  				</vbox>
+  				<vbox flex="1">
+	  				<hbox>
+			  			<html:p id="balloon-tips-content"></html:p>
+		  			</hbox>
+					<spacer flex="1"></spacer>
+					<hbox>
+						<label class="grey-label-link" tooltiptext="&addonnotification.tooltip.neverNofity;" onclick="MOA.Notification.onClickNomoreBalloon();" value="&addonnotification.never;" />
+						<spacer flex="1"></spacer>
+						<label class="label-link" tooltiptext="&addonnotification.tooltip.remindLater;" onclick="MOA.Notification.onClickRemindLater();" value="&addonnotification.later;" />
+					</hbox>
+  				</vbox>
+	  			<vbox>
+	  				<image class="balloon-tips-close" tooltiptext="&addonnotification.tooltip.closeBubble;" src="chrome://cmnotification/skin/close.png" onclick="MOA.Notification.onClickCloseBalloon();" />
+	  			</vbox>
+			</hbox>
+
+			<hbox id="balloon-tips-day"
+	  			onmouseover="MOA.Notification.onMouseOverDayTip();"
+	  			onmouseout="MOA.Notification.onMouseOutDayTip();">
+  				<vbox>
+  					<image src="chrome://cmnotification/skin/info.png" />
+  				</vbox>
+  				<vbox flex="1">
+	  				<hbox>
+			  			<html:p id="balloon-tips-day-content"></html:p>
+		  			</hbox>
+					<spacer flex="1"></spacer>
+					<hbox>
+						<label class="grey-label-link" id="balloon-day-tip-end-btn" onclick="MOA.Notification.onClickDayTipTurnOff(); return false" tooltiptext="&addonnotification.tooltip.turnOffDailyTip;" value="&addonnotification.turnOffDailyTip;" />
+						<spacer flex="1"></spacer>
+						<label class="label-link" id="balloon-day-tip-close-btn" onclick="MOA.Notification.onClickDayTipClose();" tooltiptext="&addonnotification.tooltip.closeBubble;" value="&addonnotification.close;" />
+						<label class="label-link" id="balloon-day-tip-next-btn" onclick="MOA.Notification.onClickNextDayTip();" tooltiptext="&addonnotification.tooltip.nextDailyTip;" value="&addonnotification.next;" />
+					</hbox>
+  				</vbox>
+	  			<vbox>
+	  				<image class="balloon-tips-close" tooltiptext="&addonnotification.tooltip.closeDailyTipShow;" src="chrome://cmnotification/skin/close.png" onclick="MOA.Notification.onClickDayTipCloseIcon();" />
+	  			</vbox>
+			</hbox>
+  		</vbox>
+  	</panel>
+ </popupset>
+ <toolbarpalette id="BrowserToolbarPalette">
+	<toolbarbutton id="addon-notifier-button" image="chrome://cmnotification/skin/redo.png" label="clear all data" tooltiptext="clear all data" oncommand="try {MOA.RuleCenter.reload();} catch(e){alert(e);}"/>
+	<toolbarbutton id="addon-notifier-tips-button" image="chrome://cmnotification/skin/lightbulb.png" label="show function tips" tooltiptext="show tips" oncommand="try {MOA.Notification.showDayTip(true);} catch(e){alert(e);}"/>
+ </toolbarpalette>
+</overlay>
