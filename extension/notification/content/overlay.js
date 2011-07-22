@@ -23,8 +23,19 @@ window.addEventListener("load", addonnotification.onLoad, false);
 
 function _uninstallOldNotification() {
 	try {
-		AddonManager.getAddonByID("addon-notification@mozillaonline.com", function(addon) {
-		addon.uninstall();
-		});
+		if(isFirefox4()) {
+			Components.utils.import("resource://gre/modules/AddonManager.jsm");
+			AddonManager.getAddonByID("addon-notification@mozillaonline.com", function(addon) {
+			addon.uninstall();
+			});
+		} else {
+			var em = Components.classes["@mozilla.org/extensions/manager;1"]  
+					.getService(Components.interfaces.nsIExtensionManager);
+			em.uninstallItem("addon-notification@mozillaonline.com");			
+		}
 	} catch (e) {}
+}
+
+function isFirefox4() {
+	return typeof Application.getExtensions != "undefined";
 }

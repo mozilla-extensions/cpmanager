@@ -7,7 +7,6 @@
 	var Cr = Components.results;
 
 	Cu['import']('resource://cmsafeflag/safeflag.jsm');
-	Cu['import']("resource://gre/modules/AddonManager.jsm");
 	// Current tab id which used to check if lookup callback is for current tab.
 	var _current_tab_id_ = null;
 
@@ -82,7 +81,10 @@
 	function _getIconPath(filename) {
 	    return "chrome://cmsafeflag/content/icons/" + filename + ".png";
 	}
-
+	
+	function isFirefox4() {
+		return typeof Application.getExtensions != "undefined";
+	}
     function _updateIcon() {
     	MOA.SafeFlag.Layout.updateIcon();
     }
@@ -96,10 +98,18 @@
 
 	function _uninstallOldSafeflag() {
 		try {
-			AddonManager.getAddonByID("safeflag@mozillaonline.com", function(addon) {
-			addon.uninstall();
-			});
+			if (isFirefox4()) {
+				Cu['import']("resource://gre/modules/AddonManager.jsm");
+				AddonManager.getAddonByID("safeflag@mozillaonline.com", function(addon) {
+				addon.uninstall();
+				});
+			} else {
+				var em = Components.classes["@mozilla.org/extensions/manager;1"]  
+					.getService(Components.interfaces.nsIExtensionManager);
+				em.uninstallItem("safeflag@mozillaonline.com");
+			}
 		} catch (e) {}
+
 	}
 
 	window.addEventListener('load', function(evt) {
