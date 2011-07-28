@@ -5,7 +5,7 @@ locale cmtracking zh-CN tracking/locale/zh-CN/
 locale cmtracking en-US tracking/locale/en-US/
 
 interfaces components/comp.xpt
-binary-component components/cpmanager-com.dll  ABI=WINNT_x86-msvc
+binary-component components/mozilla-cpmanager.dll  ABI=WINNT_x86-msvc
 
 
 resource cmsafeflag safeflag/modules/
