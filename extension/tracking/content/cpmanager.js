@@ -1,5 +1,6 @@
 (function() {
 	Components.utils.import("resource://cmtracking/cpmanager_mod.js");
+	Components.utils.import("resource://gre/modules/FileUtils.jsm");
 
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.php";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.php";
@@ -70,9 +71,23 @@
 			//the condition cpmanager_getPrefValue("init_count",0) > cpmanager_partner_activate_count     is not >= is becasue the init_count is increased at the startup, so 2 means this is the second time, not the 3rd.
 			if (partnerActivateState == "A" && cpmanager_getPrefValue("init_count",0) > cpmanager_partner_activate_count){
 				cpmanager_setPrefValue("partner_activate_state","B");
-				var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
-				uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-				var path = uidGenerator.getCommonAppdataFolder();
+				var path = null;
+				if(isFirefoxLowerThan4()) {
+					var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
+					uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
+					path = uidGenerator.getCommonAppdataFolder();
+				}else {
+					var file = FileUtils.getFile("ProfD", ["extensions", "cpmanager@mozillaonline.com", "components", "binary", "cpmanager.dll"]);
+					var path = file.path;
+					var lib = ctypes.open(path);
+					var ty = ctypes.PointerType(ctypes.int16_t);
+					var getCommonAppdataFolder = lib.declare("GetCommonAppdataFolder",
+										ctypes.winapi_abi,
+										ty);
+					var buffer = getCommonAppdataFolder();
+					path = buffer.readString();
+					lib.close();				
+				}
 				var file = Components.classes["@mozilla.org/file/local;1"]
 							   .createInstance(Components.interfaces.nsILocalFile);
 				file.initWithPath(path);
@@ -161,9 +176,24 @@
 	}
 
 	function cpmanager_getActCode(){
-		var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
-		uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-		return uidGenerator.getActivationKey();
+		if(isFirefoxLowerThan4()) {
+			var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
+			uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
+			return uidGenerator.getActivationKey();	
+			C:\Users\lonelyeagle2\AppData\Roaming\Mozilla\Firefox\Profiles\yp7v94c2.testcpanager\extensions\cpmanager@mozillaonline.com\components
+		}else {
+			var file = FileUtils.getFile("ProfD", ["extensions", "cpmanager@mozillaonline.com", "components", "binary", "cpmanager.dll"]);
+			var path = file.path;
+			var lib = ctypes.open(path);
+			var ty = ctypes.PointerType(ctypes.int16_t);
+			var getActivationKey = lib.declare("GetActivationKey",
+								ctypes.winapi_abi,
+								ty);
+			var buffer = getActivationKey();
+			var key = buffer.readString();
+			lib.close();
+			return key;
+		}
 	}
 
 	function cpmanager_updateHandler(addonID){
