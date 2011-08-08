@@ -9,10 +9,10 @@
 			"times":1,"desc":"收藏网页？点这里！<br />一键收藏当前网页，Ctrl+B则可打开书签侧栏、对已经收藏的网页进行整理（看详细视频介绍点<a href=\"http://www.firefox.com.cn/video/?fid=1\">这里</a>）<br/& gt;"
 		}, {
 			"addon_id":"livemargins@mozillaonline.com",
-			"btn_id":"livemargin3-button",
+			"btn_id":"appcenter-button",
 			"type":"function",
 			"dest":"tip",
-			"times":1,"desc":"资讯影音？点这里！<br />汇集了豆瓣电台、新浪音乐盒、天气、股票、立体搜索等丰富内容和功能（看详细视频介绍点<a href=\"http://www.firefox.com.cn/video/?fid=3\">这里</a>）<br/& gt;"
+			"times":1,"desc":"火狐魔镜全新升级为火狐应用中心<br />汇聚了众多实用工具、生活资讯、打折信息、音乐视频和网页游戏等网络应用，点击这里抢先体验吧<br/& gt;"
 		}, {
 			"addon_id":"share_all_cn@mozillaonline.com",
 			"btn_id":"share-all-cn-bar",
