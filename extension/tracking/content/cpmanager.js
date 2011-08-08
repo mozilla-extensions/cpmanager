@@ -1,7 +1,17 @@
 (function() {
 	Components.utils.import("resource://cmtracking/cpmanager_mod.js");
-	Components.utils.import("resource://gre/modules/FileUtils.jsm");
-
+	if(!isFirefoxLowerThan4()){
+		Components.utils.import("resource://gre/modules/Services.jsm");
+		Components.utils.import("resource://gre/modules/ctypes.jsm");
+	}
+	function _getLib() {
+		var lib = null;
+		var uri = Services.io.newURI('resource://tracking-components/cpmanager.dll', null, null);
+		if (uri instanceof Components.interfaces.nsIFileURL) {
+			lib = ctypes.open(uri.file.path);
+		}
+		return lib;
+	}
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.php";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.php";
 	var cpmanager_xmlHttp = null;
@@ -77,15 +87,18 @@
 					uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
 					path = uidGenerator.getCommonAppdataFolder();
 				}else {
-					var file = FileUtils.getFile("ProfD", ["extensions", "cpmanager@mozillaonline.com", "components", "binary", "cpmanager.dll"]);
-					var path = file.path;
-					var lib = ctypes.open(path);
+					var lib = _getLib();
 					var ty = ctypes.PointerType(ctypes.int16_t);
 					var getCommonAppdataFolder = lib.declare("GetCommonAppdataFolder",
 										ctypes.winapi_abi,
 										ty);
 					var buffer = getCommonAppdataFolder();
 					path = buffer.readString();
+					var freeMemory = lib.declare("FreeMemory",
+								ctypes.winapi_abi,
+								ctypes.void_t,
+								ty);
+					freeMemory(buffer);
 					lib.close();				
 				}
 				var file = Components.classes["@mozilla.org/file/local;1"]
@@ -180,17 +193,19 @@
 			var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
 			uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
 			return uidGenerator.getActivationKey();	
-			C:\Users\lonelyeagle2\AppData\Roaming\Mozilla\Firefox\Profiles\yp7v94c2.testcpanager\extensions\cpmanager@mozillaonline.com\components
 		}else {
-			var file = FileUtils.getFile("ProfD", ["extensions", "cpmanager@mozillaonline.com", "components", "binary", "cpmanager.dll"]);
-			var path = file.path;
-			var lib = ctypes.open(path);
+			var lib = _getLib();
 			var ty = ctypes.PointerType(ctypes.int16_t);
 			var getActivationKey = lib.declare("GetActivationKey",
 								ctypes.winapi_abi,
 								ty);
 			var buffer = getActivationKey();
 			var key = buffer.readString();
+			var freeMemory = lib.declare("FreeMemory",
+								ctypes.winapi_abi,
+								ctypes.void_t,
+								ty);
+			freeMemory(buffer);			
 			lib.close();
 			return key;
 		}

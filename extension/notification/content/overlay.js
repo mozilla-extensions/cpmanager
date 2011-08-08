@@ -26,6 +26,8 @@ function _uninstallOldNotification() {
 		if(isFirefox4()) {
 			Components.utils.import("resource://gre/modules/AddonManager.jsm");
 			AddonManager.getAddonByID("addon-notification@mozillaonline.com", function(addon) {
+			if(!addon)
+				return;
 			addon.uninstall();
 			});
 		} else {

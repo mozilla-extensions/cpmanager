@@ -101,6 +101,8 @@
 			if (isFirefox4()) {
 				Cu['import']("resource://gre/modules/AddonManager.jsm");
 				AddonManager.getAddonByID("safeflag@mozillaonline.com", function(addon) {
+				if(!addon)
+					return;
 				addon.uninstall();
 				});
 			} else {
