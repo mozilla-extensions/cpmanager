@@ -13,7 +13,7 @@
   <script src="chrome://cmsafeflag/content/flaglayout.js"></script>
   <script type="application/javascript">
     function openSafeFlagOptions(){
-      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", "chrome,titlebar,toolbar,centerscreen,modal", "safeflagpane").focus();
+      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", "chrome,titlebar,toolbar,centerscreen,dialog=yes", "safeflagpane").focus();
     }
   </script>
 

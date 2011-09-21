@@ -20,7 +20,7 @@
       }
       function init() {
         toggleSF();
-        document.getElementById('c-enable').addEventListener('command', toggleSF, false)
+        document.getElementById('c-enable').addEventListener('CheckboxStateChange', toggleSF, false)
       }
       window.addEventListener('load', init, false)
     })();
