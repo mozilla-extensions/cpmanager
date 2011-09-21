@@ -79,48 +79,37 @@
 	}
 
 	function _getIconPath(filename) {
-	    return "chrome://cmsafeflag/content/icons/" + filename + ".png";
+		return "chrome://cmsafeflag/content/icons/" + filename + ".png";
 	}
 	
-	function isFirefox4() {
-		return typeof Application.getExtensions != "undefined";
-	}
-    function _updateIcon() {
-    	MOA.SafeFlag.Layout.updateIcon();
-    }
-
-    ns.getCurrentTabSafeflag = function() {
-    	if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag)
-	    	return null;
-
-	    return _tab_url_safeflag_[_current_tab_id_].safe_flag;
-    };
-
-	function _uninstallOldSafeflag() {
-		try {
-			if (isFirefox4()) {
-				Cu['import']("resource://gre/modules/AddonManager.jsm");
-				AddonManager.getAddonByID("safeflag@mozillaonline.com", function(addon) {
-				if(!addon)
-					return;
-				addon.uninstall();
-				});
-			} else {
-				var em = Components.classes["@mozilla.org/extensions/manager;1"]  
-					.getService(Components.interfaces.nsIExtensionManager);
-				em.uninstallItem("safeflag@mozillaonline.com");
-			}
-		} catch (e) {}
-
+	function _updateIcon() {
+		MOA.SafeFlag.Layout.updateIcon();
 	}
 
-	window.addEventListener('load', function(evt) {
+	ns.getCurrentTabSafeflag = function() {
+		if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag)
+			return null;
+
+		return _tab_url_safeflag_[_current_tab_id_].safe_flag;
+	};
+
+	ns.init = function() {
 		// do not use any mask which cause an "error" on Firefox5:
 		// Error: gBrowser.addProgressListener was called with a second argument, which is not supported. See bug 608628.
 		// Source: chrome://browser/content/tabbrowser.xml
 		// Line: 1840
-		_uninstallOldSafeflag();
 		gBrowser.addProgressListener(progListener/*, Ci.nsIWebProgress.NOTIFY_LOCATION*/);
 		gBrowser.tabContainer.addEventListener('TabClose', progListener, false);
-	}, false);
+	}
+
+	ns.stop = function() {
+		gBrowser.removeProgressListener(progListener);
+		gBrowser.tabContainer.removeEventListener('TabClose', progListener, false);
+	}
+
+	if (MOA.SafeFlag.Utils.getPrefs().getBoolPref("enable")) {
+		window.addEventListener('load', function(evt) {
+			MOA.SafeFlag.Monitor.init()
+		}, false);
+	}
 })();

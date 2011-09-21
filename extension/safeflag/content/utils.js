@@ -127,17 +127,27 @@
 	};
 	
 	ns.getPrefs = function() {
-		return Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).QueryInterface(Ci.nsIPrefService);
+		var oldBranch = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService).getBranch('safeflag.');
+		var newBranch = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService).getBranch('extensions.safeflag.');
+		if (oldBranch.getChildList('', {}).length) {
+			['background.safe', 'background.unsafe'].forEach(function(key) {
+				if (oldBranch.prefHasUserValue(key)) {
+					newBranch.setBoolPref(key, oldBranch.getBoolPref(key))
+				}
+			});
+			oldBranch.deleteBranch('')
+		}
+		return newBranch;
 	};
 	
 	// Returns a string version of an exception object with its stack trace
 	function parseException(e) {
 		if (!e)
-		    return "";
+			return "";
 		else if (!e.stack)
-		    return String(e);
+			return String(e);
 		else
-		    return String(e) + " \n" + String(e.stack);
+			return String(e) + " \n" + String(e.stack);
 	}
 	
 	ns.error = function(msg, exception) {
