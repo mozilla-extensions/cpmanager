@@ -1,16 +1,5 @@
-<!ENTITY addonnotification.tooltip.neverNofity "不再提醒该信息">
-<!ENTITY addonnotification.tooltip.remindLater "以后再提醒我">
+<!ENTITY addonnotification.clearAllData "清除所有数据">
+<!ENTITY addonnotification.showFunctionTips "显示功能提示">
 
-<!ENTITY addonnotification.later "以后再说">
-<!ENTITY addonnotification.never "不再提醒">
-
-<!ENTITY addonnotification.tooltip.closeBubble "关闭提示">
-<!ENTITY addonnotification.tooltip.turnOffDailyTip "关闭每日提醒功能">
-<!ENTITY addonnotification.tooltip.closeBubble "关闭气泡提示">
-<!ENTITY addonnotification.tooltip.nextDailyTip "查看下一个功能提示">
-<!ENTITY addonnotification.tooltip.closeDailyTipShow "关闭演示">
-
-<!ENTITY addonnotification.turnOffDailyTip "不再提醒">
-
-<!ENTITY addonnotification.close "关闭">
-<!ENTITY addonnotification.next "下一个">
+<!ENTITY addonnotification.tooltip.clearAllData "清除所有提醒数据">
+<!ENTITY addonnotification.tooltip.showFunctionTips "显示功能提示">

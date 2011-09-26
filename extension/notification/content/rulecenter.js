@@ -1,47 +1,67 @@
 (function() {
-	var ns = MOA.ns('RuleCenter');
+	var ns = MOA.ns('AN.RuleCenter');
 	/**
-	 * reminders = {
+	 * _reminders, _rules & _regexps generated from lists in rules.json
+	 * _*_avail is also generated for display in option window
+	 *
+	 * _reminders = {
 	 * 	'{aaa-dddd-dddd-ddd}': {
-	 * 	  addon_id: {aaa-dddd-dddd-ddd},
-	 *    type: 'addon'
-	 * 	  rules: {
-	 * 		rules1_id: 1,
-	 * 		rules2_id: 1,
-	 *    }
+	 * 		addon_id: {aaa-dddd-dddd-ddd},
+	 * 		type: 'addon'
+	 * 		rule_ids: {
+	 * 			rules1_id: 1,
+	 * 			rules2_id: 1,
+	 * 		}
 	 * 	},
-	 *  '{aaa-dddd-dddd-ddd}__btn_fav': ....
+	 * 	'{aaa-dddd-dddd-ddd}__btn_fav': ....
 	 * }
 	 *
-	 * rules = {
+	 * _rules = {
 	 * 	rule1_id: {
-	 * 	  domian: 'abc.example.com',
-	 * 	  regexp: 'http://abc.example.com/.+',
-	 *    reminder: '{aaa-dddd-dddd-ddd}'			// reminder_id
-	 *  },
-	 *  rule2_id: ....
+	 * 		domian: 'abc.example.com',
+	 * 		regexp: 'http://abc.example.com/.+',
+	 * 		reminder_id: '{aaa-dddd-dddd-ddd}'
+	 * 	},
+	 * 	rule2_id: ....
 	 * }
 	 *
-	 * regexps = {
-	 *  'abc.example.com': {
-	 * 	  rule1_id: 1,
-	 *    rule2_id: 1
-	 *  },
+	 * _regexps = {
+	 * 	'abc.example.com': {
+	 * 		rule1_id: 1,
+	 * 		rule2_id: 1
+	 * 	},
 	 *
-	 *  'def.example2.com': ...
+	 * 	'def.example2.com': ...
 	 * }
 	 *
 	 */
-	var reminders = {};
-	var rules = {};
-	var regexps = {};				// for rules which have trigger type: window
+	var _daytips = [];
+	var _reminders = {};
+	var _rules = {};
+	var _regexps = {};				// for rules which have trigger type: window
 
-	ns.getRuleById = function(id) {
-		return rules[id];
+	var _daytips_avail = [];
+	var _reminders_avail = {};
+	var _rules_avail = [];
+
+	var _getRuleById = function(id) {
+		return _rules[id];
 	};
 
+	ns.getRulesAvailCount = function() {
+		return _rules_avail.length
+	}
+
+	ns.getRuleAvailByIndex = function(index) {
+		return _rules_avail[index]
+	}
+
 	ns.getReminderById = function(rid) {
-		return reminders[rid];
+		return _reminders[rid];
+	};
+
+	ns.getReminderAvailById = function(rid) {
+		return _reminders_avail[rid];
 	};
 
 	// remove reminder and rules/regexp related.
@@ -50,13 +70,13 @@
 		if (!reminder)
 			return;
 
-		for (var i = 0, len = reminder.rules.length; i < len; i++) {
-			var rule_id = reminder.rules[i];
-			var rule = rules[rule_id];
+		for (var i = 0, len = reminder.rule_ids.length; i < len; i++) {
+			var rule_id = reminder.rule_ids[i];
+			var rule = _rules[rule_id];
 
 			switch (rule.trigger) {
 				case 'window':
-					var domain_regexps = regexps[rules[rule_id].domain];
+					var domain_regexps = _regexps[_rules[rule_id].domain];
 					if (!!domain_regexps) {
 						delete domain_regexps[rule_id];
 
@@ -67,21 +87,21 @@
 							break;
 						}
 						if (!has_more)
-							delete regexps[rules[rule_id].domain];
+							delete _regexps[_rules[rule_id].domain];
 					}
 					break;
 			}
 
-			delete rules[reminder.rules[i]];
+			delete _rules[rule_id];
 		}
-		delete reminders[rid];
+		delete _reminders[rid];
 	};
 
 	ns.getRID = function(reminder) {
 		switch (reminder.type) {
 			case 'addon':
 				return reminder.addon_id;
-			case 'function':
+			case 'tip':
 				return reminder.addon_id + '__' + reminder.btn_id;
 		}
 	};
@@ -98,206 +118,221 @@
 	};
 
 	ns.checkAndShow = function(httpChannel, info) {
+		if (!MOA.AN.Lib.getPrefs().getBoolPref('showAddon')) {
+			return
+		}
 		if (!info.isWindowURI)
 			return;
 
-		var host = httpChannel.URI.host;
-		var tmp = host.split('.');
-		while (tmp.length > 1) {
-			var rule_related = regexps[tmp.join('.')];
+		var baseDomain = null;
+		for (var addition = 0; ; addition++) {
+			try {
+				baseDomain = MOA.AN.Lib.getBaseDomain(httpChannel.URI, addition)
+			} catch(err) {
+				MOA.debug(err);
+				break
+			}
+			var rule_related = _regexps[baseDomain];
 			for (var rule_id in rule_related) {
-				var rule = this.getRuleById(rule_id);
+				var rule = _getRuleById(rule_id);
 				if (new RegExp(rule.regexp, 'i').test(httpChannel.URI.spec)) {
-					if (this.hitReminder(rule.reminder)) {
-						MOA.log('Rule valid: ' + this.getReminderById(rule.reminder).desc);
-						MOA.Notification.addNotification(rule.reminder, info);
+					if (this.hitReminder(rule.reminder_id)) {
+						MOA.log('Rule valid: ' + this.getReminderById(rule.reminder_id).desc);
+						MOA.AN.Notification.addNotification(rule.reminder_id, info);
 					}
 				}
 			}
-			tmp.shift();
 		}
 	};
 
 	ns.clickOnInstall = function(reminder_id) {
-		MOA.Lib.setFilePref(reminder_id + '__nomore', new Date().getTime());
+		MOA.AN.Lib.setFilePref(reminder_id + '__nomore', Date.now());
 	};
 
 	ns.clickOnNoMore = function(reminder_id) {
-		MOA.Lib.setFilePref(reminder_id + '__nomore', new Date().getTime());
+		MOA.AN.Lib.setFilePref(reminder_id + '__nomore', Date.now());
 	};
 
 	ns.clickOnLater = function(reminder_id) {
-		MOA.Lib.setFilePref(reminder_id + '__later', new Date().getTime());
+		MOA.AN.Lib.setFilePref(reminder_id + '__later', Date.now());
 	};
 
-	ns.reload = function() {
-		MOA.Notification.clearAll();
-		MOA.Lib.clearFilePrefs();
-		reminders = {};
-		regexps = {};
-		rules = {};
+	ns.notificationShown = function() {	
+		MOA.AN.Lib.setFilePref('addon_show_time', Date.now());
+		var dailyAddonCount = MOA.AN.Lib.getFilePref('addon_daily_count', 0) + 1;
+		MOA.AN.Lib.setFilePref('addon_daily_count', dailyAddonCount);
+		if (dailyAddonCount >= MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon')) {
+			_reminders = {};
+			_regexps = {};
+			_rules = {};
+			MOA.AN.Notification.clearAll()
+		}
+	}
+
+	ns.reload = function(isReset) {
+		if (isReset) {
+			MOA.AN.Lib.clearFilePrefs()
+		}
+		MOA.AN.Notification.clearAll();
+		_daytips = [];
+		_reminders = {};
+		_regexps = {};
+		_rules = {};
+		_daytips_avail = [];
+		_reminders_avail = {};
+		_rules_avail = [];
 		init();
 	};
 
-	ns.getTipReminders = function() {
-		var defaultRules = _getReminderRules();
-		var tip_reminders = [];
-		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
-			var reminder = defaultRules.reminders[i];
-			if (reminder.dest == 'tip') {
-				var btn = MOA.Lib.get(reminder.btn_id);
-				// make sure function button is visible.
-				if (btn && btn.hidden == false && btn.clientWidth > 0) {
-					tip_reminders.push(reminder);
-				}
-			}
-		}
-		return tip_reminders;
-	};
-
 	ns.getDayTipReminders = function(force) {
-		var defaultRules = _getReminderRules();
-		var tip_reminders = [];
-
-		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
-			var reminder = defaultRules.reminders[i];
-
-			if (reminder.dest != 'tip')
-				continue;
-			if(!force && !!MOA.Lib.getFilePref(this.getRID(reminder) + '__nomore', false))
-				continue;
-
-			var btn = MOA.Lib.get(reminder.btn_id);
-			// make sure function button is visible.
-			if (btn && btn.hidden == false && btn.clientWidth > 0) {
-				tip_reminders.push(reminder);
-			}
-		}
-		return tip_reminders;
+		return (force ? _daytips_avail : _daytips).filter(function(reminder){
+					var btn = MOA.AN.Lib.get(reminder.btn_id);
+					return btn && btn.hidden == false && btn.clientWidth > 0
+				})
 	};
+
+	ns.getDayTipAvailReminders = function() {
+		return _daytips_avail
+	}
 
 	/**
 	 * Read rules from rules.json.
 	 * If it is null, use default_rules and save it to pref.
 	 */
-	function _getReminderRules() {
+	function _getAvailableRules() {
 		var reminder_rules = null;
 
 		var version = null;
 		try {
-			version = MOA.Lib.getPrefs().getCharPref('default_rules_version', '0');
+			version = MOA.AN.Lib.getPrefs().getCharPref('default_rules_version', '0');
 		} catch (err) {}
 
-		if (version != MOA.DefaultRules.VERSION) {
+		if (version != MOA.AN.DefaultRules.VERSION) {
 			MOA.debug('Default rules\' version has been updated, empty rules.json')
-			MOA.Lib.setStrToProFile(MOA.Lib.getProFilePath('rules.json'), '');
-			MOA.Lib.getPrefs().setCharPref('default_rules_version', MOA.DefaultRules.VERSION);
+			MOA.AN.Lib.setStrToProFile(MOA.AN.Lib.getProFilePath('rules.json'), '');
+			MOA.AN.Lib.getPrefs().setCharPref('default_rules_version', MOA.AN.DefaultRules.VERSION);
 		} else {
 			try {
-				reminder_rules = JSON.parse(MOA.Lib.readStrFromProFile(MOA.Lib.getProFilePath('rules.json')));
+				reminder_rules = JSON.parse(MOA.AN.Lib.readStrFromProFile(MOA.AN.Lib.getProFilePath('rules.json')));
 			} catch (err) { }
 		}
 
 		if (!reminder_rules) {
-			reminder_rules = MOA.DefaultRules.getDefaultRules();
-			// MOA.Lib.setStrToProFile(MOA.Lib.getProFilePath('rules.json'), JSON.stringify(reminder_rules));
+			reminder_rules = MOA.AN.DefaultRules.getDefaultRules();
+			// MOA.AN.Lib.setStrToProFile(MOA.AN.Lib.getProFilePath('rules.json'), JSON.stringify(reminder_rules));
 		}
 
 		return reminder_rules;
 	}
 
 	function init() {
-		var defaultRules = _getReminderRules();
-		var prefs = MOA.Lib.getFilePrefs();
-		var now = new Date().getTime();
+		var defaultRules = _getAvailableRules();
+		var prefs = MOA.AN.Lib.getFilePrefs();
+		var now = Date.now();
+
+		var last_addon_show = MOA.AN.Lib.getFilePref('addon_show_time', null);
+		if (last_addon_show) {
+			if (MOA.AN.Lib.roundToDay(now) - MOA.AN.Lib.roundToDay(last_addon_show)) {
+				MOA.AN.Lib.setFilePref('addon_daily_count', 0)
+			}
+		}
+		var maxDailyAddon = MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon');
+		maxDailyAddon -= MOA.AN.Lib.getFilePref('addon_daily_count', 0);
+
 		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
 			var reminder = defaultRules.reminders[i];
-			var rid = MOA.RuleCenter.getRID(reminder);
+			var reminder_id = MOA.AN.RuleCenter.getRID(reminder);
 
-			// 30 days
-			if (!!prefs[rid + '__nomore'] && prefs[rid + '__nomore'] - now < 2592000000)
-				continue;
-
-			// one day
-			if (!!prefs[rid + '__later'] && prefs[rid + '__later'] - now < 86400000)
-				continue;
-
-			switch (reminder.type) {
-				case 'addon':
-					if (MOA.Lib.isAddonInstalled(reminder.addon_id))
-						continue;
-					break;
-				case 'function':
-					// if addon_id is browser, it means this reminder is for browser functions.
-					if (reminder.addon_id != 'browser' && !MOA.Lib.isAddonEnabled(reminder.addon_id))
-						continue;
-					break;
-			}
-
-			reminders[rid] = reminder;
-			reminder.rules = [];			// rules' id which uses the reminder
-		}
-
-		var rule_id = 0;
-		for (var i = 0, len = defaultRules.rules.length; i < len; i++) {
-			// break composite rules into singles.
-			var com_rules = defaultRules.rules[i];
-
-			for (var j = 0, jlen = com_rules.reminders.length; j < jlen; j++) {
-				var rule = {
-					trigger: com_rules.trigger,
-					domain: com_rules.domain,
-					regexp: com_rules.regexp,
-					reminder: com_rules.reminders[j]
-				};
-				var reminder = reminders[rule.reminder];
-				if (!reminder)
+			if (reminder.type == 'tip') {
+				_daytips_avail.push(reminder);
+				if(!!MOA.AN.Lib.getFilePref(reminder_id + '__nomore', false))
 					continue;
 
-				rules[rule_id] = rule;
+				_daytips.push(reminder)
+			} else if (reminder.type == 'addon') {
+				_reminders_avail[reminder_id] = reminder;
 
-				// remember rules' id
-				reminder.rules.push(rule_id);
-
-				switch (rule.trigger) {
-					case 'window':
-						if (!regexps[rule.domain])
-							regexps[rule.domain] = {};
-						regexps[rule.domain][rule_id] = 1;
-						break;
+				if (maxDailyAddon <= 0) {
+					continue
 				}
+				// why 30 days ?
+				if (!!prefs[reminder_id + '__nomore']/** && now - prefs[reminder_id + '__nomore'] < 2592000000*/)
+					continue;
 
-				rule_id++;
+				// one day
+				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < 86400000)
+					continue;
+
+				_reminders[reminder_id] = reminder;
+				reminder.rule_ids = [];			// rules' id which uses the reminder
 			}
 		}
+
+		MOA.AN.Lib.filterInstalledAddons(Object.keys(_reminders), function(addons) {
+			for (var i in addons) {
+				delete _reminders[addons[i]]
+			}
+			var rule_id = 0;
+			for (var i = 0, len = defaultRules.rules.length; i < len; i++) {
+				// break composite rules into singles.
+				var com_rules = defaultRules.rules[i];
+
+				for (var j = 0, jlen = com_rules.reminder_ids.length; j < jlen; j++) {
+					var rule = {
+						trigger: com_rules.trigger,
+						domain: com_rules.domain,
+						regexp: com_rules.regexp,
+						reminder_id: com_rules.reminder_ids[j]
+					};
+					_rules_avail.push(rule);
+					var reminder = _reminders[rule.reminder_id];
+					if (!reminder)
+						continue;
+
+					_rules[rule_id] = rule;
+
+					// remember rules' id
+					reminder.rule_ids.push(rule_id);
+
+					switch (rule.trigger) {
+						case 'window':
+							if (!_regexps[rule.domain])
+								_regexps[rule.domain] = {};
+							_regexps[rule.domain][rule_id] = 1;
+							break;
+					}
+
+					rule_id++;
+				}
+			}
+		});
 	};
 
 	init();
 
 	// Read rules from server periodically.
 	function _update_rules() {
-		var last_update = MOA.Lib.getFilePref('update_rule_from_server', 0);
+		var last_update = MOA.AN.Lib.getFilePref('update_rule_from_server', 0);
 
-		if ('' != MOA.Lib.readStrFromProFile(MOA.Lib.getProFilePath('rules.json'))
-			&& (new Date().getTime() - last_update) < 1000 * 60 * 60 * 24 * 7) {
+		if ('' != MOA.AN.Lib.readStrFromProFile(MOA.AN.Lib.getProFilePath('rules.json'))
+			&& (Date.now() - last_update) < 86400000 * 7) {
 			MOA.debug('Rules has been updated in a week, skip.');
 			return;
 		}
 
 		var _updateurl = null;
 		try {
-			if (MOA.Lib.isFirefox4()) {
-				_updateurl = MOA.Lib.getPrefs().getCharPref('rules_update_url_ff4');
-			} else {
-				_updateurl = MOA.Lib.getPrefs().getCharPref('rules_update_url');
-			}
+			_updateurl = MOA.AN.Lib.getPrefs().getCharPref('rules_update_url_sincefx4')
 		} catch (e) {
 			MOA.Log('Update url does not exists, abort.');
 			return;
 		}
+		// If this extension is not updated, rules of the old version will be needed.
+		_updateurl = _updateurl.replace('%VERSION%', MOA.AN.DefaultRules.VERSION)
+								.replace('%TSTAMP%', Date.now());
 
 		MOA.debug('Update rules from server.');
-		MOA.Lib.httpGet(_updateurl, function(response) {
+		MOA.AN.Lib.httpGet(_updateurl, function(response) {
 			if (response.readyState == 4 && 200 == response.status) {
 				var rules = null;
 				try {
@@ -307,8 +342,9 @@
 				}
 
 				if (rules) {
-					MOA.Lib.setStrToProFile(MOA.Lib.getProFilePath('rules.json'), response.responseText);
-					MOA.Lib.setFilePref('update_rule_from_server', new Date().getTime());
+					MOA.AN.Lib.setStrToProFile(MOA.AN.Lib.getProFilePath('rules.json'), response.responseText);
+					MOA.AN.Lib.setFilePref('update_rule_from_server', Date.now());
+					MOA.AN.RuleCenter.reload(false)
 				}
 			}
 		});
@@ -316,10 +352,10 @@
 
 	var _interval = 1000 * 5;
 	try {
-		_interval = MOA.Lib.getPrefs().getIntPref('daytip_time_after_load');
-		MOA.debug('daytip_time_after_load: ' + _interval);
+		_interval = MOA.AN.Lib.getPrefs().getIntPref('update_rules_time_after_load');
+		MOA.debug('update_rules_time_after_load: ' + _interval);
 	} catch (e) {
-		MOA.debug('daytip_time_after_load is null.');
+		MOA.debug('update_rules_time_after_load is null.');
 	}
 	window.setTimeout(_update_rules, _interval);
 })();

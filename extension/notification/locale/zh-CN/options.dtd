@@ -1,0 +1,8 @@
+<!ENTITY notifierpane.label "提醒">
+<!ENTITY c-addon.label "启用扩展推荐">
+<!ENTITY c-daytip.label "启用每日提醒">
+<!ENTITY addonlist.label "扩展推荐规则">
+<!ENTITY addon.domain "域名">
+<!ENTITY addon.regexp "正则表达式">
+<!ENTITY addon.name "扩展名称">
+<!ENTITY addon.desc "扩展功能">

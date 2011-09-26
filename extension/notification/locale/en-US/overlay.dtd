@@ -1,16 +1,5 @@
-<!ENTITY addonnotification.tooltip.neverNofity "Never show this notification">
-<!ENTITY addonnotification.tooltip.remindLater "Show this later">
+<!ENTITY addonnotification.clearAllData "Clear All Data">
+<!ENTITY addonnotification.showFunctionTips "Show Function Tips">
 
-<!ENTITY addonnotification.later "Later">
-<!ENTITY addonnotification.never "Never">
-
-<!ENTITY addonnotification.tooltip.closeBubble "Close this tip">
-<!ENTITY addonnotification.tooltip.turnOffDailyTip "Turn off daily notification">
-<!ENTITY addonnotification.tooltip.closeBubble "Close this tip">
-<!ENTITY addonnotification.tooltip.nextDailyTip "Next Tip">
-<!ENTITY addonnotification.tooltip.closeDailyTipShow "Close Quick Tip Show">
-
-<!ENTITY addonnotification.turnOffDailyTip "Turn off">
-
-<!ENTITY addonnotification.close "Close">
-<!ENTITY addonnotification.next "Next">
+<!ENTITY addonnotification.tooltip.clearAllData "Clear All Addon Notification Data">
+<!ENTITY addonnotification.tooltip.showFunctionTips "Show Function Tips">

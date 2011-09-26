@@ -1,10 +1,10 @@
 (function() {
-	var ns = MOA.ns('Tracker');
+	var ns = MOA.ns('AN.Tracker');
 
 	var _trackurl = 'http://www.g-fox.cn/livemargins/notification.js';
 
 	ns.track = function(option) {
-		option = MOA.Lib.extend(option, {
+		option = MOA.AN.Lib.extend(option, {
 			type: '',
 			rid: '',
 			action: ''

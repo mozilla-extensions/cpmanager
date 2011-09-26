@@ -1,7 +1,8 @@
 (function() {
-	var ns = MOA.ns('Lib');
+	var ns = MOA.ns('AN.Lib');
 	var Ci = Components.interfaces;
 	var Cc = Components.classes;
+	var Cu = Components.utils;
 
 	// FIXME can not get tab for iframe
 	ns.getTabIDForHttpChannel = function (oHttpChannel) {
@@ -32,7 +33,7 @@
 		return null;
 	};
 
-	ns.getRequestWebProgress = function(request) {
+	ns.getWebProgressForRequest = function(request) {
 		try {
 			if (request && request.notificationCallbacks)
 				return request.notificationCallbacks.getInterface(Ci.nsIWebProgress);
@@ -49,7 +50,7 @@
 	};
 
 	ns.getWindowForRequest = function(request) {
-		return this.getWindowForWebProgress(this.getRequestWebProgress(request));
+		return this.getWindowForWebProgress(this.getWebProgressForRequest(request));
 	};
 
 	ns.getWindowForWebProgress = function(webProgress) {
@@ -100,6 +101,15 @@
 		return tab ? tab.linkedPanel : null;
 	};
 
+	ns.getBrowserForTabId = function(tabId) {
+		var tabs = gBrowser.tabs;
+		for (var i = 0; i < tabs.length; i++) {
+			if (tabs[i].linkedPanel == tabId) {
+				return gBrowser.getBrowserForTab(tabs[i])
+			}
+		}
+	}
+
 	ns.get = function(id) {
 		return document.getElementById(id);
 	};
@@ -147,8 +157,10 @@
 					return;
 				}
 				$this.option.onCounting($this.current);
-				$this.current--;
-				$this._count_down_timeout = window.setTimeout(ct, 1000);
+				if ($this.option) {
+					$this.current--;
+					$this._count_down_timeout = window.setTimeout(ct, 1000)
+				}
 			}
 			ct();
 		},
@@ -165,40 +177,34 @@
 	};
 
 
-
-	ns.isAddonInstalled = function(id) {
-		var extensionManager = Cc['@mozilla.org/extensions/manager;1'].getService(Ci.nsIExtensionManager);
-		return !!extensionManager.getItemForID(id);
+	ns.filterInstalledAddons = function(ids, callback) {
+		var installed = [];
+		
+		Cu['import']("resource://gre/modules/AddonManager.jsm");
+		AddonManager.getAddonsByIDs(ids, function(addons) {
+			for (var i in addons) {
+				addons[i] && installed.push(addons[i].id)
+			}
+			callback(installed)
+		});
 	};
 
-	ns.isAddonEnabled = function(id) {
-		var enabledItems = Application.prefs.getValue('extensions.enabledItems', null);
-		if (!enabledItems)
-			return null;
-
-		var list = enabledItems.split(/[,:]/);
-		for (var i = 0, len = list.length; i < len; i++) {
-			if (list[i].toLowerCase() === id.toLowerCase())
-				return true;
-		}
-
-		return false;
-	};
-
-	// file should be an array, e.g.: [dir1, dir2, dir3, filename].
-	ns.readStrFromProFile = function(file_att) {
+	var _attToFile = function(file_att, isWrite) {
 		if (typeof file_att.shift != 'function' || file_att.length == 0)
-			return '';
+			return null;
 
 		var file = Cc['@mozilla.org/file/directory_service;1']
 			.getService(Ci.nsIProperties).get('ProfD', Ci.nsIFile);
 
-		// create directory
 		var dir_name = file_att.shift();
 		while (file_att.length > 0) {
 			file.append(dir_name);
 			if (!file.exists() || !file.isDirectory()) {
-				return '';
+				if (isWrite) {
+					file.create(Ci.nsIFile.DIRECTORY_TYPE, 0777);
+				} else {
+					return null;
+				}
 			}
 
 			dir_name = file_att.shift();
@@ -206,6 +212,19 @@
 
 		file.append(dir_name);
 		if (!file.exists()) {
+			if (isWrite) {
+				file.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0666);
+			} else {
+				return null;
+			}
+		}
+		return file
+	}
+
+	// file should be an array, e.g.: [dir1, dir2, dir3, filename].
+	ns.readStrFromProFile = function(file_att) {
+		var file = _attToFile(file_att, false);
+		if (!file) {
 			return '';
 		}
 
@@ -226,13 +245,13 @@
 				data += str.value;
 			} while (read != 0);
 		} catch(err) {
-			MOA.log('Error occured when reading addon-notification/rules.json : ' + err);
+			MOA.log('Error occured when reading ' + file_att.join('/') + ' : ' + err);
 		} finally {
 			if (cstream) {
 				try {
 					cstream.close();
 				} catch (err) {
-					MOA.log('Error occured when closing reading addon-notification/rules.json : ' + err);
+					MOA.log('Error occured when closing reading ' + file_att.join('/') + ' : ' + err);
 				}
 			}
 		}
@@ -241,28 +260,7 @@
 	};
 
 	ns.setStrToProFile = function(file_att, json) {
-		if (typeof file_att.shift != 'function' || file_att.length == 0)
-			return '';
-
-		var file = Cc['@mozilla.org/file/directory_service;1']
-			.getService(Ci.nsIProperties).get('ProfD', Ci.nsIFile);
-
-		// create directory
-		var dir_name = file_att.shift();
-		while (file_att.length > 0) {
-			file.append(dir_name);
-			if (!file.exists() || !file.isDirectory()) {
-				file.create(Ci.nsIFile.DIRECTORY_TYPE, 0777);
-			}
-
-			dir_name = file_att.shift();
-		}
-
-		// create file
-		file.append(dir_name);
-		if (!file.exists()) {
-			file.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0666);
-		}
+		var file = _attToFile(file_att, true);
 
 		var foStream = Cc['@mozilla.org/network/file-output-stream;1']
 			.createInstance(Ci.nsIFileOutputStream);
@@ -276,13 +274,13 @@
 			converter.init(foStream, 'UTF-8', 0, 0);
 			converter.writeString(json);
 		} catch(err) {
-			MOA.log('Error occured when writing addon-notification/rules.json : ' + err);
+			MOA.log('Error occured when writing ' + file_att.join('/') + ' : ' + err);
 		} finally {
 			if (converter) {
 				try {
 					converter.close();
 				} catch (err) {
-					MOA.log('Error occured when closing writing addon-notification/rules.json : ' + err);
+					MOA.log('Error occured when closing writing ' + file_att.join('/') + ' : ' + err);
 				}
 			}
 		}
@@ -337,7 +335,31 @@
 		};
 	};
 
-	ns.isFirefox4 = function() {
+	ns.sinceFx4 = function() {
 		return typeof Application.getExtensions !== 'undefined';
+		//return !!this.get('addon-bar')
 	};
+
+	ns.getBaseDomain = function(uri, addition) {
+		var eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"].getService(Ci.nsIEffectiveTLDService);
+		if (!addition) {
+			addition = 0
+		}
+		return (uri instanceof Ci.nsIURI) ?
+				eTLDService.getBaseDomain(uri, addition) :
+				eTLDService.getBaseDomainFromHost(uri, addition)
+	};
+
+	ns.getString = function(stringID, stringArgs) {
+		var stringBundle = document.getElementById("addonnotification-strings");
+		return stringArgs ?
+				stringBundle.getFormattedString(stringID, stringArgs) :
+				stringBundle.getString(stringID)
+	};
+
+	ns.roundToDay = function(timeInMilliS) {
+		var offset = (new Date()).getTimezoneOffset() * 60000;
+		timeInMilliS -= offset;
+		return timeInMilliS - timeInMilliS % 86400000
+	}
 })();
