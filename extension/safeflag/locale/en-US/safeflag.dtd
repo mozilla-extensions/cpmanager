@@ -1,27 +1,4 @@
-<!ENTITY prefs.title "Safe Flag Preferences">
-<!ENTITY prefs.iconposlabel "Icon Position：">
-<!ENTITY prefs.posAlabel "Addressbar">
-<!ENTITY prefs.posSlabel "Statusbar">
-<!ENTITY prefs.posLMlabel "Leftmost">
-<!ENTITY prefs.posLlabel  "Left">
-<!ENTITY prefs.posRlabel  "Right">
-<!ENTITY prefs.posRMlabel "Rightmost">
-<!ENTITY prefs.background.safe.label "Green address bar for safe sites">
-<!ENTITY prefs.background.unsafe.label "Red address bar for unsafe sites">
-<!ENTITY close "Close">
-
 <!ENTITY prefs.options "Options">
-
-<!ENTITY prefs.posLMtooltip "Move to the left if there is any items in the left">
-<!ENTITY prefs.posRMtooltip "Move to the right if there is any items in the right">
-<!ENTITY prefs.openinlabel "Open new page in:">
-<!ENTITY prefs.tabBGlabel "a new tab in the background">
-<!ENTITY prefs.tabFGlabel "a new tab in the foreground">
-<!ENTITY prefs.winBGlabel "a new window in the background">
-<!ENTITY prefs.winFGlabel "a new window in the foreground">
-<!ENTITY prefs.currentTablabel "Current Tab">
-<!ENTITY save "Save">
-<!ENTITY cancel "Cancel">
 
 <!ENTITY safeflag.keepYourBrowserSafe "Firefox keeps you safe!" >
 <!ENTITY safeflag.safeJudgedByGoogle "Safe Browsing" >

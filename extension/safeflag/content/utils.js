@@ -173,4 +173,9 @@
 			}
 		};
 	};
+
+	ns.getString = function(stringID) {
+		var stringBundle = document.getElementById("safeflag-strings");
+		return stringBundle.getString(stringID)
+	};
 })();
