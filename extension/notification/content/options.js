@@ -36,5 +36,5 @@
 		};
 		document.getElementById('addon').view = addonTreeView;
 	}
-	window.addEventListener('load', init, false);
+	document.getElementById('notifierpane').addEventListener('paneload', init, false);
 })();

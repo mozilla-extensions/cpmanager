@@ -30,7 +30,7 @@ style	chrome://global/content/customizeToolbar.xul	chrome://cmsafeflag/skin/over
 style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/linux/overlay.css os=Linux
 style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/mac/overlay.css os=Darwin
 
-overlay   chrome://cmsafeflag/content/options.xul   chrome://cmnotification/content/options.xul appversion>=4.0
+overlay   chrome://cmsafeflag/content/options.xul   chrome://cmnotification/content/optionsOverlay.xul appversion>=4.0
 
 overlay   chrome://browser/content/browser.xul   chrome://cmnotification/content/ff-overlay.xul appversion>=4.0
 override chrome://addonnotification/content/ff-overlay.xul chrome://cmnotification/content/notification_blank.xul
