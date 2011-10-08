@@ -24,14 +24,14 @@
 		return true;
 	}
 
-	// remenber default background style for urlbar which is white under windows and linux but is empty under mac
-	var default_background = null;
+	// remenber default className of urlbar to switch its background color
+	var default_className = null;
 	function _updateIcon() {
 		var urlbar = document.getElementById('urlbar');
-		if (null == default_background) {
-			default_background = urlbar.style.backgroundColor;
+		if (null == default_className) {
+			default_className = urlbar.className;
 		}
-		urlbar.style.backgroundColor = default_background;
+		urlbar.className = default_className;
 		var icon = document.getElementById("safeflag-icon");
 		icon.src = _getIconPath('special/default');
 		icon.tooltipText = 'Safe Flag';
@@ -51,13 +51,13 @@
 			icon.src = _getIconPath('special/unsafe');
 			if(isUnsafeBackground) {
 				MOA.debug('Set background color for unsafe sites.');
-				urlbar.style.backgroundColor = "red";
+				urlbar.className = [default_className, 'sfbg_unsafe'].join(' ').trim();
 			}
 		} else {
 			icon.src = _getIconPath('special/safe');
 			if(isSafeBackground) {
 				MOA.debug('Set background color for safe sites.');
-				urlbar.style.backgroundColor = "#CCFF99";
+				urlbar.className = [default_className, 'sfbg_safe'].join(' ').trim();
 			}
 		}
 	}
@@ -71,10 +71,12 @@
 			case 'enable':
 				if (MOA.SafeFlag.Utils.getPrefs().getBoolPref("enable")) {
 					MOA.SafeFlag.Monitor.init();
-					_initIconEvent()
+					_initIconEvent();
+					_updateIcon()
 				} else {
 					MOA.SafeFlag.Monitor.stop();
-					_stopIconEvent()
+					_stopIconEvent();
+					document.getElementById('urlbar').className = default_className
 				}
 				break;
 			case 'background.unsafe':
@@ -154,9 +156,9 @@
 	}
 
 	if (MOA.SafeFlag.Utils.getPrefs().getBoolPref("enable")) {
-		MOA.SafeFlag.Utils.PrefListener('extensions.safeflag.', _onPrefChange);
 		window.addEventListener('load', function(evt) {
 			_initIconEvent();
 		}, false);
 	}
+	MOA.SafeFlag.Utils.PrefListener('extensions.safeflag.', _onPrefChange);
 })();
