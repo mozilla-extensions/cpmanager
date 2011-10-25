@@ -7,36 +7,10 @@
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   title="&title;"
   id="cpmanagerOptions">
-  <script type="application/javascript">
-    (function() {
-      function toggleSF() {
-        if(document.getElementById("c-enable").checked) {
-          document.getElementById("b-safe").disabled = false;
-          document.getElementById("b-unsafe").disabled = false
-        }else {
-          document.getElementById("b-safe").disabled = true;
-          document.getElementById("b-unsafe").disabled = true
-        }
-      }
-      function init() {
-        toggleSF();
-        document.getElementById('c-enable').addEventListener('CheckboxStateChange', toggleSF, false)
-      }
-      window.addEventListener('load', init, false)
-    })();
-  </script>
 
-  <prefpane id="safeflagpane" label="&safeflagpane.label;" image="chrome://cmsafeflag/skin/info-safe32.png">
-    <preferences>
-      <preference id="b-enable" name="extensions.safeflag.enable" type="bool"/>
-      <preference id="b-safe" name="extensions.safeflag.background.safe" type="bool"/>
-      <preference id="b-unsafe" name="extensions.safeflag.background.unsafe" type="bool"/>
-    </preferences>
-    <vbox>  
-      <checkbox id="c-enable" preference="b-enable" label="&c-enable.label;"/>
-      <checkbox id="c-safe" preference="b-safe" label="&c-safe.label;"/>
-      <checkbox id="c-unsafe" preference="b-unsafe" label="&c-unsafe.label;"/>
-    </vbox>
-  </prefpane>
+  <prefpane id="safeflagpane"
+            label="&safeflagpane.label;"
+            image="chrome://cmsafeflag/skin/info-safe32.png"
+            src="chrome://cmsafeflag/content/safeflagpane.xul"/>
 
 </prefwindow>

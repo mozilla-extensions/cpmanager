@@ -13,7 +13,16 @@
   <script src="chrome://cmsafeflag/content/flaglayout.js"></script>
   <script type="application/javascript">
     function openSafeFlagOptions(){
-      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", "chrome,titlebar,toolbar,centerscreen,dialog=yes", "safeflagpane").focus();
+      var features = "chrome,titlebar,toolbar,centerscreen";
+      try {
+        var instantApply = Components.classes["@mozilla.org/preferences-service;1"]
+                             .getService(Components.interfaces.nsIPrefService)
+                             .getBranch("browser.preferences.").getBoolPref("instantApply");
+        features += instantApply ? ",dialog=no" : ",modal";
+      } catch (e) {
+        features += ",modal";
+      }
+      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", features, "safeflagpane").focus();
     }
   </script>
 
