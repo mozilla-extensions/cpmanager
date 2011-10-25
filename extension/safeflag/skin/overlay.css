@@ -1,5 +1,13 @@
 @namespace html url(http://www.w3.org/1999/xhtml);
 
+#urlbar.sfbg_safe {
+	background-color: #cf9;
+}
+
+#urlbar.sfbg_unsafe {
+	background-color: red;
+}
+
 #safeflag-contextpopup{
 	-moz-appearance: tooltip;
 } 
