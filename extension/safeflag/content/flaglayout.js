@@ -114,7 +114,7 @@
 				popup.className = 'safeflag-popup-safe';
 			}
 			popup.openPopup(safeGetElementById('safeflag-icon'), 'after_start', 0, 0, false, false);
-		}, 100);
+		}, 400);
 	}
 
 	function _onMouseOutIcon() {
