@@ -25,6 +25,9 @@
       window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", features, "safeflagpane").focus();
     }
   </script>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="safeflag-strings" src="chrome://cmsafeflag/locale/safeflag.properties"/>
+  </stringbundleset>
 
   <hbox id="urlbar-icons">
     <image id="safeflag-icon" class="urlbar-icon" hidden="true" insertbefore="star-button"

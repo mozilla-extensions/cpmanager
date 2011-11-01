@@ -34,7 +34,7 @@
 		urlbar.className = default_className;
 		var icon = document.getElementById("safeflag-icon");
 		icon.src = _getIconPath('special/default');
-		icon.tooltipText = 'Safe Flag';
+		icon.tooltipText = MOA.SafeFlag.Utils.getString('tooltipSafeFlag');
 
 		if (!_isActivated())
 			return;
