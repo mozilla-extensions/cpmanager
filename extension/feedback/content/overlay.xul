@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://cmfeedback/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://cmfeedback/locale/overlay.dtd">
+<overlay id="moz-cn-feedback-overlay" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="chrome://cmfeedback/content/overlay.js"/>
+  <script src="chrome://cmfeedback/content/monitor.js"/>
+
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="moz_cn_feedback" class="toolbarbutton-1" tooltiptext="&title.label;" label="&title.label;" oncommand="MozCnFeedback.show_panel();" >
+		</toolbarbutton>
+	</toolbarpalette>
+
+	<popupset id="mainPopupSet">
+		<panel id="moz-cn-feedback-popup"  type="arrow" >
+			<vbox>
+				<vbox class="group">
+					<hbox>
+						<hbox>
+							<checkbox checked="true" id="moz-cn-feedback-checkbox" oncommand="document.getElementById('moz-cn-feedback-url').disabled = !this.checked;"></checkbox>
+							<label control="moz-cn-feedback-url" class="check_label">&check.label;</label>
+						</hbox>
+						<hbox class="feedback_close" onclick="MozCnFeedback.close_panel();"></hbox>
+					</hbox>
+					<hbox>
+						<textbox id="moz-cn-feedback-url" class="feedback_url"></textbox>
+					</hbox>
+				</vbox>
+				<vbox class="group">
+					<hbox >
+						<label control="moz-cn-feedback-comment">&suggest.title;</label>
+					</hbox>
+					<hbox>
+						<textbox id="moz-cn-feedback-comment" class="textarea" rows="3" multiline="true" placeholder="&suggest.box;" ></textbox>
+					</hbox>
+				</vbox>
+				<hbox class="group">
+					<label control="moz-cn-feedback-contact" class="moz-contact">&contact.title;</label>
+					<textbox id="moz-cn-feedback-contact" class="feedback_contact" multiline="false" placeholder="&contact.box;"></textbox>
+				</hbox>
+				<hbox>
+					<button id="moz-cn-feedback-submit" oncommand="MozCnFeedback.submit();">&submit.button;</button>
+					<hbox id="moz-cn-feedback-messp" style="display:none;"><vbox>&submit.process;</vbox></hbox>
+					<hbox id="moz-cn-feedback-messf" style="display:none;">
+						<vbox>&submit.fail;</vbox>
+						<vbox class="message" onclick="MozCnFeedback.resubmit();">&submit.retry;</vbox>
+						<vbox class="message" onclick="MozCnFeedback.close_panel();">&submit.close;</vbox>
+					</hbox>
+				</hbox>
+			</vbox>
+		</panel>
+		<panel id="moz-cn-feedback-success" type="arrow" >
+			<vbox class="success_box">
+				<hbox>
+					<hbox class="success_title">&success.title;</hbox>
+					<hbox class="feedback_close" onclick="MozCnFeedback.close_success();"></hbox>
+				</hbox>
+				<hbox class="des"><description>&success.des;</description></hbox>
+				<hbox class="links_title"><vbox>&link.title;</vbox></hbox>
+				<hbox class="success_links">
+					<label class="text-link" onclick="openUILinkIn('http://mozilla.com.cn', 'tab'); ">
+						&link.community;
+					</label>
+					<label class="text-link" onclick="openUILinkIn('http://weibo.com/firefox?c=spr_sw_sq_lm5_weibo_p002156', 'tab'); ">
+						&link.sina;
+					</label>
+					<label class="text-link last" onclick="openUILinkIn('http://t.qq.com/mozilla_firefox', 'tab'); ">
+						&link.tencent;
+					</label>
+				</hbox>
+				<hbox class="button-container">
+					<button oncommand="MozCnFeedback.close_success();">&submit.close;</button>
+				</hbox>
+			</vbox>
+		</panel>
+	</popupset>
+
+</overlay>

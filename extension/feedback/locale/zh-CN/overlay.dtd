@@ -1,0 +1,17 @@
+<!ENTITY title.label "意见反馈">
+<!ENTITY check.label "网站无法正常访问？ 报告网址：">
+<!ENTITY suggest.title "有话想对火狐说？ 反馈建议：">
+<!ENTITY suggest.box "对火狐的任何问题、意见、建议">
+<!ENTITY contact.title "留下您的联系方式">
+<!ENTITY contact.box "邮箱/QQ/MSN ……">
+<!ENTITY submit.button "提交">
+<!ENTITY submit.process "提交中……">
+<!ENTITY submit.fail "提交失败，请检查网络是否可用">
+<!ENTITY submit.retry "重试">
+<!ENTITY submit.close "关闭">
+<!ENTITY success.title "反馈提交成功！">
+<!ENTITY success.des "感谢您对火狐的支持，我们将尽快处理反馈意见，与您共同打造更好的火狐浏览器！">
+<!ENTITY link.title "欢迎通过以下方式，与我们保持联系:">
+<!ENTITY link.community "火狐社区">
+<!ENTITY link.sina "火狐新浪微博">
+<!ENTITY link.tencent "火狐腾讯微博">

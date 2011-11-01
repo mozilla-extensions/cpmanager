@@ -21,6 +21,11 @@ skin      cmnotification   classic/1.0   notification/skin/
 locale    cmnotification   en-US         notification/locale/en-US/
 locale    cmnotification   zh-CN         notification/locale/zh-CN/
 
+content   cmfeedback	feedback/content/
+locale    cmfeedback   en-US         feedback/locale/en-US/
+locale    cmfeedback   zh-CN         feedback/locale/zh-CN/
+skin	  cmfeedback   classic/1.0	 feedback/skin/
+
 overlay	chrome://browser/content/browser.xul	chrome://cmtracking/content/cpmanager.xul
 
 overlay	chrome://browser/content/browser.xul	chrome://cmsafeflag/content/overlay.xul
@@ -34,3 +39,6 @@ overlay   chrome://cmsafeflag/content/options.xul   chrome://cmnotification/cont
 
 overlay   chrome://browser/content/browser.xul   chrome://cmnotification/content/ff-overlay.xul appversion>=4.0
 override chrome://addonnotification/content/ff-overlay.xul chrome://cmnotification/content/notification_blank.xul
+
+overlay   chrome://browser/content/browser.xul   chrome://cmfeedback/content/overlay.xul appversion>=4.0
+style chrome://browser/content/browser.xul chrome://cmfeedback/skin/mac/overlay.css os=Darwin

@@ -1,0 +1,28 @@
+
+#moz_cn_feedback { list-style-image: url("chrome://cmfeedback/skin/feed_icon.png"); }
+#moz-cn-feedback-popup { margin-left:-10px; text-align:center; -moz-appearance: none; }
+#moz-cn-feedback-checkbox { margin:0 2px; }
+#moz-cn-feedback-popup textbox.textarea { text-align:left; font-size:12px; height:75px; width:324px; }
+#moz-cn-feedback-popup hbox.group, #moz-cn-feedback-popup vbox.group { margin:0 0 14px 0; }
+#moz-cn-feedback-popup hbox.group label.moz-contact { margin-top:5px; }
+#moz-cn-feedback-popup  textbox.feedback_url { width:324px; text-align:left; }
+#moz-cn-feedback-popup  textbox.feedback_contact { text-align:left; width:218px; -moz-padding-start:4px; padding:2px 2px 3px; font-size:12px; }
+#moz-cn-feedback-popup button { width:65px; text-align:center; margin-left:127px; cursor:pointer; }
+#moz-cn-feedback-popup label.check_label { -moz-margin-start:0; }
+#moz-cn-feedback-popup hbox.feedback_close { cursor:pointer; margin:-3px 0 0 106px; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent; }
+#moz-cn-feedback-messp, #moz-cn-feedback-messf { height:21px; margin:10px 0 0 5px; }
+
+#moz-cn-feedback-success { margin-left:-10px; text-align:center; -moz-appearance: none; }
+#moz-cn-feedback-success hbox.des { width:320px; margin:15px 0 50px; }
+#moz-cn-feedback-success hbox.des description { width:320px; text-align:left; line-height:22px; }
+#moz-cn-feedback-success hbox.links_title { width:320px; margin:0 0 10px 6px; }
+#moz-cn-feedback-success hbox.success_title { text-align:left; width:320px; font-size:22px; margin-left:6px; }
+#moz-cn-feedback-success hbox.feedback_close { cursor:pointer; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent; }
+#moz-cn-feedback-success hbox.success_links { height:25px; }
+#moz-cn-feedback-success hbox.success_links label.text-link { margin-right:52px;}
+#moz-cn-feedback-success hbox.success_links label.last { margin-right:0;}
+#moz-cn-feedback-success hbox.button-container { margin-top:20px; }
+#moz-cn-feedback-success button { cursor:pointer; margin-left:137px; }
+
+#moz-cn-feedback-messp vbox, #moz-cn-feedback-messf vbox { text-align:center; }
+#moz-cn-feedback-messf vbox.message { margin-left:5px; color:#07519A; cursor:pointer; }
