@@ -61,7 +61,7 @@
 			var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 			if (!!reminder) {
 				Cu['import']("resource://gre/modules/AddonManager.jsm")
-				AddonManager.getInstallForURL(reminder.xpi_url, function(addonInstall) {
+				AddonManager.getInstallForURL([reminder.xpi_url, "?src=external-cmnotification"].join(""), function(addonInstall) {
 					var webInstallListener = Cc["@mozilla.org/addons/web-install-listener;1"]
 												.getService(Ci.amIWebInstallListener);
 					AddonManager.addInstallListener(webInstallListener);
@@ -297,7 +297,9 @@
 
 	function _closeDayTip() {
 		MOA.AN.Lib.get('addon-notification-popup').hidePopup();
-		_hide_daytip_countdown.reset();
+		try {
+			_hide_daytip_countdown.destroy();
+		} catch(e) {}
 	};
 
 	function _track_daytip(action) {
@@ -410,8 +412,10 @@
 			_current_day_tip_reminder = _daytipreminders.shift();
 			MOA.AN.RuleCenter.clickOnNoMore(MOA.AN.RuleCenter.getRID(_current_day_tip_reminder));
 			_show_day_tips(_current_day_tip_reminder);
-			_hide_daytip_countdown.start();
-			_track_daytip();
+			try {
+				_hide_daytip_countdown.start();
+				_track_daytip();
+			} catch(e) {}
 		}, 1);
 	};
 
