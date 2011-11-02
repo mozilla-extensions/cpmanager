@@ -80,6 +80,7 @@ var MozCnFeedback = {
 			MozCnFeedback.el("moz-cn-feedback-messf").style.display = "block";
 		};
 		request.open("POST", url, true);
+		request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		request.send(content);
 	},
 
