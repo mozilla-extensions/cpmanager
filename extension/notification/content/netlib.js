@@ -38,14 +38,14 @@
 			if (request && request.notificationCallbacks)
 				return request.notificationCallbacks.getInterface(Ci.nsIWebProgress);
 		} catch (err ) {
-			// MOA.log(err);
+			// MOA.debug(err);
 		}
 
 		try {
 			if (request && request.loadGroup && request.loadGroup.groupObserver)
 				return request.loadGroup.groupObserver.QueryInterface(Ci.nsIWebProgress);
 		} catch (err) {
-			// MOA.log(err);
+			// MOA.debug(err);
 		}
 	};
 
@@ -58,7 +58,7 @@
 			if (webProgress)
 				return webProgress.DOMWindow;
 		} catch (err) {
-			// MOA.log(err);
+			// MOA.debug(err);
 		}
 
 		return null;
@@ -90,7 +90,7 @@
 				return tab;
 			}
 		} catch (err) {
-			MOA.log(err);
+			MOA.debug(err);
 		}
 
 		return null;
@@ -245,13 +245,13 @@
 				data += str.value;
 			} while (read != 0);
 		} catch(err) {
-			MOA.log('Error occured when reading ' + file_att.join('/') + ' : ' + err);
+			MOA.debug('Error occured when reading ' + file_att.join('/') + ' : ' + err);
 		} finally {
 			if (cstream) {
 				try {
 					cstream.close();
 				} catch (err) {
-					MOA.log('Error occured when closing reading ' + file_att.join('/') + ' : ' + err);
+					MOA.debug('Error occured when closing reading ' + file_att.join('/') + ' : ' + err);
 				}
 			}
 		}
@@ -274,13 +274,13 @@
 			converter.init(foStream, 'UTF-8', 0, 0);
 			converter.writeString(json);
 		} catch(err) {
-			MOA.log('Error occured when writing ' + file_att.join('/') + ' : ' + err);
+			MOA.debug('Error occured when writing ' + file_att.join('/') + ' : ' + err);
 		} finally {
 			if (converter) {
 				try {
 					converter.close();
 				} catch (err) {
-					MOA.log('Error occured when closing writing ' + file_att.join('/') + ' : ' + err);
+					MOA.debug('Error occured when closing writing ' + file_att.join('/') + ' : ' + err);
 				}
 			}
 		}

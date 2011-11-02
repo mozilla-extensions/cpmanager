@@ -137,7 +137,7 @@
 				var rule = _getRuleById(rule_id);
 				if (new RegExp(rule.regexp, 'i').test(httpChannel.URI.spec)) {
 					if (this.hitReminder(rule.reminder_id)) {
-						MOA.log('Rule valid: ' + this.getReminderById(rule.reminder_id).desc);
+						MOA.debug('Rule valid: ' + this.getReminderById(rule.reminder_id).desc);
 						MOA.AN.Notification.addNotification(rule.reminder_id, info);
 					}
 				}
@@ -315,8 +315,8 @@
 		var last_update = MOA.AN.Lib.getFilePref('update_rule_from_server', 0);
 
 		if ('' != MOA.AN.Lib.readStrFromProFile(MOA.AN.Lib.getProFilePath('rules.json'))
-			&& (Date.now() - last_update) < 86400000 * 7) {
-			MOA.debug('Rules has been updated in a week, skip.');
+			&& (Date.now() - last_update) < 86400000) {
+			MOA.debug('Rules has been updated in 24 hour, skip.');
 			return;
 		}
 
@@ -324,7 +324,7 @@
 		try {
 			_updateurl = MOA.AN.Lib.getPrefs().getCharPref('rules_update_url_sincefx4')
 		} catch (e) {
-			MOA.Log('Update url does not exists, abort.');
+			MOA.debug('Update url does not exists, abort.');
 			return;
 		}
 		// If this extension is not updated, rules of the old version will be needed.
@@ -338,7 +338,7 @@
 				try {
 					rules = JSON.parse(response.responseText);
 				} catch (err) {
-					MOA.log('Rules file\' format is wrong: ' + err);
+					MOA.debug('Rules file\' format is wrong: ' + err);
 				}
 
 				if (rules) {

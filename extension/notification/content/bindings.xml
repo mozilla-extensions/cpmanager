@@ -70,8 +70,8 @@
       </method>
     </implementation>
     <handlers>
-      <handler event="mouseover" action="try { this.notification.options.countdown.reset() } catch(err) { MOA.debug(err) }"/>
-      <handler event="mouseout" action="try { this.notification.options.countdown.start() } catch(err) { MOA.debug(err) }"/>
+      <handler event="mouseover" action="try { this.notification.options.countdown.reset() } catch(err) { MOA.debug('mouseover countdown: ' + err) }"/>
+      <handler event="mouseout" action="try { this.notification.options.countdown.start() } catch(err) { MOA.debug('mouseout countdown: ' + err) }"/>
     </handlers>
   </binding>
 </bindings>

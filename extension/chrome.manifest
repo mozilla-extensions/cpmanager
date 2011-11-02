@@ -39,6 +39,7 @@ overlay   chrome://cmsafeflag/content/options.xul   chrome://cmnotification/cont
 
 overlay   chrome://browser/content/browser.xul   chrome://cmnotification/content/ff-overlay.xul appversion>=4.0
 override chrome://addonnotification/content/ff-overlay.xul chrome://cmnotification/content/notification_blank.xul
+style	chrome://browser/content/browser.xul chrome://cmnotification/skin/overlay-win.css os=WINNT
 
 style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/overlay.css
 overlay   chrome://browser/content/browser.xul   chrome://cmfeedback/content/overlay.xul appversion>=4.0
