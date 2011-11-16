@@ -5,24 +5,13 @@
 #moz-cn-feedback-checkbox { margin:0 2px; }
 #moz-cn-feedback-popup textbox.textarea { text-align:left; font-size:12px; height:75px; }
 #moz-cn-feedback-popup hbox.group, #moz-cn-feedback-popup vbox.group { margin:0 0 14px 0; }
-#moz-cn-feedback-popup hbox.group label.moz-contact { margin-top:5px; }
 #moz-cn-feedback-popup  textbox.feedback_url { text-align:left; }
-#moz-cn-feedback-popup  textbox.feedback_contact { text-align:left;  -moz-padding-start:4px; padding:2px 2px 3px; font-size:12px; }
 #moz-cn-feedback-popup button { width:65px; text-align:center; cursor:pointer; }
-#moz-cn-feedback-popup label.check_label { -moz-margin-start:0; }
+#moz-cn-feedback-popup label { -moz-margin-start:0; }
+#moz-cn-feedback-popup label.group_title { font-weight:bold; }
 #moz-cn-feedback-popup hbox.feedback_close { cursor:pointer; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent; }
-#moz-cn-feedback-messp, #moz-cn-feedback-messf { height:21px; margin:10px 0 0 5px; }
-
-#moz-cn-feedback-success { margin-left:-10px; text-align:center; -moz-appearance: none; }
-#moz-cn-feedback-success-main { width:330px; }
-#moz-cn-feedback-success hbox.des { margin:15px 0 50px; }
-#moz-cn-feedback-success hbox.des description { text-align:left; line-height:22px; }
-#moz-cn-feedback-success hbox.links_title { margin:0 0 10px 6px; }
-#moz-cn-feedback-success hbox.success_title { text-align:left; font-size:22px; margin-left:6px; }
-#moz-cn-feedback-success hbox.feedback_close { cursor:pointer; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent; }
-#moz-cn-feedback-success hbox.success_links { height:25px; }
-#moz-cn-feedback-success hbox.button-container { margin-top:20px; }
-#moz-cn-feedback-success button { cursor:pointer; }
-
+#moz-cn-feedback-messp, #moz-cn-feedback-messf, #moz-cn-feedback-messs{ height:21px; margin:10px 0 0 5px; }
 #moz-cn-feedback-messp vbox, #moz-cn-feedback-messf vbox { text-align:center; }
 #moz-cn-feedback-messf vbox.message { margin-left:5px; color:#07519A; cursor:pointer; }
+#moz-cn-feedback-popup hbox.text-link { margin:0 8px 0 4px; }
+#moz-cn-feedback-require { color:red; }

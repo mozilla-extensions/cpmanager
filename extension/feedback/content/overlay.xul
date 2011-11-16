@@ -16,28 +16,48 @@
 				<vbox class="group">
 					<hbox>
 						<hbox>
-							<checkbox checked="true" id="moz-cn-feedback-checkbox" oncommand="document.getElementById('moz-cn-feedback-url').disabled = !this.checked;"></checkbox>
-							<label control="moz-cn-feedback-url" class="check_label">&check.label;</label>
+							<label class="group_title">&compat.title;</label>
 						</hbox>
 						<spacer flex="1" />
 						<hbox class="feedback_close" onclick="MozCnFeedback.close_panel();"></hbox>
 					</hbox>
 					<hbox>
-						<textbox flex="1" id="moz-cn-feedback-url" class="feedback_url"></textbox>
+						<hbox>
+							<label control="moz-cn-feedback-url">&compat.label;</label>
+						</hbox>
+						<vbox flex="1">
+							<hbox><textbox flex="1" id="moz-cn-feedback-url" class="feedback_url"></textbox></hbox>
+							<hbox class="text-link" onclick="MozCnFeedback.show_url();">&compat.fillurl;</hbox>
+						</vbox>
 					</hbox>
 				</vbox>
 				<vbox class="group">
 					<hbox >
-						<label control="moz-cn-feedback-comment">&suggest.title;</label>
+						<label class="group_title">&suggest.title;</label>
 					</hbox>
 					<hbox>
+						<vbox>
+							<hbox><label control="moz-cn-feedback-comment">&suggest.label;</label></hbox>
+							<hbox id="moz-cn-feedback-require" class="required" style="display:none;">
+								<label>&suggest.require;</label>
+							</hbox>
+						</vbox>
 						<textbox flex="1" id="moz-cn-feedback-comment" class="textarea" rows="3" multiline="true" placeholder="&suggest.box;" ></textbox>
 					</hbox>
 				</vbox>
-				<hbox class="group">
-					<label control="moz-cn-feedback-contact" class="moz-contact">&contact.title;</label>
-					<textbox flex="1" id="moz-cn-feedback-contact" class="feedback_contact" multiline="false" placeholder="&contact.box;"></textbox>
-				</hbox>
+
+				<vbox class="group">
+					<hbox>
+						<label class="group_title">&question.title;</label>
+					</hbox>
+					<hbox>
+						<hbox>
+							<label>&question.label;</label>
+						</hbox>
+						<hbox class="text-link comm_link" onclick="openUILinkIn('http://mozilla.com.cn', 'tab'); ">&question.community;</hbox>
+						<hbox class="text-link" onclick="openUILinkIn('http://weibo.com/firefox?c=spr_sw_sq_lm5_weibo_p002156', 'tab'); ">&question.weibo;</hbox>
+					</hbox>
+				</vbox>
 				<hbox>
 					<spacer flex="1" />
 					<button id="moz-cn-feedback-submit" oncommand="MozCnFeedback.submit();">&submit.button;</button>
@@ -47,34 +67,8 @@
 						<vbox class="message" onclick="MozCnFeedback.resubmit();">&submit.retry;</vbox>
 						<vbox class="message" onclick="MozCnFeedback.close_panel();">&submit.close;</vbox>
 					</hbox>
+					<hbox id="moz-cn-feedback-messs" style="display:none;"><vbox>&submit.success;</vbox></hbox>
 					<spacer flex="1" />
-				</hbox>
-			</vbox>
-		</panel>
-		<panel id="moz-cn-feedback-success" type="arrow" >
-			<vbox id="moz-cn-feedback-success-main" class="success_box">
-				<hbox>
-					<hbox class="success_title">&success.title;</hbox>
-					<spacer flex="1" />
-					<hbox class="feedback_close" onclick="MozCnFeedback.close_success();"></hbox>
-				</hbox>
-				<hbox class="des"><description flex="1">&success.des;</description></hbox>
-				<hbox class="links_title"><vbox>&link.title;</vbox></hbox>
-				<hbox class="success_links">
-					<label class="text-link" onclick="openUILinkIn('http://mozilla.com.cn', 'tab'); ">
-						&link.community;
-					</label>
-					<spacer flex="1" />
-					<label class="text-link" onclick="openUILinkIn('http://weibo.com/firefox?c=spr_sw_sq_lm5_weibo_p002156', 'tab'); ">
-						&link.sina;
-					</label>
-					<spacer flex="1" />
-					<label class="text-link last" onclick="openUILinkIn('http://t.qq.com/mozilla_firefox', 'tab'); ">
-						&link.tencent;
-					</label>
-				</hbox>
-				<hbox class="button-container">
-					<spacer flex="1" /><button oncommand="MozCnFeedback.close_success();">&submit.close;</button><spacer flex="1" />
 				</hbox>
 			</vbox>
 		</panel>

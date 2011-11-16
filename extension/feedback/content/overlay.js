@@ -10,10 +10,7 @@ var MozCnFeedback = {
 		delete this.panel;
 		return this.panel = this.el("moz-cn-feedback-popup");
 	},
-	get spanel() {
-		delete this.spanel;
-		return this.spanel = this.el("moz-cn-feedback-success");
-	},
+
 	get toolbarbutton() {
 		delete this.toolbarbutton;
 		if(this.el('moz_cn_feedback'))
@@ -21,10 +18,9 @@ var MozCnFeedback = {
 	},
 
 	show_url: function() {
-		if (el("moz-cn-feedback-checkbox").checked) {
-			el('moz-cn-feedback-url').disabled = "false";
-		} else {
-			el('moz-cn-feedback-url').disabled = "true";
+		if (MozCnFeedback.el("moz-cn-feedback-url").disabled == false) {
+			this.el("moz-cn-feedback-require").style.display = "none";
+			this.el("moz-cn-feedback-url").value = gBrowser.contentDocument.location;
 		}
 	},
 
@@ -36,46 +32,43 @@ var MozCnFeedback = {
 	},
 
 	show_success: function() {
-		if (this.spanel.state === "open" || this.spanel.state === "showing") {
-			this.spanel.hidePopup();
-		}
-		this.close_panel();
-		this.spanel.openPopup(this.toolbarbutton, "after_end", -15, 0, false, false);
+		this.el("moz-cn-feedback-messp").style.display = "none";
+		this.el("moz-cn-feedback-messf").style.display = "none";
+		this.el("moz-cn-feedback-submit").style.display = "none";
+		this.el("moz-cn-feedback-messs").style.display = "block";
+		this.el("moz-cn-feedback-url").reset();
+		this.el("moz-cn-feedback-comment").reset();
+		window.setTimeout(function() {
+			MozCnFeedback.close_panel();
+			MozCnFeedback.input_recover();
+		}, 2000);
 	},
 
 	reset_button: function() {
-		MozCnFeedback.el("moz-cn-feedback-messp").style.display = "none";
-		MozCnFeedback.el("moz-cn-feedback-messf").style.display = "none";
-		MozCnFeedback.el("moz-cn-feedback-submit").style.display = "block";
-		MozCnFeedback.el("moz-cn-feedback-comment").reset();
-		MozCnFeedback.el("moz-cn-feedback-contact").reset();
+		this.el("moz-cn-feedback-messp").style.display = "none";
+		this.el("moz-cn-feedback-messf").style.display = "none";
+		this.el("moz-cn-feedback-messs").style.display = "none";
+		this.el("moz-cn-feedback-submit").style.display = "block";
+		this.el("moz-cn-feedback-url").reset();
 	},
 
 	close_panel: function() {
-		MozCnFeedback.reset_button();
+		this.reset_button();
+		this.el("moz-cn-feedback-require").style.display = "none";
 		if (this.panel.state === "open" || this.panel.state === "showing") {
 			this.panel.hidePopup();
 		}
 	},
 
-	close_success: function() {
-		if (this.spanel.state === "open" || this.spanel.state === "showing") {
-			this.spanel.hidePopup();
-		}
-	},
-
 	send_request:function() {
-		if (this.el("moz-cn-feedback-url").disabled) {
-			var content = 'comment=' + this.el("moz-cn-feedback-comment").value + '&contact=' + this.el("moz-cn-feedback-contact").value;
-		} else {
-			var content = 'url=' + this.el("moz-cn-feedback-url").value + '&comment=' + this.el("moz-cn-feedback-comment").value + '&contact=' + this.el("moz-cn-feedback-contact").value;
-		}
+		var content = 'url=' + this.el("moz-cn-feedback-url").value + '&comment=' + this.el("moz-cn-feedback-comment").value;
 		var url = "http://i.g-fox.cn/apply/feed_addon.php";
 		var request = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
 		request.onload = function(aEvent) {
 			MozCnFeedback.show_success();
 		};
 		request.onerror = function(aEvent) {
+			MozCnFeedback.input_recover();
 			MozCnFeedback.el("moz-cn-feedback-messp").style.display = "none";
 			MozCnFeedback.el("moz-cn-feedback-messf").style.display = "block";
 		};
@@ -84,15 +77,37 @@ var MozCnFeedback = {
 		request.send(content);
 	},
 
+	input_disable:function() {
+		this.el("moz-cn-feedback-comment").disabled = true;
+		this.el("moz-cn-feedback-url").disabled = true;
+	},
+
+	input_recover:function() {
+		this.el("moz-cn-feedback-comment").disabled = false;
+		this.el("moz-cn-feedback-url").disabled = false;
+	},
+
 	submit:function() {
-		this.send_request();
-		this.el("moz-cn-feedback-submit").style.display = "none";
-		this.el("moz-cn-feedback-messp").style.display = "block";
+		if (this.el("moz-cn-feedback-url").value == '' && this.el("moz-cn-feedback-comment").value == '') {
+			this.el("moz-cn-feedback-require").style.display = "block";
+		} else {
+			this.send_request();
+			this.input_disable();
+			this.el("moz-cn-feedback-require").style.display = "none";
+			this.el("moz-cn-feedback-submit").style.display = "none";
+			this.el("moz-cn-feedback-messp").style.display = "block";
+		}
 	},
 
 	resubmit:function() {
-		MozCnFeedback.el("moz-cn-feedback-messf").style.display = "none";
-		this.el("moz-cn-feedback-messp").style.display = "block";
-		this.send_request();
+		if (this.el("moz-cn-feedback-url").value == '' && this.el("moz-cn-feedback-comment").value == '') {
+			this.el("moz-cn-feedback-require").style.display = "block";
+		} else {
+			this.input_disable();
+			this.el("moz-cn-feedback-require").style.display = "none";
+			this.el("moz-cn-feedback-messf").style.display = "none";
+			this.el("moz-cn-feedback-messp").style.display = "block";
+			this.send_request();
+		}
 	}
 };

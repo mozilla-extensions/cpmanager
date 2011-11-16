@@ -3,9 +3,8 @@
 
 	var FeedbackListener = {
 		onLocationChange: function(webProgress, request, uri) {
-			document.getElementById("moz-cn-feedback-url").value = uri.spec;
-			MozCnFeedback.reset_button();
-		},
+			document.getElementById("moz-cn-feedback-url").reset();
+		}
 	};
 
 	function installButton() {
@@ -32,11 +31,11 @@
 				installButton();
 			}
 			MozCnFeedback.panel.addEventListener("popupshown", function(e) {
-				document.getElementById("moz-cn-feedback-url").value = gBrowser.contentDocument.location;
 				gBrowser.addProgressListener(FeedbackListener);
 			}, false );
 			MozCnFeedback.panel.addEventListener("popuphidden", function(e) {
 				gBrowser.removeProgressListener(FeedbackListener);
+				document.getElementById("moz-cn-feedback-url").reset();
 			}, false );
 		}
 	}
