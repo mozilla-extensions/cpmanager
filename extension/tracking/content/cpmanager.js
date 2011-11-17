@@ -1,9 +1,12 @@
 (function() {
-	Components.utils.import("resource://cmtracking/cpmanager_mod.js");
+	var tmp = {};
+	Components.utils.import("resource://cmtracking/cpmanager_mod.js", tmp);
 	if(!isFirefoxLowerThan4()){
-		Components.utils.import("resource://gre/modules/Services.jsm");
-		Components.utils.import("resource://gre/modules/ctypes.jsm");
+		Components.utils.import("resource://gre/modules/Services.jsm", tmp);
+		Components.utils.import("resource://gre/modules/ctypes.jsm", tmp);
 	}
+	var {cp_mod, cpmanager_FileUtil, cpmanager_LOG, Services, ctypes} = tmp;
+	
 	function _getLib() {
 		var lib = null;
 		var uri = Services.io.newURI('resource://tracking-components/cpmanager.dll', null, null);
@@ -12,8 +15,8 @@
 		}
 		return lib;
 	}
-	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.php";
-	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.php";
+	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
+	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
 	var cpmanager_xmlHttp = null;
 	var cpmanager_init_delay_initial = 5000;
 	var cpmanager_init_delay = 15*60*1000;
@@ -146,6 +149,48 @@
 	  	}
 	}
 
+	function cpmanager_paramSyncStatus() {
+		try {			
+			if (!Weave) {
+				Cu.import('resource://services-sync/main.js');
+			}
+			var status = Weave.Status.checkSetup();
+			switch (status) {
+				case Weave.CLIENT_NOT_CONFIGURED:
+					return "&syncst=cnf";
+				case Weave.STATUS_OK:
+					return "&syncst=ok";
+				case Weave.LOGIN_FAILED:
+					return "&syncst=elf";
+				default:
+					return "&syncst=" + status;
+			}
+		} catch (e) {
+	  		cpmanager_LOG(e);
+			return "";
+	  	}
+	}
+
+	function cpmanager_paramCEHome() {
+		var homePrefBranch = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService).getBranch('browser.startup.');
+		var homePref = homePrefBranch.getComplexValue("homepage", Ci.nsIPrefLocalizedString).data;
+		var usingCEHome = [/^about:cehome$/, /^http:\/\/[a-z]+\.firefoxchina\.cn/].some(function(regex) {
+			return regex.test(homePref);
+		});
+		return "&cehome=" + usingCEHome;
+	}
+
+	function cpmanager_paramPrevSessionLen() {
+		return "&prevsessionlen=" + cpmanager_getPrefValue('prevsessionlen', 0);
+	}
+
+	function cpmanager_recordSessionLen() {
+		cp_mod.winCount -= 1;
+		if (!cp_mod.winCount) {
+			cpmanager_setPrefValue('prevsessionlen', (Date.now() - cp_mod.startTime) / (60 * 1000));
+		}
+	}
+
 	//get the new list from internet
 	function cpmanager_init(){
 		cpmanager_LOG("cpmanager: cpmanager inited");
@@ -172,7 +217,7 @@
 
 	//get AddonListNew and start the installation check.
 	function cpmanager_startUpdate(){
-		var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate();
+		var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
@@ -218,6 +263,9 @@
 
 	//Application.events.addListener("load",listener);
 	function cpmanager_loadEventHandler(event){
+		cp_mod.startTime = cp_mod.startTime || Date.now();
+		cp_mod.winCount += 1;
+		window.addEventListener('unload', cpmanager_recordSessionLen, false);
 		if (cp_mod.touched) return;
 		cp_mod.touched = true;
 	// all change to init_count must happen in this function, because other functions will be executed more than one time,

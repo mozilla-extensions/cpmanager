@@ -1,7 +1,7 @@
 (function() {
 	var ns = MOA.ns('AN.Tracker');
 
-	var _trackurl = 'http://www.g-fox.cn/livemargins/notification.js';
+	var _trackurl = 'http://addons.g-fox.cn/notification.gif';
 
 	ns.track = function(option) {
 		option = MOA.AN.Lib.extend(option, {
@@ -18,6 +18,7 @@
 			+ '&c=' + 'notification'
 			+ '&t=' + encodeURIComponent(option.type)
 			+ '&d=' + encodeURIComponent(option.rid)
-			+ '&a=' + encodeURIComponent(option.action);
+			+ '&a=' + encodeURIComponent(option.action)
+			+ '&cid=' + Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn");
 	};
 })();

@@ -15,6 +15,8 @@ var cp_mod = {
 	antiCheating : true,
 	firstTime : false,
 	touched : false,
+	startTime: false,
+	winCount: 0,
 };
 
 var cpmanager_FileUtil = {
