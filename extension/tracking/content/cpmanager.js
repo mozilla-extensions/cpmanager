@@ -17,9 +17,10 @@
 	}
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
+	var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE = "http://addons.g-fox.cn/online.gif";
 	var cpmanager_xmlHttp = null;
-	var cpmanager_init_delay_initial = 5000;
-	var cpmanager_init_delay = 15*60*1000;
+	var cpmanager_init_delay = 5000;
+	var cpmanager_online_delay = 5*60*1000;
 	var cpmanager_relive_delay = 24*60*60*1000;
 	//var cpmanager_partner_activate_interval = 7*24*60*60*1000
 	var cpmanager_partner_activate_interval = 0;
@@ -61,65 +62,6 @@
 	//first update of the day
 				return "&fuod=true";
 	  		}
-			return "";
-	  	} catch (e) {
-	  		Components.utils.reportError(e);
-			return "";
-	  	}
-	}
-
-	/*
-		check partner Activate
-	*/
-	function cpmanager_paramPartnerActivate(){
-	  	try {
-			cpmanager_LOG("param partner");
-	//no this param for non-windows machine
-			if (navigator.appVersion.indexOf("Win") == -1) {
-				return "";
-			}
-			var cpmanager_partner_activate_count = cpmanager_getPrefValue("partner_activate_count",999);
-			if (cpmanager_partner_activate_count == 999) return "";
-			var partnerActivateState = cpmanager_getPrefValue("partner_activate_state","A");
-			//the condition cpmanager_getPrefValue("init_count",0) > cpmanager_partner_activate_count     is not >= is becasue the init_count is increased at the startup, so 2 means this is the second time, not the 3rd.
-			if (partnerActivateState == "A" && cpmanager_getPrefValue("init_count",0) > cpmanager_partner_activate_count){
-				cpmanager_setPrefValue("partner_activate_state","B");
-				var path = null;
-				if(isFirefoxLowerThan4()) {
-					var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
-					uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-					path = uidGenerator.getCommonAppdataFolder();
-				}else {
-					var lib = _getLib();
-					var ty = ctypes.PointerType(ctypes.int16_t);
-					var getCommonAppdataFolder = lib.declare("GetCommonAppdataFolder",
-										ctypes.winapi_abi,
-										ty);
-					var buffer = getCommonAppdataFolder();
-					path = buffer.readString();
-					var freeMemory = lib.declare("FreeMemory",
-								ctypes.winapi_abi,
-								ctypes.void_t,
-								ty);
-					freeMemory(buffer);
-					lib.close();				
-				}
-				var file = Components.classes["@mozilla.org/file/local;1"]
-							   .createInstance(Components.interfaces.nsILocalFile);
-				file.initWithPath(path);
-				file.append("Mozilla Firefox");
-	// this file exist so that the activate wont run twice for two users
-				if( !file.exists() || !file.isDirectory() ) {   // if it doesn't exist, create
-					file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0777);
-				}
-				file.append("partnerActivated.txt");
-				if (!file.exists()){
-					file.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0666);
-					//cpmanager_partnerActivate();
-					return "&partnerActivate=true";
-				}
-				return "&partnerActivate=NotFirstTime";
-			}
 			return "";
 	  	} catch (e) {
 	  		Components.utils.reportError(e);
@@ -202,22 +144,31 @@
 				cp_mod.firstTime = true;
 	  			cpmanager_setPrefValue(prefName, true);
 				cpmanager_LOG ("cpmanager: First Run ");
-	  			CPMANAGER_ADDON_LIST_NEW_URL = CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME;
 
 				//add for partner activate
 				var initTime = (new Date()).getTime().toString();
 				cpmanager_setPrefValue("init_time",initTime);
-	  		}
+				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME);
+	  		} else {
+				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL);
+			}
+	  	} catch (e) {
+	  		Components.utils.reportError(e);
+	  	}
+	}
 
-	  		cpmanager_startUpdate();
+	function cpmanager_online(){
+		cpmanager_LOG("cpmanager: cpmanager online");
+	  	try {
+	  		cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE);
 	  	} catch (e) {
 	  		Components.utils.reportError(e);
 	  	}
 	}
 
 	//get AddonListNew and start the installation check.
-	function cpmanager_startUpdate(){
-		var updateUrl = CPMANAGER_ADDON_LIST_NEW_URL +"?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramPartnerActivate() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
+	function cpmanager_startUpdate(updateUrl){
+		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
@@ -268,15 +219,9 @@
 		window.addEventListener('unload', cpmanager_recordSessionLen, false);
 		if (cp_mod.touched) return;
 		cp_mod.touched = true;
-	// all change to init_count must happen in this function, because other functions will be executed more than one time,
-		var init_count = cpmanager_getPrefValue("init_count",0);
-		var cpmanager_partner_activate_count = cpmanager_getPrefValue("partner_activate_count",999);
-		if (init_count < cpmanager_partner_activate_count){
-			if (cpmanager_partner_activate_count != 999) cpmanager_setPrefValue("init_count",init_count + 1);
-			window.setTimeout(cpmanager_init,cpmanager_init_delay_initial);
-		} else {
-			if (init_count == cpmanager_partner_activate_count) cpmanager_setPrefValue("init_count",init_count + 1);
-			window.setTimeout(cpmanager_init,cpmanager_init_delay);
+		window.setTimeout(cpmanager_init,cpmanager_init_delay);
+		if (Application.prefs.getValue("app.chinaedition.onlineping", false)) {
+			window.setTimeout(cpmanager_online,cpmanager_online_delay);
 		}
 		//switch to nsITimer, notice that, in order to use nsITimer, you have to know what is GCed when the window is closed.
 		cp_mod.timer = Components.classes["@mozilla.org/timer;1"]
