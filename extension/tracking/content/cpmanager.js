@@ -49,9 +49,8 @@
 	/*
 		return whether this is the first update of the day as a param.
 	*/
-	function cpmanager_paramFUOD(){
+	function cpmanager_paramFUOD(prefName){
 	  	try {
-			var prefName = "update_date";
 	//		var partnerID = prefs.getCharPref("mozilla.partner.id");
 			var lastdate = cpmanager_getPrefValue(prefName,"");
 	//			this.cpmanager_LOG(prefName + " = " + initialized);
@@ -148,9 +147,9 @@
 				//add for partner activate
 				var initTime = (new Date()).getTime().toString();
 				cpmanager_setPrefValue("init_time",initTime);
-				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME);
+				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME, 'update_date');
 	  		} else {
-				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL);
+				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL, 'update_date');
 			}
 	  	} catch (e) {
 	  		Components.utils.reportError(e);
@@ -160,15 +159,15 @@
 	function cpmanager_online(){
 		cpmanager_LOG("cpmanager: cpmanager online");
 	  	try {
-	  		cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE);
+	  		cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE, 'online_date');
 	  	} catch (e) {
 	  		Components.utils.reportError(e);
 	  	}
 	}
 
 	//get AddonListNew and start the installation check.
-	function cpmanager_startUpdate(updateUrl){
-		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD() + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
+	function cpmanager_startUpdate(updateUrl, fuodPref){
+		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
@@ -233,6 +232,9 @@
 						if (win) {
 						//	win.cpmanager_LOG("lalalalala");
 							win.cpmanager_init();
+							if (win.Application.prefs.getValue("app.chinaedition.onlineping", false)) {
+								win.cpmanager_online();
+							}
 						}
 				} };
 
