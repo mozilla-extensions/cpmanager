@@ -52,7 +52,11 @@
 			"desc":"收藏网页？点这里！<br />一键收藏当前网页，Ctrl+B则可打开书签侧栏、对已经收藏的网页进行整理<br />",
 			"url":"http://www.firefox.com.cn/video/?fid=2"
 		}],
-		"rules": []
+		"rules": [],
+		"consts": {
+			"max_daily_addon": 1,
+			"later_wait_days": 3
+		}
 	};
 
 	ns.VERSION = '0.5';

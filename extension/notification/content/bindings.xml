@@ -42,6 +42,9 @@
     <implementation>
       <constructor><![CDATA[
         this.getByAID('title').value = this.notification.options.title;
+        if (this.notification.options.closeicon) {
+            this.getByAID('closebutton').addEventListener('command', this.notification.options.closeicon, false)
+        }
         let links = this.notification.options.links;
         for (var link in links) {
             if (link == 'learnmore') {

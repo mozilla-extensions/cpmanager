@@ -166,6 +166,9 @@
 			},
 			countdown: _notify_countdown,
 			title: MOA.AN.Lib.getString('addon.title'),
+			closeicon: function() {
+				_track_addon_noti('closeicon', tabId);
+			},
 			links: {
 				learnmore: {
 					text: MOA.AN.Lib.getString('addon.LearnMore'),
@@ -331,8 +334,8 @@
 		popupnotification.setAttribute("popupid", "addon-notification-daytip");
 		popupnotification.setAttribute("closebuttoncommand", "MOA.AN.Notification.onClickDayTipCloseIcon()");
 		var options = {
-			title: title,
 			countdown: _hide_daytip_countdown,
+			title: title,
 			links: {
 				close: {
 					text: MOA.AN.Lib.getString('daytip.CloseDaytip'),

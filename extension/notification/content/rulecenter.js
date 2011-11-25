@@ -43,6 +43,8 @@
 	var _daytips_avail = [];
 	var _reminders_avail = {};
 	var _rules_avail = [];
+	var _hit_times = {};
+	var _max_daily_addon = 0;
 
 	var _getRuleById = function(id) {
 		return _rules[id];
@@ -74,25 +76,27 @@
 			var rule_id = reminder.rule_ids[i];
 			var rule = _rules[rule_id];
 
-			switch (rule.trigger) {
-				case 'window':
-					var domain_regexps = _regexps[_rules[rule_id].domain];
-					if (!!domain_regexps) {
-						delete domain_regexps[rule_id];
+			if (rule) {
+				switch (rule.trigger) {
+					case 'window':
+						var domain_regexps = _regexps[_rules[rule_id].domain];
+						if (!!domain_regexps) {
+							delete domain_regexps[rule_id];
 
-						// if rules under domain is empty, delete domain
-						var has_more = false;
-						for (var tmp in domain_regexps) {
-							has_more = true;
-							break;
+							// if rules under domain is empty, delete domain
+							var has_more = false;
+							for (var tmp in domain_regexps) {
+								has_more = true;
+								break;
+							}
+							if (!has_more)
+								delete _regexps[_rules[rule_id].domain];
 						}
-						if (!has_more)
-							delete _regexps[_rules[rule_id].domain];
-					}
-					break;
-			}
+						break;
+				}
 
-			delete _rules[rule_id];
+				delete _rules[rule_id];
+			}
 		}
 		delete _reminders[rid];
 	};
@@ -106,15 +110,12 @@
 		}
 	};
 
-	// TODO save hittimes
-	var hittimes = {};
 	ns.hitReminder = function(rid) {
 		var reminder = this.getReminderById(rid);
-		if (!hittimes[rid])
-			hittimes[rid] = 0;
 
-		hittimes[rid] = hittimes[rid] + 1;
-		return hittimes[rid] >= (reminder.times ? reminder.times : 1);
+		_hit_times[rid] = _hit_times[rid] + 1;
+		MOA.AN.Lib.setFilePref(rid + '__hits', _hit_times[rid]);
+		return _hit_times[rid] >= (reminder.times ? reminder.times : 1);
 	};
 
 	ns.checkAndShow = function(httpChannel, info) {
@@ -161,11 +162,11 @@
 		MOA.AN.Lib.setFilePref('addon_show_time', Date.now());
 		var dailyAddonCount = MOA.AN.Lib.getFilePref('addon_daily_count', 0) + 1;
 		MOA.AN.Lib.setFilePref('addon_daily_count', dailyAddonCount);
-		if (dailyAddonCount >= MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon')) {
-			_reminders = {};
+		if (dailyAddonCount >= _max_daily_addon) {
+			//_reminders = {};
 			_regexps = {};
 			_rules = {};
-			MOA.AN.Notification.clearAll()
+			//MOA.AN.Notification.clearAll()
 		}
 	}
 
@@ -181,6 +182,8 @@
 		_daytips_avail = [];
 		_reminders_avail = {};
 		_rules_avail = [];
+		_hit_times = {};
+		_max_daily_addon = 0;
 		init();
 	};
 
@@ -227,6 +230,12 @@
 
 	function init() {
 		var defaultRules = _getAvailableRules();
+		defaultRules = MOA.AN.Lib.extend(defaultRules, {
+			consts: {
+				max_daily_addon: 1,
+				later_wait_days: 3
+			}
+		})
 		var prefs = MOA.AN.Lib.getFilePrefs();
 		var now = Date.now();
 
@@ -236,8 +245,9 @@
 				MOA.AN.Lib.setFilePref('addon_daily_count', 0)
 			}
 		}
-		var maxDailyAddon = MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon');
-		maxDailyAddon -= MOA.AN.Lib.getFilePref('addon_daily_count', 0);
+		var alt_max_daily_addon = MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon');
+		_max_daily_addon = alt_max_daily_addon || defaultRules.consts.max_daily_addon;
+		var max_daily_addon = _max_daily_addon - MOA.AN.Lib.getFilePref('addon_daily_count', 0);
 
 		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
 			var reminder = defaultRules.reminders[i];
@@ -252,18 +262,19 @@
 			} else if (reminder.type == 'addon') {
 				_reminders_avail[reminder_id] = reminder;
 
-				if (maxDailyAddon <= 0) {
+				if (max_daily_addon <= 0) {
 					continue
 				}
 				// why 30 days ?
 				if (!!prefs[reminder_id + '__nomore']/** && now - prefs[reminder_id + '__nomore'] < 2592000000*/)
 					continue;
 
-				// one day
-				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < 86400000)
+				var laterWaitDays = defaultRules.consts.later_wait_days;
+				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < laterWaitDays * 86400000)
 					continue;
 
 				_reminders[reminder_id] = reminder;
+				_hit_times[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__hits', 0);
 				reminder.rule_ids = [];			// rules' id which uses the reminder
 			}
 		}
