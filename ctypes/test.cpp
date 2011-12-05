@@ -918,10 +918,10 @@ extern "C" void _declspec(dllexport) GetID(wchar_t* retval)
 //NS_IMETHODIMP CUidGenerator::GetActivationKey(const PRUnichar *sn, nsAString & _retval)
 extern "C" wchar_t DLLEXPORT *GetActivationKey()
 {
-	SYSTEMTIME time;
+/*	SYSTEMTIME time;
 	GetSystemTime(&time);
 	char lpszTime[256];
-	sprintf_s(lpszTime,255,"%u:%u:%u:%u_%u_%u_%u",time.wHour,time.wMinute,time.wSecond,time.wMilliseconds,time.wYear,time.wMonth,time.wDay);
+	sprintf_s(lpszTime,255,"%u:%u:%u:%u_%u_%u_%u",time.wHour,time.wMinute,time.wSecond,time.wMilliseconds,time.wYear,time.wMonth,time.wDay);*/
 	char lpszCPUHD[1024];
 	md5wrapper * md5 = new md5wrapper();
 	string md5_1;
@@ -940,11 +940,12 @@ extern "C" wchar_t DLLEXPORT *GetActivationKey()
 		md5_2 = md5->getHashFromString("");
 	} else {
 		md5_2 = md5->getHashFromString(lpszMac);
-	}*/
+	}
 	actCode = "time=";
 	actCode += lpszTime;
 	actCode += "&key1=";
-//	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;
+	actCode += md5_1 + "&key2=" + md5_2+"&sn="+ lpszSN + "&random2=" + random2;*/
+	actCode = "key1=";
 	actCode += md5_1;
 	Encrypt enc;
 	char key[25];
