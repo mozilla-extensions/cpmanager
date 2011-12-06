@@ -17,10 +17,12 @@
 	}
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
-	var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE = "http://addons.g-fox.cn/online.gif";
+	var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE = "http://www.g-fox.cn/online.gif";
+	var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE2 = "http://www.g-fox.cn/online15.gif";
 	var cpmanager_xmlHttp = null;
 	var cpmanager_init_delay = 5000;
 	var cpmanager_online_delay = 5*60*1000;
+	var cpmanager_online_delay2 = 15*60*1000;
 	var cpmanager_relive_delay = 24*60*60*1000;
 	//var cpmanager_partner_activate_interval = 7*24*60*60*1000
 	var cpmanager_partner_activate_interval = 0;
@@ -80,9 +82,9 @@
 	function cpmanager_paramActCode() {
 		try {
 			if (navigator.appVersion.indexOf("Win")!=-1) {
-				return "&actcode=" + cpmanager_getActCode();
+				return "&ver=2&actcode2=" + cpmanager_getActCode();
 			} else {
-				return "";
+				return "&ver=2&actcode2=" + encodeURIComponent(cpmanager_getPrefValue("uuid", ""));
 			}
 		} catch (e) {
 	  		Components.utils.reportError(e);
@@ -125,6 +127,14 @@
 		return "&prevsessionlen=" + cpmanager_getPrefValue('prevsessionlen', 0);
 	}
 
+	function cpmanager_paramActive() {
+		if (((new Date()).getTime() - parseInt(cpmanager_getPrefValue("init_time",0))) / 86400000 >= 15) {
+			return "&days=15";
+		} else {
+			return "";
+		}
+	}
+
 	function cpmanager_recordSessionLen() {
 		cp_mod.winCount -= 1;
 		if (!cp_mod.winCount) {
@@ -143,6 +153,9 @@
 				cp_mod.firstTime = true;
 	  			cpmanager_setPrefValue(prefName, true);
 				cpmanager_LOG ("cpmanager: First Run ");
+
+				var uuidgen = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
+				cpmanager_setPrefValue("uuid", uuidgen.generateUUID().number);
 
 				//add for partner activate
 				var initTime = (new Date()).getTime().toString();
@@ -165,9 +178,18 @@
 	  	}
 	}
 
+	function cpmanager_online2(){
+		cpmanager_LOG("cpmanager: cpmanager online2");
+	  	try {
+	  		cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE2, 'online_date2');
+	  	} catch (e) {
+	  		Components.utils.reportError(e);
+	  	}
+	}
+
 	//get AddonListNew and start the installation check.
 	function cpmanager_startUpdate(updateUrl, fuodPref){
-		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen();
+		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen() + cpmanager_paramActive();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
@@ -219,9 +241,8 @@
 		if (cp_mod.touched) return;
 		cp_mod.touched = true;
 		window.setTimeout(cpmanager_init,cpmanager_init_delay);
-		if (Application.prefs.getValue("app.chinaedition.onlineping", false)) {
-			window.setTimeout(cpmanager_online,cpmanager_online_delay);
-		}
+		window.setTimeout(cpmanager_online,cpmanager_online_delay);
+		window.setTimeout(cpmanager_online2,cpmanager_online_delay2);
 		//switch to nsITimer, notice that, in order to use nsITimer, you have to know what is GCed when the window is closed.
 		cp_mod.timer = Components.classes["@mozilla.org/timer;1"]
 	       .createInstance(Components.interfaces.nsITimer);
@@ -229,12 +250,11 @@
 					wm: Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator),
 					notify: function(timer) {
 						var win = this.wm.getMostRecentWindow("navigator:browser");
-						if (win) {
+						if (win && win.MOA && win.MOA.CPManager) {
 						//	win.cpmanager_LOG("lalalalala");
-							win.cpmanager_init();
-							if (win.Application.prefs.getValue("app.chinaedition.onlineping", false)) {
-								win.cpmanager_online();
-							}
+							win.setTimeout(win.MOA.CPManager.cpmanager_init(), win.MOA.CPManager.cpmanager_init_delay);
+							win.setTimeout(win.MOA.CPManager.cpmanager_online(), win.MOA.CPManager.cpmanager_online_delay);
+							win.setTimeout(win.MOA.CPManager.cpmanager_online2(), win.MOA.CPManager.cpmanager_online_delay2);
 						}
 				} };
 
@@ -286,4 +306,12 @@
 		cpmanager_loadEventHandler();
 		setXpinstallWhitelist();
 	}, false);
+	
+	var ns = MOA.ns('CPManager');
+	ns.cpmanager_init = cpmanager_init;
+	ns.cpmanager_online = cpmanager_online;
+	ns.cpmanager_online2 = cpmanager_online2;
+	ns.cpmanager_init_delay = cpmanager_init_delay;
+	ns.cpmanager_online_delay = cpmanager_online_delay;
+	ns.cpmanager_online_delay2 = cpmanager_online_delay2;
 })();

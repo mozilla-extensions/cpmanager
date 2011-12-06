@@ -7,7 +7,6 @@
 <overlay id="safeflag" xmlns:html="http://www.w3.org/1999/xhtml"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script src="chrome://cmsafeflag/content/moa.js"></script>
   <script src="chrome://cmsafeflag/content/utils.js"></script>
   <script src="chrome://cmsafeflag/content/safeflag.js"></script>
   <script src="chrome://cmsafeflag/content/flaglayout.js"></script>
