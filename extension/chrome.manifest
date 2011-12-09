@@ -44,3 +44,5 @@ style	chrome://browser/content/browser.xul chrome://cmnotification/skin/overlay-
 style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/overlay.css
 overlay   chrome://browser/content/browser.xul   chrome://cmfeedback/content/overlay.xul appversion>=4.0
 style chrome://browser/content/browser.xul chrome://cmfeedback/skin/mac/overlay.css os=Darwin
+style chrome://browser/content/browser.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
+style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
