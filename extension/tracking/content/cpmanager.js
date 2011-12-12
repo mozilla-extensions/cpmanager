@@ -135,6 +135,10 @@
 		}
 	}
 
+	function cpmanager_paramLocale() {
+	  	return "&locale=" + Application.prefs.getValue("general.useragent.locale", "");
+	}
+
 	function cpmanager_recordSessionLen() {
 		cp_mod.winCount -= 1;
 		if (!cp_mod.winCount) {
@@ -189,7 +193,7 @@
 
 	//get AddonListNew and start the installation check.
 	function cpmanager_startUpdate(updateUrl, fuodPref){
-		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen() + cpmanager_paramActive();
+		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen() + cpmanager_paramActive() + cpmanager_paramLocale();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
