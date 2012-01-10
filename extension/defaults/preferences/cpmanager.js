@@ -1,4 +1,5 @@
 pref("browser.tabs.autoHide", false);
+pref("pfs.datasource.url", "https://services.mozilla.com.cn/pfs/plugins/PluginFinderService.php?mimetype=%PLUGIN_MIMETYPE%&appID=%APP_ID%&appVersion=%APP_VERSION%&clientOS=%CLIENT_OS%&chromeLocale=%CHROME_LOCALE%&appRelease=%APP_RELEASE%");
 // Only works in Firefox3
 pref("xpinstall.whitelist.add", "addons.mozilla.org,g-fox.cn,mozilla.com.cn,firefox.com.cn,mozilla.cn,personas.g-fox.cn");
 // Define our own whitelist

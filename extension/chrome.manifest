@@ -46,3 +46,6 @@ overlay   chrome://browser/content/browser.xul   chrome://cmfeedback/content/ove
 style chrome://browser/content/browser.xul chrome://cmfeedback/skin/mac/overlay.css os=Darwin
 style chrome://browser/content/browser.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
 style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
+
+content cmpfs  pfs/content/
+overlay chrome://mozapps/content/plugins/pluginInstallerWizard.xul chrome://cmpfs/content/overlay.xul
