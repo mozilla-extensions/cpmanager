@@ -5,6 +5,13 @@
 	height: 3em;
 }
 
+#lms-notification-icon {
+	list-style-image: url("chrome://livemargins/skin/appcenter-16.png");
+}
+#notification-popup-box[anchorid="lms-notification-icon"] > #lms-notification-icon {
+	display: -moz-box;
+}
+
 .popup-notification-icon[popupid="addon-notification-daytip"] {
 	list-style-image: url("chrome://cmnotification/skin/info64.png");
 }
@@ -13,18 +20,25 @@
 	list-style-image: url("chrome://cmnotification/skin/discover64.png");
 }
 
+.popup-notification-icon[popupid="addon-notification-lm"] {
+	list-style-image: url("chrome://livemargins/skin/appcenter-32.png");
+}
+
 #addon-notification-addon-notification,
+#addon-notification-lm-notification,
 #addon-notification-popup > popupnotification {
 	-moz-binding: url("chrome://cmnotification/content/bindings.xml#addon-notification-popup");
 }
 
 #addon-notification-addon-notification .popup-notification-label,
+#addon-notification-lm-notification .popup-notification-label,
 #addon-notification-popup .popup-notification-label {
 	font-size: 110%;
 	font-weight: bold;
 }
 
 #addon-notification-addon-notification a,
+#addon-notification-lm-notification a,
 #addon-notification-popup a {
 	color: -moz-nativehyperlinktext;
 	margin-left: 0.5em;
@@ -32,16 +46,19 @@
 }
 
 #addon-notification-addon-notification .text-link-gray,
+#addon-notification-lm-notification .text-link-gray,
 #addon-notification-popup .text-link-gray {
 	color: gray;
 }
 
 #addon-notification-addon-notification .text-link-gray:hover,
+#addon-notification-lm-notification .text-link-gray:hover,
 #addon-notification-popup .text-link-gray:hover {
 	color: -moz-nativehyperlinktext;
 }
 
 #addon-notification-addon-notification .popup-notification-button-container,
+#addon-notification-lm-notification .popup-notification-button-container,
 #addon-notification-popup .popup-notification-button-container {
 	border-top: 1px solid #c9c9c9;
 	padding-top: 10px;
