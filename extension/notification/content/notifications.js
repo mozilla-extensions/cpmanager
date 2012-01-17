@@ -98,6 +98,13 @@
 		_closeInstallNoti(tabId);
 	};
 
+	function closeIconClicked(tabId) {
+		var notification = tabNotiQueue[tabId];
+		if (!!notification) {
+			MOA.AN.RuleCenter.clickOnCloseIcon(notification.reminder_id);
+		}
+	}
+
 	/**
 	 * Add notification, called by RuleCenter.
 	 */
@@ -168,6 +175,7 @@
 			title: MOA.AN.Lib.getString('addon.title'),
 			closeicon: function() {
 				_track_addon_noti('closeicon', tabId);
+				closeIconClicked(tabId);
 			},
 			links: {
 				learnmore: {

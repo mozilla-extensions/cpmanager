@@ -158,6 +158,11 @@
 		MOA.AN.Lib.setFilePref(reminder_id + '__later', Date.now());
 	};
 
+	ns.clickOnCloseIcon = function(reminder_id) {
+		var close_count = MOA.AN.Lib.getFilePref(reminder_id+'__closecount', 0);
+		MOA.AN.Lib.setFilePref(reminder_id + '__closecount', close_count + 1);
+	};
+
 	ns.notificationShown = function() {	
 		MOA.AN.Lib.setFilePref('addon_show_time', Date.now());
 		var dailyAddonCount = MOA.AN.Lib.getFilePref('addon_daily_count', 0) + 1;
@@ -233,7 +238,9 @@
 		defaultRules = MOA.AN.Lib.extend(defaultRules, {
 			consts: {
 				max_daily_addon: 1,
-				later_wait_days: 3
+				later_wait_days: 3,
+				close_multiple: 5,
+				max_close_count: 5
 			}
 		})
 		var prefs = MOA.AN.Lib.getFilePrefs();
@@ -248,6 +255,9 @@
 		var alt_max_daily_addon = MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon');
 		_max_daily_addon = alt_max_daily_addon || defaultRules.consts.max_daily_addon;
 		var max_daily_addon = _max_daily_addon - MOA.AN.Lib.getFilePref('addon_daily_count', 0);
+		var laterWaitDays = defaultRules.consts.later_wait_days;
+		var closeMultiple = defaultRules.consts.close_multiple;
+		var maxCloseCount = defaultRules.consts.max_close_count;
 
 		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
 			var reminder = defaultRules.reminders[i];
@@ -265,12 +275,11 @@
 				if (max_daily_addon <= 0) {
 					continue
 				}
-				// why 30 days ?
-				if (!!prefs[reminder_id + '__nomore']/** && now - prefs[reminder_id + '__nomore'] < 2592000000*/)
+				var close_count = MOA.AN.Lib.getFilePref(reminder_id+'__closecount', 0);
+				if (!!prefs[reminder_id + '__nomore']/* || close_count > maxCloseCount*/)
 					continue;
 
-				var laterWaitDays = defaultRules.consts.later_wait_days;
-				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < laterWaitDays * 86400000)
+				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < laterWaitDays * (close_count ? closeMultiple : 1)/*Math.pow(2, close_count)*/ * 86400000)
 					continue;
 
 				_reminders[reminder_id] = reminder;
