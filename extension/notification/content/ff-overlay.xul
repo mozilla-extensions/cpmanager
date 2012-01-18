@@ -12,7 +12,9 @@
   <stringbundleset id="stringbundleset">
     <stringbundle id="addonnotification-strings" src="chrome://cmnotification/locale/overlay.properties"/>
   </stringbundleset>
-
+ <box id="notification-popup-box">
+    <image id="lms-notification-icon" class="notification-anchor-icon" role="button"/>
+ </box>
  <popupset id="mainPopupSet">
     <panel id="addon-notification-popup"
            type="arrow"

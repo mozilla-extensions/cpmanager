@@ -37,6 +37,7 @@
 	 */
 	var _daytips = [];
 	var _reminders = {};
+	var _reminders_lm = {};
 	var _rules = {};
 	var _regexps = {};				// for rules which have trigger type: window
 
@@ -105,6 +106,8 @@
 		switch (reminder.type) {
 			case 'addon':
 				return reminder.addon_id;
+			case 'lm':
+				return reminder.app_uid;
 			case 'tip':
 				return reminder.addon_id + '__' + reminder.btn_id;
 		}
@@ -158,6 +161,11 @@
 		MOA.AN.Lib.setFilePref(reminder_id + '__later', Date.now());
 	};
 
+	ns.clickOnCloseIcon = function(reminder_id) {
+		var close_count = MOA.AN.Lib.getFilePref(reminder_id+'__closecount', 0);
+		MOA.AN.Lib.setFilePref(reminder_id + '__closecount', close_count + 1);
+	};
+
 	ns.notificationShown = function() {	
 		MOA.AN.Lib.setFilePref('addon_show_time', Date.now());
 		var dailyAddonCount = MOA.AN.Lib.getFilePref('addon_daily_count', 0) + 1;
@@ -177,6 +185,7 @@
 		MOA.AN.Notification.clearAll();
 		_daytips = [];
 		_reminders = {};
+		_reminders_lm = {};
 		_regexps = {};
 		_rules = {};
 		_daytips_avail = [];
@@ -224,7 +233,6 @@
 			reminder_rules = MOA.AN.DefaultRules.getDefaultRules();
 			// MOA.AN.Lib.setStrToProFile(MOA.AN.Lib.getProFilePath('rules.json'), JSON.stringify(reminder_rules));
 		}
-
 		return reminder_rules;
 	}
 
@@ -233,7 +241,9 @@
 		defaultRules = MOA.AN.Lib.extend(defaultRules, {
 			consts: {
 				max_daily_addon: 1,
-				later_wait_days: 3
+				later_wait_days: 3,
+				close_multiple: 5,
+				max_close_count: 5
 			}
 		})
 		var prefs = MOA.AN.Lib.getFilePrefs();
@@ -248,6 +258,9 @@
 		var alt_max_daily_addon = MOA.AN.Lib.getPrefs().getIntPref('maxDailyAddon');
 		_max_daily_addon = alt_max_daily_addon || defaultRules.consts.max_daily_addon;
 		var max_daily_addon = _max_daily_addon - MOA.AN.Lib.getFilePref('addon_daily_count', 0);
+		var laterWaitDays = defaultRules.consts.later_wait_days;
+		var closeMultiple = defaultRules.consts.close_multiple;
+		var maxCloseCount = defaultRules.consts.max_close_count;
 
 		for (var i = 0, len = defaultRules.reminders.length; i < len; i++) {
 			var reminder = defaultRules.reminders[i];
@@ -259,30 +272,48 @@
 					continue;
 
 				_daytips.push(reminder)
-			} else if (reminder.type == 'addon') {
+			} else if (['addon', 'lm'].indexOf(reminder.type) > -1) {
 				_reminders_avail[reminder_id] = reminder;
 
 				if (max_daily_addon <= 0) {
 					continue
 				}
-				// why 30 days ?
-				if (!!prefs[reminder_id + '__nomore']/** && now - prefs[reminder_id + '__nomore'] < 2592000000*/)
+				var close_count = MOA.AN.Lib.getFilePref(reminder_id+'__closecount', 0);
+				if (!!prefs[reminder_id + '__nomore']/* || close_count > maxCloseCount*/)
 					continue;
 
-				var laterWaitDays = defaultRules.consts.later_wait_days;
-				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < laterWaitDays * 86400000)
+				if (!!prefs[reminder_id + '__later'] && now - prefs[reminder_id + '__later'] < laterWaitDays * (close_count ? closeMultiple : 1)/*Math.pow(2, close_count)*/ * 86400000)
 					continue;
 
-				_reminders[reminder_id] = reminder;
+				if (reminder.type == 'addon') {
+					_reminders[reminder_id] = reminder;
+				} else if (reminder.type == 'lm') {
+					_reminders_lm[reminder_id] = reminder;
+				}
 				_hit_times[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__hits', 0);
 				reminder.rule_ids = [];			// rules' id which uses the reminder
 			}
+		}
+
+		if (MOA.LM4) {
+			var apps = Object.keys(_reminders_lm).filter(function(reminder_id) {
+				var jsm = {};
+				Cu.import('resource://livemargins/dao.jsm', jsm);
+				var reminder = _reminders_lm[reminder_id];
+				return jsm.AppCenterDAO.appExists(reminder.app_uid) && !!jsm.AppCenterDAO.query("SELECT visits FROM apps WHERE uid=:uid;", {uid: reminder.app_uid})[0].visits;
+			});
+			for (var i in apps) {
+				delete _reminders_lm[apps[i]]
+			}
+		} else {
+			_reminders_lm = {};
 		}
 
 		MOA.AN.Lib.filterInstalledAddons(Object.keys(_reminders), function(addons) {
 			for (var i in addons) {
 				delete _reminders[addons[i]]
 			}
+			_reminders = MOA.AN.Lib.extend(_reminders, _reminders_lm);
 			var rule_id = 0;
 			for (var i = 0, len = defaultRules.rules.length; i < len; i++) {
 				// break composite rules into singles.

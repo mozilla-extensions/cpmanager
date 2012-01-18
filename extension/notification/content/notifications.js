@@ -60,18 +60,24 @@
 		if (!!notification) {
 			var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 			if (!!reminder) {
-				Cu['import']("resource://gre/modules/AddonManager.jsm")
-				AddonManager.getInstallForURL([reminder.xpi_url, "?src=external-cmnotification"].join(""), function(addonInstall) {
-					var webInstallListener = Cc["@mozilla.org/addons/web-install-listener;1"]
-												.getService(Ci.amIWebInstallListener);
-					AddonManager.addInstallListener(webInstallListener);
-					var browser = MOA.AN.Lib.getBrowserForTabId(tabId);
-					//AddonManager.installAddonsFromWebpage("application/x-xpinstall", browser.contentWindow, browser.currentURI, [addonInstall])
-					AddonManager.installAddonsFromWebpage("application/x-xpinstall",
-						browser.contentWindow,
-						Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(reminder.xpi_url, null, null),
-						[addonInstall])
-				}, "application/x-xpinstall", null, reminder.addon_name);
+				if (reminder.type == 'addon') {
+					Cu['import']("resource://gre/modules/AddonManager.jsm")
+					AddonManager.getInstallForURL([reminder.xpi_url, "?src=external-cmnotification"].join(""), function(addonInstall) {
+						var webInstallListener = Cc["@mozilla.org/addons/web-install-listener;1"]
+													.getService(Ci.amIWebInstallListener);
+						AddonManager.addInstallListener(webInstallListener);
+						var browser = MOA.AN.Lib.getBrowserForTabId(tabId);
+						//AddonManager.installAddonsFromWebpage("application/x-xpinstall", browser.contentWindow, browser.currentURI, [addonInstall])
+						AddonManager.installAddonsFromWebpage("application/x-xpinstall",
+							browser.contentWindow,
+							Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(reminder.xpi_url, null, null),
+							[addonInstall])
+					}, "application/x-xpinstall", null, reminder.addon_name);
+				} else if (reminder.type == 'lm') {
+					var jsm = {};
+					Cu.import('resource://livemargins/appcenter.jsm', jsm);
+					jsm.AppCenter.installAndOpenApp(reminder.app_uid);
+				}
 				_closeInstallNoti(tabId);
 				MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
 				return;
@@ -97,6 +103,13 @@
 		}
 		_closeInstallNoti(tabId);
 	};
+
+	function closeIconClicked(tabId) {
+		var notification = tabNotiQueue[tabId];
+		if (!!notification) {
+			MOA.AN.RuleCenter.clickOnCloseIcon(notification.reminder_id);
+		}
+	}
 
 	/**
 	 * Add notification, called by RuleCenter.
@@ -125,7 +138,7 @@
 			return;
 
 		MOA.AN.Tracker.track({
-			type: 'addon',
+			type: reminder.type,
 			rid: notification.reminder_id,
 			action: action ? action : 'show'
 		});
@@ -140,7 +153,7 @@
 			}
 		});
 		var mainAction = {
-			label: MOA.AN.Lib.getString('addon.InstallNow'),
+			label: MOA.AN.Lib.getString(reminder.type + '.InstallNow'),
 			accessKey: 'O',
 			callback: function() {
 				_track_addon_noti('install', tabId);
@@ -165,15 +178,16 @@
 				}
 			},
 			countdown: _notify_countdown,
-			title: MOA.AN.Lib.getString('addon.title'),
+			title: MOA.AN.Lib.getString(reminder.type + '.title'),
 			closeicon: function() {
 				_track_addon_noti('closeicon', tabId);
+				closeIconClicked(tabId);
 			},
 			links: {
 				learnmore: {
-					text: MOA.AN.Lib.getString('addon.LearnMore'),
+					text: MOA.AN.Lib.getString(reminder.type + '.LearnMore'),
 					href: reminder.url,
-					tooltip: MOA.AN.Lib.getString('addon.tooltip.LearnMore', [reminder.addon_name]),
+					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.LearnMore', [reminder.addon_name || reminder.app_name]),
 					callback: function(evt) {
 						_track_addon_noti('learnmore', tabId);
 						gBrowser.selectedTab = gBrowser.addTab(reminder.url);
@@ -181,8 +195,8 @@
 					}
 				},
 				neverremind: {
-					text: MOA.AN.Lib.getString('addon.NeverRemind'),
-					tooltip: MOA.AN.Lib.getString('addon.tooltip.NeverRemind', [reminder.addon_name]),
+					text: MOA.AN.Lib.getString(reminder.type + '.NeverRemind'),
+					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.NeverRemind', [reminder.addon_name || reminder.app_name]),
 					callback: function() {
 						_track_addon_noti('nomore', tabId);
 						noMoreReminder(tabId);
@@ -196,12 +210,12 @@
 				}*/
 			}
 		}
-		var message = [MOA.AN.Lib.getString('addon.FCERec2U', [reminder.addon_name]),
+		var message = [MOA.AN.Lib.getString(reminder.type + '.FCERec2U', [reminder.addon_name || reminder.app_name]),
 		               reminder.desc].join(' ')
 		_notification = PopupNotifications.show(MOA.AN.Lib.getBrowserForTabId(tabId),
-			"addon-notification-addon",
+			"addon-notification-" + reminder.type,
 			message,
-			"addons-notification-icon",
+			reminder.type + "s-notification-icon",
 			mainAction,
 			null,
 			popupOption
@@ -263,12 +277,8 @@
 
 		if (reminder.type == 'addon') {
 			_show_install_notification(tabId);
-		} else if (reminder.type == 'function') {
-			_show_function_notification({
-				reminder: reminder,
-				reminder_id: notification.reminder_id,
-				tabId: tabId
-			});
+		} else if (reminder.type == 'lm') {
+			_show_install_notification(tabId);
 		}
 		MOA.AN.RuleCenter.notificationShown()
 	};
