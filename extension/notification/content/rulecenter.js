@@ -38,6 +38,8 @@
 	var _daytips = [];
 	var _reminders = {};
 	var _reminders_lm = {};
+	var _reminders_plugin_pfs = {};
+	var _reminders_text = {};
 	var _rules = {};
 	var _regexps = {};				// for rules which have trigger type: window
 
@@ -108,6 +110,10 @@
 				return reminder.addon_id;
 			case 'lm':
 				return reminder.app_uid;
+			case 'plugin_pfs':
+				return reminder.mime_type + '__' + reminder.type;
+			case 'text':
+				return reminder.short_name;
 			case 'tip':
 				return reminder.addon_id + '__' + reminder.btn_id;
 		}
@@ -186,6 +192,8 @@
 		_daytips = [];
 		_reminders = {};
 		_reminders_lm = {};
+		_reminders_plugin_pfs = {};
+		_reminders_text = {};
 		_regexps = {};
 		_rules = {};
 		_daytips_avail = [];
@@ -272,7 +280,7 @@
 					continue;
 
 				_daytips.push(reminder)
-			} else if (['addon', 'lm'].indexOf(reminder.type) > -1) {
+			} else if (['addon', 'lm', 'plugin_pfs', 'text'].indexOf(reminder.type) > -1) {
 				_reminders_avail[reminder_id] = reminder;
 
 				if (max_daily_addon <= 0) {
@@ -289,6 +297,10 @@
 					_reminders[reminder_id] = reminder;
 				} else if (reminder.type == 'lm') {
 					_reminders_lm[reminder_id] = reminder;
+				} else if (reminder.type == 'plugin_pfs') {
+					_reminders_plugin_pfs[reminder_id] = reminder;
+				} else if (reminder.type == 'text') {
+					_reminders_text[reminder_id] = reminder;
 				}
 				_hit_times[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__hits', 0);
 				reminder.rule_ids = [];			// rules' id which uses the reminder
@@ -309,11 +321,27 @@
 			_reminders_lm = {};
 		}
 
+		var plugins = Object.keys(_reminders_plugin_pfs).filter(function(mime_type) {
+			return !!navigator.mimeTypes[mime_type];
+		});
+		for (var i in plugins) {
+			delete _reminders_plugin_pfs[plugins[i]]
+		}
+
 		MOA.AN.Lib.filterInstalledAddons(Object.keys(_reminders), function(addons) {
 			for (var i in addons) {
 				delete _reminders[addons[i]]
 			}
 			_reminders = MOA.AN.Lib.extend(_reminders, _reminders_lm);
+			_reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_pfs);
+			_reminders = MOA.AN.Lib.extend(_reminders, _reminders_text);
+			var OS = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+			for (var i in _reminders) {
+				var reminder = _reminders[i];
+				if (reminder.platform && reminder.platform != OS) {
+					delete _reminders[reminder]
+				}
+			}
 			var rule_id = 0;
 			for (var i = 0, len = defaultRules.rules.length; i < len; i++) {
 				// break composite rules into singles.

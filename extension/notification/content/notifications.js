@@ -77,6 +77,8 @@
 					var jsm = {};
 					Cu.import('resource://livemargins/appcenter.jsm', jsm);
 					jsm.AppCenter.installAndOpenApp(reminder.app_uid);
+				} else if (reminder.type == 'text') {
+					gBrowser.selectedTab = gBrowser.addTab(reminder.learnmore_url);
 				}
 				_closeInstallNoti(tabId);
 				MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
@@ -178,7 +180,7 @@
 				}
 			},
 			countdown: _notify_countdown,
-			title: MOA.AN.Lib.getString(reminder.type + '.title'),
+			title: reminder.title || MOA.AN.Lib.getString(reminder.type + '.title'),
 			closeicon: function() {
 				_track_addon_noti('closeicon', tabId);
 				closeIconClicked(tabId);
@@ -187,7 +189,7 @@
 				learnmore: {
 					text: MOA.AN.Lib.getString(reminder.type + '.LearnMore'),
 					href: reminder.url,
-					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.LearnMore', [reminder.addon_name || reminder.app_name]),
+					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.LearnMore', [reminder.addon_name || reminder.app_name || reminder.title]),
 					callback: function(evt) {
 						_track_addon_noti('learnmore', tabId);
 						gBrowser.selectedTab = gBrowser.addTab(reminder.url);
@@ -196,7 +198,7 @@
 				},
 				neverremind: {
 					text: MOA.AN.Lib.getString(reminder.type + '.NeverRemind'),
-					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.NeverRemind', [reminder.addon_name || reminder.app_name]),
+					tooltip: MOA.AN.Lib.getString(reminder.type + '.tooltip.NeverRemind', [reminder.addon_name || reminder.app_name || reminder.title]),
 					callback: function() {
 						_track_addon_noti('nomore', tabId);
 						noMoreReminder(tabId);
@@ -210,7 +212,7 @@
 				}*/
 			}
 		}
-		var message = [MOA.AN.Lib.getString(reminder.type + '.FCERec2U', [reminder.addon_name || reminder.app_name]),
+		var message = [MOA.AN.Lib.getString(reminder.type + '.FCERec2U', [reminder.addon_name || reminder.app_name || reminder.title]),
 		               reminder.desc].join(' ')
 		_notification = PopupNotifications.show(MOA.AN.Lib.getBrowserForTabId(tabId),
 			"addon-notification-" + reminder.type,
@@ -236,6 +238,12 @@
 			showingNotifications[notification.reminder_id] = 1;
 
 		var curBrowser = MOA.AN.Lib.getBrowserForTabId(tabId);
+		if (reminder.type == 'plugin_pfs') {
+			var plugin = curBrowser.contentDocument.createElement('object');
+			plugin.type = reminder.mime_type;
+			gPluginHandler.pluginUnavailable(plugin, 'PluginNotFound');
+			return;
+		}
 		_system_popup_countdown = new MOA.AN.Lib.CountDown({
 			onCounting: function() {
 				if (!PopupNotifications.isPanelOpen) {
@@ -275,9 +283,7 @@
 		var notification = tabNotiQueue[tabId];
 		var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 
-		if (reminder.type == 'addon') {
-			_show_install_notification(tabId);
-		} else if (reminder.type == 'lm') {
+		if (['addon', 'lm', 'plugin_pfs', 'text'].indexOf(reminder.type) > -1) {
 			_show_install_notification(tabId);
 		}
 		MOA.AN.RuleCenter.notificationShown()

@@ -1,8 +1,8 @@
 <!ENTITY notifierpane.label "Notifications">
-<!ENTITY c-addon.label "Enable Addon/App Recommendation">
+<!ENTITY c-addon.label "Enable Addon/App/... Recommendation">
 <!ENTITY c-daytip.label "Enable Daily Tips">
-<!ENTITY addonlist.label "Rules for Addon/App Recommendation">
+<!ENTITY addonlist.label "Rules for Addon/App/... Recommendation">
 <!ENTITY addon.domain "Domain">
 <!ENTITY addon.regexp "RegExp">
-<!ENTITY addon.name "Addon/App Name">
-<!ENTITY addon.desc "Addon/App Description">
+<!ENTITY addon.name "Addon/App/... Name">
+<!ENTITY addon.desc "Addon/App/... Description">

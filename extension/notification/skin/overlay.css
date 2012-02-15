@@ -8,7 +8,11 @@
 #lms-notification-icon {
 	list-style-image: url("chrome://livemargins/skin/appcenter-16.png");
 }
-#notification-popup-box[anchorid="lms-notification-icon"] > #lms-notification-icon {
+#texts-notification-icon {
+	list-style-image: url("chrome://global/skin/icons/information-16.png");
+}
+#notification-popup-box[anchorid="lms-notification-icon"] > #lms-notification-icon,
+#notification-popup-box[anchorid="texts-notification-icon"] > #texts-notification-icon {
 	display: -moz-box;
 }
 
@@ -22,16 +26,24 @@
 
 .popup-notification-icon[popupid="addon-notification-lm"] {
 	list-style-image: url("chrome://livemargins/skin/appcenter-32.png");
+	width: 32px;
+	height: 32px;
+}
+
+.popup-notification-icon[popupid="addon-notification-text"] {
+	list-style-image: url("chrome://global/skin/icons/information-64.png");
 }
 
 #addon-notification-addon-notification,
 #addon-notification-lm-notification,
+#addon-notification-text-notification,
 #addon-notification-popup > popupnotification {
 	-moz-binding: url("chrome://cmnotification/content/bindings.xml#addon-notification-popup");
 }
 
 #addon-notification-addon-notification .popup-notification-label,
 #addon-notification-lm-notification .popup-notification-label,
+#addon-notification-text-notification .popup-notification-label,
 #addon-notification-popup .popup-notification-label {
 	font-size: 110%;
 	font-weight: bold;
@@ -39,6 +51,7 @@
 
 #addon-notification-addon-notification a,
 #addon-notification-lm-notification a,
+#addon-notification-text-notification a,
 #addon-notification-popup a {
 	color: -moz-nativehyperlinktext;
 	margin-left: 0.5em;
@@ -47,18 +60,21 @@
 
 #addon-notification-addon-notification .text-link-gray,
 #addon-notification-lm-notification .text-link-gray,
+#addon-notification-text-notification .text-link-gray,
 #addon-notification-popup .text-link-gray {
 	color: gray;
 }
 
 #addon-notification-addon-notification .text-link-gray:hover,
 #addon-notification-lm-notification .text-link-gray:hover,
+#addon-notification-text-notification .text-link-gray:hover,
 #addon-notification-popup .text-link-gray:hover {
 	color: -moz-nativehyperlinktext;
 }
 
 #addon-notification-addon-notification .popup-notification-button-container,
 #addon-notification-lm-notification .popup-notification-button-container,
+#addon-notification-text-notification .popup-notification-button-container,
 #addon-notification-popup .popup-notification-button-container {
 	border-top: 1px solid #c9c9c9;
 	padding-top: 10px;

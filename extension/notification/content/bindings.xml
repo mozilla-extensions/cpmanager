@@ -48,12 +48,14 @@
         let links = this.notification.options.links;
         for (var link in links) {
             if (link == 'learnmore') {
-                var p = this.getByAID('parentofa');
-                var learnmore = document.createElementNS('http://www.w3.org/1999/xhtml','a');
-                learnmore.innerHTML = links[link].text;
-                learnmore.href = links[link].href;
-                learnmore.onclick = links[link].callback;
-                p.appendChild(learnmore);
+                if (links[link].href) {
+                    var desc = this.getByAID('parentofa');
+                    var learnmore = document.createElementNS('http://www.w3.org/1999/xhtml','a');
+                    learnmore.innerHTML = links[link].text;
+                    learnmore.href = links[link].href;
+                    learnmore.onclick = links[link].callback;
+                    desc.appendChild(learnmore);
+                }
                 continue
             }
             let linklabel = this.getByAID(link);
