@@ -322,6 +322,7 @@
 		}
 
 		var plugins = Object.keys(_reminders_plugin_pfs).filter(function(mime_type) {
+			mime_type = mime_type.split('__')[0];
 			return !!navigator.mimeTypes[mime_type];
 		});
 		for (var i in plugins) {
