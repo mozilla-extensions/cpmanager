@@ -49,3 +49,8 @@ style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/linu
 
 content cmpfs  pfs/content/
 overlay chrome://mozapps/content/plugins/pluginInstallerWizard.xul chrome://cmpfs/content/overlay.xul
+content cmimprove                improve/content/
+locale  cmimprove  en-US         improve/locale/en-US/
+locale  cmimprove  zh-CN         improve/locale/zh-CN/
+skin	  cmimprove  classic/1.0	 improve/skin/
+overlay chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul 

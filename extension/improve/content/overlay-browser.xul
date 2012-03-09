@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<?xml-stylesheet href="chrome://cmimprove/skin/browser.css" type="text/css" ?>
+<!DOCTYPE window [
+<!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
+%improveDTD;
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+%browserDTD;
+]>
+<overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script src="chrome://cmimprove/content/overlay-browser.js" />
+  <menupopup id="BMB_bookmarksPopup">
+    <menuitem id="cm_menu_bookmarksSidebar" insertafter="BMB_viewBookmarksToolbar"
+      key="viewBookmarksSidebarKb"
+      label="&cp.menu.bookmarksSidebar;">
+      <observes element="viewBookmarksSidebar" attribute="autoCheck"/>
+      <observes element="viewBookmarksSidebar" attribute="type"/>
+      <observes element="viewBookmarksSidebar" attribute="group"/>
+      <observes element="viewBookmarksSidebar" attribute="sidebarurl"/>
+      <observes element="viewBookmarksSidebar" attribute="oncommand"/>
+    </menuitem>
+    <menuitem id="BMB_bookmarksShowAll"
+              label="&cp.showAllBookmarks2.label;"/>
+  </menupopup>
+</overlay>
