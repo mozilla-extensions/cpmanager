@@ -1,40 +1,51 @@
-
-XPCOMUtils.defineLazyGetter(PlacesStarButton, "_cm_bundle", function() {
-  const IMPROVE_STRING_BUNDLE_URI = "chrome://cmimprove/locale/browser.properties";
-  return Cc["@mozilla.org/intl/stringbundle;1"].
-         getService(Ci.nsIStringBundleService).
-         createBundle(IMPROVE_STRING_BUNDLE_URI);
-});
-PlacesStarButton.onClick = function (aEvent){
-    if (aEvent.button == 0 && !this._pendingStmt) {
-      PlacesCommandHook.bookmarkCurrentPage(true,PlacesUtils.toolbarFolderId);
+var cmImprove = {
+  el: function(id) {
+    if (typeof id == 'string')
+      return document.getElementById(id);
+    else
+      return id;
+  },
+  get bookmarksPopup() {
+    return this.el("BMB_bookmarksPopup");
+  },
+  
+  get _bundles() {
+    return Cc["@mozilla.org/intl/stringbundle;1"].
+           getService(Ci.nsIStringBundleService).
+           createBundle("chrome://cmimprove/locale/browser.properties");
+  },
+  bookmarksPopup_popupshowing : function() {
+    var item_t = cmImprove.el("BMB_viewBookmarksToolbar");
+    item_t.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksToolbar"));
+    var item_s = cmImprove.el("cm_menu_bookmarksSidebar");
+    item_s.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksSidebar"));
+  },
+  init : function(){
+    PlacesStarButton.onClick = function (aEvent){
+      if (aEvent.button == 0 && !this._pendingStmt) {
+        PlacesCommandHook.bookmarkCurrentPage(true,PlacesUtils.toolbarFolderId);
+      }
+      aEvent.stopPropagation();
     }
-    aEvent.stopPropagation();
+    PlacesStarButton.__defineGetter__("_unstarredTooltip", function(){
+      delete this._unstarredTooltip;
+      return this._unstarredTooltip =
+        cmImprove._bundles.GetStringFromName("starButtonOff.tooltip");
+    });
+    
+    StarUI.panel.addEventListener("popupshown", function () {
+      StarUI._element("editBookmarkPanelTitle").value = cmImprove._bundles.GetStringFromName("editBookmarkPanel.addBookmarkTitle");
+      var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");
+      var link = document.getAnonymousElementByAttribute(footer, "anonid", "promo-link");
+      link.setAttribute("href", "http://www.firefox.com.cn/sync/");
+    },false);
+    
+    cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+  },
+  uninit : function(){
+    cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+  }
 }
-PlacesStarButton.__defineGetter__("_unstarredTooltip", function(){
-  delete this._unstarredTooltip;
-  return this._unstarredTooltip =
-    PlacesStarButton._cm_bundle.GetStringFromName("starButtonOff.tooltip");
-});
 
-XPCOMUtils.defineLazyGetter(StarUI, "_cm_bundle", function() {
-  const IMPROVE_STRING_BUNDLE_URI = "chrome://cmimprove/locale/browser.properties";
-  return Cc["@mozilla.org/intl/stringbundle;1"].
-         getService(Ci.nsIStringBundleService).
-         createBundle(IMPROVE_STRING_BUNDLE_URI);
-});
-StarUI.__doShowEditBookmarkPanel = StarUI._doShowEditBookmarkPanel;
-StarUI._doShowEditBookmarkPanel = function(aItemId, aAnchorElement, aPosition){
-  StarUI.__doShowEditBookmarkPanel(aItemId, aAnchorElement, aPosition);
-  this._element("editBookmarkPanelTitle").value = StarUI._cm_bundle.GetStringFromName("editBookmarkPanel.addBookmarkTitle");
-}
-/*
-  <menupopup id="bookmarksMenuPopup">
-    <menuitem id="cm_menu_bookmarksSidebar"
-      key="viewBookmarksSidebarKb"
-      observes="viewBookmarksSidebar"
-      accesskey="&bookmarksButton.accesskey;" >
-    </menuitem>
-
-  </menupopup>
-*/
+window.addEventListener('load', cmImprove.init, false)
+window.addEventListener('unload', cmImprove.uninit, false)
