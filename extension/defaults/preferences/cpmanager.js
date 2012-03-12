@@ -6,3 +6,5 @@ pref("xpinstall.whitelist.add", "addons.mozilla.org,g-fox.cn,mozilla.com.cn,fire
 // this list plus default whitelist should equals to "xpinstall.whitelist.add" 
 pref("extensions.cpmanager@mozillaonline.com.xpinstall.whitelist.add", "g-fox.cn,mozilla.com.cn,firefox.com.cn,mozilla.cn,personas.g-fox.cn");
 pref("extensions.cpmanager@mozillaonline.com.xpinstall.importlist", true);
+
+pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);

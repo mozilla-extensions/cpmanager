@@ -40,6 +40,23 @@ var cmImprove = {
       link.setAttribute("href", "http://www.firefox.com.cn/sync/");
     },false);
     
+    // If pref "initialized" has been set to True, this means it's not a new profile.
+    var prefs = Application.prefs;
+    if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
+      return;
+    }
+    
+    if (!prefs.getValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false)) {
+      return;
+    }
+
+    prefs.setValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false);
+    // Show bookmark toolbar
+    // Only affect FF4.0 or newer version
+    if (window.setToolbarVisibility && document.getElementById("PersonalToolbar")) {
+               setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
+    } 
+
     cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
   },
   uninit : function(){
