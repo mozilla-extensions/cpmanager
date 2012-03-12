@@ -165,6 +165,12 @@
 				var initTime = (new Date()).getTime().toString();
 				cpmanager_setPrefValue("init_time",initTime);
 				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME, 'update_date');
+
+                // Show bookmark toolbar
+                // Only affect FF4.0 or newer version
+                if (window.setToolbarVisibility && document.getElementById("PersonalToolbar")) {
+                    setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
+                }
 	  		} else {
 				cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL, 'update_date');
 			}
