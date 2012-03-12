@@ -1,3 +1,4 @@
+(function() {
 var cmImprove = {
   el: function(id) {
     if (typeof id == 'string')
@@ -16,9 +17,9 @@ var cmImprove = {
   },
   bookmarksPopup_popupshowing : function() {
     var item_t = cmImprove.el("BMB_viewBookmarksToolbar");
-    item_t.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksToolbar"));
+    item_t && item_t.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksToolbar"));
     var item_s = cmImprove.el("cm_menu_bookmarksSidebar");
-    item_s.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksSidebar"));
+    item_s && item_s.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksSidebar"));
   },
   init : function(){
     PlacesStarButton.onClick = function (aEvent){
@@ -57,12 +58,13 @@ var cmImprove = {
                setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
     } 
 
-    cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
   },
   uninit : function(){
-    cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
   }
 }
 
 window.addEventListener('load', cmImprove.init, false)
 window.addEventListener('unload', cmImprove.uninit, false)
+})();
