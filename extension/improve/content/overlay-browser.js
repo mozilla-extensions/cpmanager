@@ -39,7 +39,9 @@ var cmImprove = {
       var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");
       var link = document.getAnonymousElementByAttribute(footer, "anonid", "promo-link");
       link.setAttribute("href", "http://www.firefox.com.cn/sync/");
-    },false);
+    },false); 
+
+    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false);
     
     // If pref "initialized" has been set to True, this means it's not a new profile.
     var prefs = Application.prefs;
@@ -56,9 +58,7 @@ var cmImprove = {
     // Only affect FF4.0 or newer version
     if (window.setToolbarVisibility && document.getElementById("PersonalToolbar")) {
                setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
-    } 
-
-    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+    }
   },
   uninit : function(){
     cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
