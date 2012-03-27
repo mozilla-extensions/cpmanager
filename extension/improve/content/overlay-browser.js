@@ -21,10 +21,30 @@ var cmImprove = {
     var item_s = cmImprove.el("cm_menu_bookmarksSidebar");
     item_s && item_s.setAttribute("label",cmImprove._bundles.GetStringFromName("menu.bookmarksSidebar"));
   },
+  showBookmarkToolbar : function() {
+    // If pref "initialized" has been set to True, this means it's not a new profile.
+    var prefs = Application.prefs;
+    if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
+      return;
+    }
+    
+    if (!prefs.getValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false)) {
+      return;
+    }
+
+    prefs.setValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false);
+    // Show bookmark toolbar
+    // Only affect FF4.0 or newer version
+    if (window.setToolbarVisibility && document.getElementById("PersonalToolbar")) {
+               setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
+    }
+  },
   init : function(){
     PlacesStarButton.onClick = function (aEvent){
+      var tfID = Application.prefs.getValue("extensions.cmimprove.bookmarks.parentFolder",PlacesUtils.unfiledBookmarksFolderId);
+      var showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
       if (aEvent.button == 0 && !this._pendingStmt) {
-        PlacesCommandHook.bookmarkCurrentPage(true,PlacesUtils.toolbarFolderId);
+        PlacesCommandHook.bookmarkCurrentPage(showUI,tfID);
       }
       aEvent.stopPropagation();
     }
@@ -42,23 +62,7 @@ var cmImprove = {
     },false); 
 
     cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false);
-    
-    // If pref "initialized" has been set to True, this means it's not a new profile.
-    var prefs = Application.prefs;
-    if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
-      return;
-    }
-    
-    if (!prefs.getValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false)) {
-      return;
-    }
-
-    prefs.setValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false);
-    // Show bookmark toolbar
-    // Only affect FF4.0 or newer version
-    if (window.setToolbarVisibility && document.getElementById("PersonalToolbar")) {
-               setToolbarVisibility(document.getElementById("PersonalToolbar"), true);
-    }
+    cmImprove.showBookmarkToolbar();
   },
   uninit : function(){
     cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
