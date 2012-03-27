@@ -7,13 +7,20 @@ var cmImprove = {
       return id;
   },
   get bookmarksPopup() {
-    return this.el("BMB_bookmarksPopup");
+    delete this.bookmarksPopup;
+    return this.bookmarksPopup = this.el("BMB_bookmarksPopup");
   },
-  
+
   get _bundles() {
-    return Cc["@mozilla.org/intl/stringbundle;1"].
-           getService(Ci.nsIStringBundleService).
-           createBundle("chrome://cmimprove/locale/browser.properties");
+    delete this._bundles;
+    return this._bundles = Cc["@mozilla.org/intl/stringbundle;1"].
+        getService(Ci.nsIStringBundleService).
+        createBundle("chrome://cmimprove/locale/browser.properties");
+  },
+  get _vc() {
+    delete this._vc;
+    return this._vc = Cc['@mozilla.org/xpcom/version-comparator;1'].
+        createInstance(Ci.nsIVersionComparator);
   },
   bookmarksPopup_popupshowing : function() {
     var item_t = cmImprove.el("BMB_viewBookmarksToolbar");
@@ -27,7 +34,7 @@ var cmImprove = {
     if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
       return;
     }
-    
+
     if (!prefs.getValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false)) {
       return;
     }
@@ -53,19 +60,57 @@ var cmImprove = {
       return this._unstarredTooltip =
         cmImprove._bundles.GetStringFromName("starButtonOff.tooltip");
     });
-    
+
     StarUI.panel.addEventListener("popupshown", function () {
       StarUI._element("editBookmarkPanelTitle").value = cmImprove._bundles.GetStringFromName("editBookmarkPanel.addBookmarkTitle");
       var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");
       var link = document.getAnonymousElementByAttribute(footer, "anonid", "promo-link");
       link.setAttribute("href", "http://www.firefox.com.cn/sync/");
-    },false); 
+    },false);
 
     cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.addEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false);
+    if (cmImprove._vc.compare(Application.version, '11.0') >= 0) {
+      document.getElementById('appcontent').addEventListener('DOMContentLoaded', cmImprove.iFrameCertFix, false);
+    }
+
     cmImprove.showBookmarkToolbar();
   },
   uninit : function(){
-    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false)
+    cmImprove.bookmarksPopup && cmImprove.bookmarksPopup.removeEventListener("popupshowing",cmImprove.bookmarksPopup_popupshowing,false);
+    if (cmImprove._vc.compare(Application.version, '11.0') >= 0) {
+      document.getElementById('appcontent').removeEventListener('DOMContentLoaded', cmImprove.iFrameCertFix, false);
+    }
+  },
+  iFrameCertFix: function(evt) {
+    var contentDoc = evt.target;
+    if (contentDoc.documentURI.match(/^about:certerror/) && contentDoc.defaultView !== contentDoc.defaultView.top && !contentDoc.querySelector('#exceptionDialogButton')) {
+      var iframeCert = Application.prefs.getValue("extensions.cmimprove.iframe_cert_fix.whitelist", "").split(',');
+      if (iframeCert.some(function(host) contentDoc.location.host == host )) {
+/*
+        <div id="expertContent" collapsed="true">
+          <h2 onclick="toggle('expertContent');" id="expertContentHeading">&certerror.expert.heading;</h2>
+          <div>
+            <p>&certerror.expert.content;</p>
+            <p>&certerror.expert.contentPara2;</p>
+            <button id='exceptionDialogButton'>&certerror.addException.label;</button>
+          </div>
+        </div>
+*/
+        var div = contentDoc.createElement('div');
+        div.id = 'expertContent';
+        div.setAttribute('collapsed', 'true');
+        contentDoc.querySelector('#technicalContent').parentNode.appendChild(div);
+        contentDoc.querySelector('#expertContent').innerHTML = ["<h2 onclick=\"toggle('expertContent');\" id=\"expertContentHeading\">",
+            cmImprove._bundles.GetStringFromName("certerror.expert.heading"),
+            "</h2><div><p>",
+            cmImprove._bundles.GetStringFromName("certerror.expert.content"),
+            "</p><p>",
+            cmImprove._bundles.GetStringFromName("certerror.expert.contentPara2"),
+            "</p><button id='exceptionDialogButton'>",
+            cmImprove._bundles.GetStringFromName("certerror.addException.label"),
+            "</button></div>"].join('');
+      }
+    }
   }
 }
 

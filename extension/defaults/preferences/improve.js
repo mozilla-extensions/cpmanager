@@ -8,3 +8,6 @@ pref("extensions.cmimprove.bookmarks.parentFolder", 3);
 
 // whether or not to show the edit-bookmark UI when adds a bookmark to the page
 pref("extensions.cmimprove.bookmarks.add.showEditUI", true);
+
+// Add Cert Exception
+pref("extensions.cmimprove.iframe_cert_fix.whitelist", "dynamic.12306.cn");
