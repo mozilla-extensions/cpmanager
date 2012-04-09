@@ -111,6 +111,12 @@ var cmImprove = {
             "</button></div>"].join('');
       }
     }
+    if (contentDoc.documentURI.match(/^about:certerror/) && contentDoc.defaultView !== contentDoc.defaultView.top && contentDoc.querySelector('#expertContent').hasAttribute('hidden')) {
+      var iframeCert = Application.prefs.getValue("extensions.cmimprove.iframe_cert_fix.whitelist", "").split(',');
+      if (iframeCert.some(function(host) contentDoc.location.host == host )) {
+        contentDoc.querySelector('#expertContent').removeAttribute('hidden');
+      }
+    }
   }
 }
 
