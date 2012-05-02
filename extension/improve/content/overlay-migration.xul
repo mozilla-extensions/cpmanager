@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE window [
+<!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/migration.dtd">
+%improveDTD;
+]>
+<overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <radiogroup id="importSourceGroup">
+    <radio id="360se"        label="&importFrom360se.label;"        accesskey="&importFrom360se.accesskey;"/>
+  </radiogroup>
+</overlay>
