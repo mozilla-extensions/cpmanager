@@ -5,15 +5,45 @@
 %improveDTD;
 <!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
 %browserDTD;
+<!ENTITY % placesDTD SYSTEM "chrome://browser/locale/places/places.dtd">
+%placesDTD;
 ]>
 <overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
       xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script src="chrome://cmimprove/content/overlay-browser.js" />
+  <commandset id="mainCommandSet">
+    <command id="OrganizerCommand_browserImport"
+           oncommand="PlacesOrganizer.importFromBrowser();"/>
+  
+    <command id="OrganizerCommand_import"
+             oncommand="PlacesOrganizer.importFromFile();"/>
+    <command id="OrganizerCommand_export"
+           oncommand="PlacesOrganizer.exportBookmarks();"/>
+  </commandset>
   <menupopup id="BMB_bookmarksPopup">
     <menuitem id="cm_menu_bookmarksSidebar" insertafter="BMB_viewBookmarksToolbar"
       key="viewBookmarksSidebarKb" observes="viewBookmarksSidebar"/>
     <menuitem id="BMB_bookmarksShowAll"
               label="&cp.showAllBookmarks2.label;"/>
+    <menu accesskey="&maintenance.accesskey;" class="menu-iconic"
+          id="cm_menu_maintenance" insertafter="BMB_bookmarksShowAll" label="&maintenance.label;"
+          tooltiptext="&maintenance.tooltip;">
+      <menupopup id="maintenanceButtonPopup">
+        <menuitem id="browserImport"
+                  command="OrganizerCommand_browserImport"
+                  label="&importOtherBrowser.label;"
+                  accesskey="&importOtherBrowser.accesskey;"/>
+        <menuitem id="fileImport"
+                  command="OrganizerCommand_import"
+                  label="&importBookmarksFromHTML.label;"
+                  accesskey="&importBookmarksFromHTML.accesskey;"/>
+        <menuseparator/>
+        <menuitem id="fileExport"
+                  command="OrganizerCommand_export"
+                  label="&exportBookmarksToHTML.label;"
+                  accesskey="&exportBookmarksToHTML.accesskey;"/>
+      </menupopup>
+    </menu>
   </menupopup>
 </overlay>
