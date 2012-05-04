@@ -49,16 +49,8 @@ style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/linu
 
 content cmpfs  pfs/content/
 overlay chrome://mozapps/content/plugins/pluginInstallerWizard.xul chrome://cmpfs/content/overlay.xul
-
 content cmimprove                improve/content/
 locale  cmimprove  en-US         improve/locale/en-US/
 locale  cmimprove  zh-CN         improve/locale/zh-CN/
 skin	  cmimprove  classic/1.0	 improve/skin/
 overlay chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul 
-
-#import 360se
-
-overlay chrome://browser/content/migration/migration.xul   chrome://cmimprove/content/overlay-migration.xul os=WINNT appversion<14.0
-override chrome://browser/locale/migration/migration.properties chrome://cmimprove/locale/migration.properties os=WINNT appversion<14.0
-component {e3a19376-354b-49dd-a730-9a018fe1137d} components/ns360seMigrator.js os=WINNT appversion<14.0
-contract @mozilla.org/profile/migrator;1?app=browser&type=360se {e3a19376-354b-49dd-a730-9a018fe1137d} os=WINNT appversion<14.0
