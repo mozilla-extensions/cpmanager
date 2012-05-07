@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding='UTF-8'?>
-<?xml-stylesheet href="chrome://cmimprove/skin/browser.css" type="text/css" ?>
+<?xml-stylesheet href="chrome://cmimprove-os/skin/cm_menu_maintenance.css" type="text/css" ?>
 <!DOCTYPE window [
 <!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
 %improveDTD;
@@ -27,7 +27,7 @@
       key="viewBookmarksSidebarKb" observes="viewBookmarksSidebar"/>
     <menuitem id="BMB_bookmarksShowAll"
               label="&cp.showAllBookmarks2.label;"/>
-    <menu accesskey="&maintenance.accesskey;" class="menu-iconic-left"
+    <menu accesskey="&maintenance.accesskey;" class="menu-iconic"
           id="cm_menu_maintenance" insertafter="BMB_bookmarksShowAll" label="&maintenance.label;"
           tooltiptext="&maintenance.tooltip;">
       <menupopup id="maintenanceButtonPopup">
