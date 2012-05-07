@@ -27,7 +27,7 @@
       key="viewBookmarksSidebarKb" observes="viewBookmarksSidebar"/>
     <menuitem id="BMB_bookmarksShowAll"
               label="&cp.showAllBookmarks2.label;"/>
-    <menu accesskey="&maintenance.accesskey;" class="menu-iconic"
+    <menu accesskey="&maintenance.accesskey;" class="menu-iconic-left"
           id="cm_menu_maintenance" insertafter="BMB_bookmarksShowAll" label="&maintenance.label;"
           tooltiptext="&maintenance.tooltip;">
       <menupopup id="maintenanceButtonPopup">
