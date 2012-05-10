@@ -340,7 +340,7 @@
 			for (var i in _reminders) {
 				var reminder = _reminders[i];
 				if (reminder.platform && reminder.platform != OS) {
-					delete _reminders[reminder]
+					delete _reminders[i]
 				}
 			}
 			var rule_id = 0;
