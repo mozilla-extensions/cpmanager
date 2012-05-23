@@ -11,3 +11,6 @@ pref("extensions.cmimprove.bookmarks.add.showEditUI", true);
 
 // Add Cert Exception
 pref("extensions.cmimprove.iframe_cert_fix.whitelist", "dynamic.12306.cn");
+
+// features enable
+pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
