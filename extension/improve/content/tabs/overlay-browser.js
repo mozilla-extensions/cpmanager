@@ -163,6 +163,14 @@ var tcm = {
         parent.insertBefore(m,anchor);
       }
     });
+
+    var _updateContextMenuOrig = TabContextMenu.updateContextMenu.bind(TabContextMenu);
+    TabContextMenu.updateContextMenu = (function(aPopupMenu) {
+      _updateContextMenuOrig(aPopupMenu);
+      $('ce_context_closeRight').hidden = this.contextTab.pinned;
+      $('ce_context_closeRight').disabled = !this.contextTab.nextElementSibling;
+      $('ce_context_bookmark').hidden = this.contextTab !== gBrowser.selectedTab;
+    }).bind(TabContextMenu);
   },
 }
 window.addEventListener('load', tcm.init, false);
