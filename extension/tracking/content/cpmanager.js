@@ -139,6 +139,17 @@
 	  	return "&locale=" + Application.prefs.getValue("general.useragent.locale", "");
 	}
 
+	var enabledMOExtensions = "";
+	function cpmanager_paramMOExts() {
+		if (!enabledMOExtensions) {
+			var enabledExtensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
+			enabledMOExtensions = enabledExtensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name)/.test(ext));
+			enabledMOExtensions = enabledMOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
+			enabledMOExtensions = enabledMOExtensions.join(",");
+		}
+		return enabledMOExtensions ? "&moexts=" + enabledMOExtensions : "";
+	}
+
 	function cpmanager_recordSessionLen() {
 		cp_mod.winCount -= 1;
 		if (!cp_mod.winCount) {
@@ -193,7 +204,7 @@
 
 	//get AddonListNew and start the installation check.
 	function cpmanager_startUpdate(updateUrl, fuodPref){
-		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen() + cpmanager_paramActive() + cpmanager_paramLocale();
+		updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") + cpmanager_paramFUOD(fuodPref) + cpmanager_paramCEVersion() + cpmanager_paramActCode() + cpmanager_paramSyncStatus() + cpmanager_paramCEHome() + cpmanager_paramPrevSessionLen() + cpmanager_paramActive() + cpmanager_paramLocale() + cpmanager_paramMOExts();
 		cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);
 		try {
 			if (window.XMLHttpRequest && cpmanager_xmlHttp == null) {
