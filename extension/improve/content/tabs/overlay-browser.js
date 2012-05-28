@@ -102,7 +102,7 @@ var tcm = {
       }
     } catch(e) {}
     // Add new menu
-    var btn_new = $E("menuitem", { 
+    var btn_new = $E("menuitem", {
                       id: "ce_context_newTab" ,
                       label: getString("cp.tabs.new") ,
                       accesskey: "N" ,
@@ -111,15 +111,15 @@ var tcm = {
                       style:"list-style-image: url('chrome://cmimprove/skin/tabs/menuicon.png');-moz-image-region: rect(0px, 16px, 16px, 0px);",
                       class:"menuitem-iconic",
                     });
-    var btn_clone = $E("menuitem",{ 
+    var btn_clone = $E("menuitem",{
                       id: "ce_context_cloneTab" ,
                       label: getString("cp.tabs.clone") ,
                     },{command: cmd_cloneTab});
-    var btn_closeRight = $E("menuitem",{ 
+    var btn_closeRight = $E("menuitem",{
                       id: "ce_context_closeRight" ,
                       label: getString("cp.tabs.close.right"),
                     },{command: cmd_closeRight});
-    var btn_bookmark = $E("menuitem",{ 
+    var btn_bookmark = $E("menuitem",{
                       id: "ce_context_bookmark" ,
                       label: getString("cp.tabs.bookmark") ,
                       key: "addBookmarkAsKb" ,
@@ -130,31 +130,31 @@ var tcm = {
     var arr = [btn_new//[new]
               ,btn_clone//[clone]
               ,$E("menuseparator")  //--------------------
-              ,$M("context_pinTab",{ 
+              ,$M("context_pinTab",{
                       style:"list-style-image: url('chrome://cmimprove/skin/tabs/menuicon.png');-moz-image-region: rect(0px, 32px, 16px, 16px);",
-                      class:"menuitem-iconic"})//pin        
-              ,$M("context_unpinTab",{ 
+                      class:"menuitem-iconic"})//pin
+              ,$M("context_unpinTab",{
                       style:"list-style-image: url('chrome://cmimprove/skin/tabs/menuicon.png');-moz-image-region: rect(0px, 48px, 16px, 32px);",
-                      class:"menuitem-iconic"})//unpin         
-              ,$("context_tabViewMenu")//moveTo      
-              ,$("context_openTabInWindow")//moveWin     
+                      class:"menuitem-iconic"})//unpin
+              ,$("context_tabViewMenu")//moveTo
+              ,$("context_openTabInWindow")//moveWin
               ,$E("menuseparator")  //--------------------
-              ,$M("context_closeTab",{ 
+              ,$M("context_closeTab",{
                       style:"list-style-image: url('chrome://cmimprove/skin/tabs/menuicon.png');-moz-image-region: rect(0px, 64px, 16px, 48px);",
                       class:"menuitem-iconic",
-                      key:"key_close" })//close       
-              ,$("context_closeOtherTabs")//closeOtherTabs  
+                      key:"key_close" })//close
+              ,$("context_closeOtherTabs")//closeOtherTabs
               ,btn_closeRight//[closeRight]
               ,$M("context_undoCloseTab",{ key:"key_undoCloseTab" })//undoClose
               ,$E("menuseparator")  //--------------------
               ,btn_bookmark//[bookmark]
-              ,$M("context_bookmarkAllTabs",{ label: getString("cp.tabs.bookmark.all") })//bookmarkAll 
-              ,$M("context_reloadTab",{ 
+              ,$M("context_bookmarkAllTabs",{ label: getString("cp.tabs.bookmark.all") })//bookmarkAll
+              ,$M("context_reloadTab",{
                       oncommand:null,
                       style:"list-style-image: url('chrome://cmimprove/skin/tabs/menuicon.png');-moz-image-region: rect(0px, 96px, 16px, 80px);",
                       class:"menuitem-iconic" }
-                   ,{ command:cmd_reloadSkipCache })//reload      
-              ,$("context_reloadAllTabs")//reloadAll   
+                   ,{ command:cmd_reloadSkipCache })//reload
+              ,$("context_reloadAllTabs")//reloadAll
     ]
     var anchor = $E("menuseparator",{ hidden: "true" });
     parent.insertBefore(anchor,parent.firstChild);
@@ -170,6 +170,11 @@ var tcm = {
       $('ce_context_closeRight').hidden = this.contextTab.pinned;
       $('ce_context_closeRight').disabled = !this.contextTab.nextElementSibling;
       $('ce_context_bookmark').hidden = this.contextTab !== gBrowser.selectedTab;
+      if (this.contextTab.pinned) {
+        $('context_closeTab').removeAttribute('key');
+      } else {
+        $('context_closeTab').setAttribute('key', 'key_close');
+      }
     }).bind(TabContextMenu);
   },
 }
