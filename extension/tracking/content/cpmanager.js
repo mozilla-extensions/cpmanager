@@ -139,15 +139,19 @@
 	  	return "&locale=" + Application.prefs.getValue("general.useragent.locale", "");
 	}
 
-	var enabledMOExtensions = "";
+	var MOExtensions = "";
 	function cpmanager_paramMOExts() {
-		if (!enabledMOExtensions) {
-			var enabledExtensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
-			enabledMOExtensions = enabledExtensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name)/.test(ext));
-			enabledMOExtensions = enabledMOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
-			enabledMOExtensions = enabledMOExtensions.join(",");
+		if (!MOExtensions) {
+			var extensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
+			var bootstrapped = JSON.parse(Application.prefs.getValue("extensions.bootstrappedAddons", ""));
+			for (var id in bootstrapped) {
+				extensions.push(id);
+			}
+			MOExtensions = extensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name|personas@christopher\.beard)/.test(ext));
+			MOExtensions = MOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
+			MOExtensions = MOExtensions.join(",");
 		}
-		return enabledMOExtensions ? "&moexts=" + enabledMOExtensions : "";
+		return MOExtensions ? "&moexts=" + MOExtensions : "";
 	}
 
 	function cpmanager_recordSessionLen() {
