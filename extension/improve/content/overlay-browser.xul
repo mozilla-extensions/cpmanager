@@ -16,6 +16,7 @@
 
   <script src="chrome://cmimprove/content/tabs/overlay-browser.js" />
   <script type="application/javascript" src="chrome://browser/content/places/places.js"/>
+  <script src="chrome://cmimprove/content/tracking/overlay-browser.js" />
 
   <commandset id="mainCommandSet">
     <command id="OrganizerCommand_browserImport"
