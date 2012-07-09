@@ -9,33 +9,36 @@
 %placesDTD;
 ]>
 <overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
-      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="chrome://cmimprove/content/bookmark/overlay-browser.js" />
 
   <script src="chrome://cmimprove/content/certerror/overlay-browser.js" />
 
-  <script src="chrome://cmimprove/content/tabs/overlay-browser.js" />
+  <script type="application/javascript" src="chrome://cmimprove/content/tabs/overlay-browser.js" />
   <script type="application/javascript" src="chrome://browser/content/places/places.js"/>
   <script src="chrome://cmimprove/content/tracking/overlay-browser.js" />
 
   <commandset id="mainCommandSet">
     <command id="OrganizerCommand_browserImport"
-           oncommand="PlacesOrganizer.importFromBrowser();"/>
-  
+             oncommand="PlacesOrganizer.importFromBrowser();"/>
     <command id="OrganizerCommand_import"
              oncommand="PlacesOrganizer.importFromFile();"/>
     <command id="OrganizerCommand_export"
-           oncommand="PlacesOrganizer.exportBookmarks();"/>
-
-
+             oncommand="PlacesOrganizer.exportBookmarks();"/>
   </commandset>
+
   <menupopup id="BMB_bookmarksPopup">
-    <menuitem id="cm_menu_bookmarksSidebar" insertafter="BMB_viewBookmarksToolbar"
-      key="viewBookmarksSidebarKb" observes="viewBookmarksSidebar"/>
+    <menuitem id="cm_menu_bookmarksSidebar"
+              insertafter="BMB_viewBookmarksToolbar"
+              key="viewBookmarksSidebarKb"
+              observes="viewBookmarksSidebar"/>
     <menuitem id="BMB_bookmarksShowAll"
               label="&cp.showAllBookmarks2.label;"/>
-    <menu accesskey="&maintenance.accesskey;" class="menu-iconic"
-          id="cm_menu_maintenance" insertafter="BMB_bookmarksShowAll" label="&maintenance.label;"
+    <menu accesskey="&maintenance.accesskey;"
+          class="menu-iconic"
+          id="cm-menu-maintenance"
+          insertafter="BMB_bookmarksShowAll"
+          label="&maintenance.label;"
           tooltiptext="&maintenance.tooltip;">
       <menupopup id="maintenanceButtonPopup">
         <menuitem id="browserImport"
@@ -56,4 +59,40 @@
     <menu id="BMB_subscribeToPageMenuitem" insertafter="BMB_bookmarksShowAll" />
   </menupopup>
 
+  <toolbarpalette id="BrowserToolbarPalette">
+    <toolbarbutton id="ce-undo-close-toolbar-button"
+                   type="menu-button"
+                   class="toolbarbutton-1"
+                   label="&undoCloseTab.label;"
+                   tooltiptext="&undoCloseTab.label;"
+                   accesskey="&undoCloseTab.accesskey;"
+                   observes="History:UndoCloseTab">
+          <menupopup id="ce-undo-close-tb-menu"
+                     placespopup="true"
+                     oncommand="event.stopPropagation();"
+                     onpopupshowing="if (!this.parentNode._placesView)
+                                       new ceUndoCloseTabMenu(this.parentNode);
+                                     this.parentNode._placesView.populateUndoSubmenu();"
+                     tooltip="bhTooltip"
+                     popupsinherittooltip="true" >
+        </menupopup>
+    </toolbarbutton>
+  </toolbarpalette>
+
+  <menupopup id="tabContextMenu">
+    <menu id="ce-undo-close-tab-contextmenu"
+          label="&historyUndoMenu.label;"
+          accesskey="&historyMenu.accesskey;">
+      <menupopup id="ce-undo-close-tab-menu"
+                 placespopup="true"
+                 onpopupshowing="if (!this.parentNode._placesView)
+                                   new ceUndoCloseTabMenu(this.parentNode);
+                                 this.parentNode._placesView.populateUndoSubmenu();"
+                 tooltip="bhTooltip"
+                 popupsinherittooltip="true" />
+    </menu>
+  </menupopup>
+  <vbox id="browser-panel" >
+    <html:canvas id="ce-animation-canvas" class="animation-content" />
+  </vbox>
 </overlay>

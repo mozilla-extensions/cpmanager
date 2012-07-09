@@ -1,7 +1,139 @@
+Components.utils.import("resource://gre/modules/Services.jsm");
+
+
+// View for the undo menu.
+function log(e){
+  Services.console.logStringMessage(e);
+}
+function ceUndoCloseTabMenu(element) {
+  this._root = element;   // <menu> or <toolbarbutton>
+  this._popup = this._root.firstChild; // <menupopup>
+  this._root._placesView = this;
+  XPCOMUtils.defineLazyServiceGetter(this, "_ss",
+                                     "@mozilla.org/browser/sessionstore;1",
+                                     "nsISessionStore");
+  this.toggleRecentlyClosedTabs();
+  this._enableClearMenu = false;
+}
+
+ceUndoCloseTabMenu.prototype = {
+  enableClearMenu: function UCTM_enableClearMenu(){
+    this._enableClearMenu = true;
+  },
+  clearRecentlyClosedTabs: function UCTM_clearRecentlyClosedTabs() {
+    var max = 10;
+    try {
+      max = Services.prefs.getIntPref("browser.sessionstore.max_tabs_undo");
+      Services.prefs.setIntPref("browser.sessionstore.max_tabs_undo", 0);
+      Services.prefs.setIntPref("browser.sessionstore.max_tabs_undo", max);
+    } catch(ex) {
+      max = 10;
+      Services.prefs.setIntPref("browser.sessionstore.max_tabs_undo", max);
+    }
+    this.toggleRecentlyClosedTabs();
+  },
+  toggleRecentlyClosedTabs: function UCTM_toggleRecentlyClosedTabs() {
+    // enable/disable the Recently Closed Tabs sub menu
+    var undoMenu = this._root;
+
+    // no restorable tabs, so disable menu
+    if (this._ss.getClosedTabCount(window) == 0)
+      undoMenu.setAttribute("disabled", true);
+    else
+      undoMenu.removeAttribute("disabled");
+  },
+  
+  /**
+    * Re-open a closed tab and put it to the end of the tab strip.
+    * Used for a middle click.
+    * @param aEvent
+    *        The event when the user clicks the menu item
+    */
+  _undoCloseMiddleClick: function UCTM_undoCloseMiddleClick(aEvent) {
+    if (aEvent.button != 1)
+      return;
+
+    undoCloseTab(aEvent.originalTarget.value);
+    gBrowser.moveTabToEnd();
+  },
+
+  /**
+   * Populate when the history menu is opened
+   */
+  populateUndoSubmenu: function UCTM_populateUndoSubmenu() {
+    var undoMenu = this._root;
+    var undoPopup = this._popup;
+
+    // remove existing menu items
+    while (undoPopup.hasChildNodes())
+      undoPopup.removeChild(undoPopup.firstChild);
+
+    // no restorable tabs, so make sure menu is disabled, and return
+    if (this._ss.getClosedTabCount(window) == 0) {
+      undoMenu.setAttribute("disabled", true);
+      return;
+    }
+
+    // enable menu
+    undoMenu.removeAttribute("disabled");
+
+    // populate menu
+    var undoItems = JSON.parse(this._ss.getClosedTabData(window));
+    for (var i = 0; i < undoItems.length; i++) {
+      var m = document.createElement("menuitem");
+      m.setAttribute("label", undoItems[i].title);
+      if (undoItems[i].image) {
+        let iconURL = undoItems[i].image;
+        // don't initiate a connection just to fetch a favicon (see bug 467828)
+        if (/^https?:/.test(iconURL))
+          iconURL = "moz-anno:favicon:" + iconURL;
+        m.setAttribute("image", iconURL);
+      }
+      m.setAttribute("class", "menuitem-iconic bookmark-item menuitem-with-favicon");
+      m.setAttribute("value", i);
+      m.setAttribute("oncommand", "undoCloseTab(" + i + ");");
+
+      // Set the targetURI attribute so it will be shown in tooltip and trigger
+      // onLinkHovered. SessionStore uses one-based indexes, so we need to
+      // normalize them.
+      let tabData = undoItems[i].state;
+      let activeIndex = (tabData.index || tabData.entries.length) - 1;
+      if (activeIndex >= 0 && tabData.entries[activeIndex])
+        m.setAttribute("targetURI", tabData.entries[activeIndex].url);
+
+      m.addEventListener("click", this._undoCloseMiddleClick, false);
+      if (i == 0)
+        m.setAttribute("key", "key_undoCloseTab");
+      undoPopup.appendChild(m);
+    }
+
+    // "Clear All Tabs"
+    var bundles = Cc["@mozilla.org/intl/stringbundle;1"].
+            getService(Ci.nsIStringBundleService).
+            createBundle("chrome://cmimprove/locale/browser.properties");
+    undoPopup.appendChild(document.createElement("menuseparator"));
+    m = undoPopup.appendChild(document.createElement("menuitem"));
+    m.id = "ce_menu_clearAllTabs";
+    if(!this._enableClearMenu)
+      m.setAttribute("disabled","true");
+    m.setAttribute("label", bundles.GetStringFromName("ce.menuClearAllTabs.label"));
+    var self = this;
+    m.addEventListener("command", function(){self.clearRecentlyClosedTabs()}, false);
+
+    // "Restore All Tabs"
+    var strings = gNavigatorBundle;
+    m = undoPopup.appendChild(document.createElement("menuitem"));
+    m.id = "menu_restoreAllTabs";
+    m.setAttribute("label", strings.getString("menuRestoreAllTabs.label"));
+    m.addEventListener("command", function() {
+      for (var i = 0; i < undoItems.length; i++)
+        undoCloseTab();
+    }, false);
+  },
+};
 // tabs context menu
 (function() {
 
-Components.utils.import("resource://gre/modules/Services.jsm");
 function $(id){
   if (typeof id == 'string') {
     return document.getElementById(id);
@@ -83,6 +215,298 @@ function cmd_reloadSkipCache(){
   const reloadFlags = Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_PROXY | Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE;
   tab.linkedBrowser.reloadWithFlags(reloadFlags);
 }
+var undoclose = {
+  handleEvent: function UC_handleEvent(aEvent) {
+    switch (aEvent.type) {
+      case "load":
+        this.init();
+        break;
+      case "unload":
+        this.uninit();
+        break;
+      case "TabClose":
+        this.animate(aEvent.originalTarget);
+        this.enableClearMenu();
+      case "TabOpen":
+      case "aftercustomization":
+          this.toggleRecentlyClosedTabs();
+        break;
+    }
+  },
+  enableClearMenu: function UC_enableClearMenu(){
+    var button = $("ce-undo-close-toolbar-button");
+    if(button){
+      if(!button._placesView)
+        new ceUndoCloseTabMenu(button);
+      button._placesView.enableClearMenu();
+    }
+    var menu = $("ce-undo-close-tab-contextmenu");
+    if(menu){
+      if(!menu._placesView)
+        new ceUndoCloseTabMenu(menu);
+      menu._placesView.enableClearMenu();
+    }
+  },
+  init: function UC_init(){
+    gBrowser.tabContainer.addEventListener("TabOpen", this, false);
+    gBrowser.tabContainer.addEventListener("TabClose", this, false);
+    var toolbox = $("navigator-toolbox");
+    toolbox.addEventListener("aftercustomization",this,false)
+    setTimeout(this.toggleRecentlyClosedTabs,200);
+  },
+  uninit: function UC_uninit(){
+    gBrowser.tabContainer.removeEventListener("TabClose", this, false);
+    gBrowser.tabContainer.removeEventListener("TabOpen", this, false);
+    var toolbox = $("navigator-toolbox");
+    toolbox.removeEventListener("aftercustomization",this,false)
+  },
+  toggleRecentlyClosedTabs: function UC_toggleRecentlyClosedTabs(){
+    var button = $("ce-undo-close-toolbar-button");
+    if(button){
+      if(!button._placesView)
+        new ceUndoCloseTabMenu(button);
+      button._placesView.toggleRecentlyClosedTabs();
+    }
+    var menu = $("ce-undo-close-tab-contextmenu");
+    if(menu){
+      if(!menu._placesView)
+        new ceUndoCloseTabMenu(menu);
+      menu._placesView.toggleRecentlyClosedTabs();
+    }
+  },
+  iQ: function UC_iQ(elem) {
+    return {
+      elem: elem,
+      // ----------
+      // Function: css
+      // Sets or gets CSS properties on the receiver. When setting certain numerical properties,
+      // will automatically add "px". A property can be removed by setting it to null.
+      //
+      // Possible call patterns:
+      //   a: object, b: undefined - sets with properties from a
+      //   a: string, b: undefined - gets property specified by a
+      //   a: string, b: string/number - sets property specified by a to b
+      css: function animation_content_css(a, b) {
+        let properties = null;
+      
+        if (typeof a === 'string') {
+          let key = a;
+          if (b === undefined) {
+            return window.getComputedStyle(this.elem, null).getPropertyValue(key);
+          }
+          properties = {};
+          properties[key] = b;
+        } else if (a instanceof Rect) {
+          properties = {
+            left: a.left,
+            top: a.top,
+            width: a.width,
+            height: a.height
+          };
+        } else {
+          properties = a;
+        }
+      
+        let pixels = {
+          'left': true,
+          'top': true,
+          'right': true,
+          'bottom': true,
+          'width': true,
+          'height': true
+        };
+      
+        for (let key in properties) {
+          let value = properties[key];
+      
+          if (pixels[key] && typeof value != 'string')
+            value += 'px';
+      
+          if (value == null) {
+            this.elem.style.removeProperty(key);
+          } else if (key.indexOf('-') != -1)
+            this.elem.style.setProperty(key, value, '');
+          else
+            this.elem.style[key] = value;
+        }
+        return this;
+      },
+      
+      // ----------
+      // Function: animate
+      // Uses CSS transitions to animate the element.
+      //
+      // Parameters:
+      //   css - an object map of the CSS properties to change
+      //   options - an object with various properites (see below)
+      //
+      // Possible "options" properties:
+      //   duration - how long to animate, in milliseconds
+      //   easing - easing function to use. Possibilities include
+      //     "tabviewBounce", "easeInQuad". Default is "ease".
+      //   complete - function to call once the animation is done, takes nothing
+      //     in, but "this" is set to the element that was animated.
+      animate: function animation_content_animate(css, options) {
+        if (!options)
+          options = {};
+      
+        let easings = {
+          tabviewBounce: "cubic-bezier(0.0, 0.63, .6, 1.29)", 
+          easeInQuad: 'ease-in', // TODO: make it a real easeInQuad, or decide we don't care
+          fast: 'cubic-bezier(0.7,0,1,1)'
+        };
+      
+        let duration = (options.duration || 400);
+        let easing = (easings[options.easing] || 'ease');
+      
+        if (css instanceof Rect) {
+          css = {
+            left: css.left,
+            top: css.top,
+            width: css.width,
+            height: css.height
+          };
+        }
+      
+        // The latest versions of Firefox do not animate from a non-explicitly
+        // set css properties. So for each element to be animated, go through
+        // and explicitly define 'em.
+        let rupper = /([A-Z])/g;
+        let cStyle = window.getComputedStyle(this.elem, null);
+        for (let prop in css) {
+          prop = prop.replace(rupper, "-$1").toLowerCase();
+          this.css(prop, cStyle.getPropertyValue(prop));
+        }
+      
+        this.css({
+          '-moz-transition-property': Object.keys(css).join(", "),
+          '-moz-transition-duration': (duration / 1000) + 's',
+          '-moz-transition-timing-function': easing
+        });
+      
+        this.css(css);
+        let self = this;
+        setTimeout(function() {
+          self.css({
+            '-moz-transition-property': 'none',
+            '-moz-transition-duration': '',
+            '-moz-transition-timing-function': ''
+          });
+      
+          if (typeof options.complete == "function")
+            options.complete.apply(self);
+        }, duration);
+      
+        return this;
+      },
+      
+      // ----------
+      // Function: fadeOut
+      // Animates the receiver to full transparency. Calls callback on completion.
+      fadeOut: function animation_content_fadeOut(callback) {
+        let self = this;
+        this.animate({
+          opacity: 0
+        }, {
+          duration: 400,
+          complete: function() {
+            self.css({display: 'none'});
+            if (typeof callback == "function")
+              callback.apply(self);
+          }
+        });
+    
+        return this;
+      },
+    
+      // ----------
+      // Function: fadeIn
+      // Animates the receiver to full opacity.
+      fadeIn: function animation_content_fadeIn() {
+        this.css({display: ''});
+        this.animate({
+          opacity: 1
+        }, {
+          duration: 400
+        });
+    
+        return this;
+      },
+    
+      // ----------
+      // Function: hide
+      // Hides the receiver.
+      hide: function animation_content_hide() {
+        this.css({display: 'none', opacity: 0});
+        return this;
+      },
+      
+      // ----------
+      // Function: show
+      // Shows the receiver.
+      show: function animation_content_show() {
+        this.css({display: '', opacity: 1});
+        return this;
+      },
+    };
+  },
+  animateCount: 0,
+  animate: function UC_animate(aTab){
+    try{
+      if (!Services.prefs.getBoolPref("extensions.cmimprove.features.undocloseanimation.enable", true)) {
+        return;
+      }
+    } catch(e) {}
+    var button = $("ce-undo-close-toolbar-button");
+    if(!button)
+      return;
+    if(aTab != window.gBrowser.selectedTab)
+      return;
+    if(this.animateCount++ > 0)
+      return;
+    var panel = $("browser-panel");
+
+    var linkedBrowser = window.gBrowser.selectedTab.linkedBrowser
+    var top1 = linkedBrowser.boxObject.screenY - panel.boxObject.screenY + panel.boxObject.y;
+    var left1 = linkedBrowser.boxObject.screenX - panel.boxObject.screenX + panel.boxObject.x;
+    var width1 = linkedBrowser.boxObject.width;
+    var height1 = linkedBrowser.boxObject.height;
+
+    var top2 = button.boxObject.screenY - panel.boxObject.screenY + panel.boxObject.y + button.boxObject.height/2;
+    var left2 = button.boxObject.screenX - panel.boxObject.screenX + panel.boxObject.x + button.boxObject.width/2;
+    var width2 = 0;
+    var height2 = 0;
+
+    var win = linkedBrowser.contentWindow.content;
+    var canvas = $("ce-animation-canvas");
+    canvas.width = width1;
+    canvas.height = height1;
+    let ctx = canvas.getContext("2d");
+    ctx.drawWindow(win, win.scrollX, win.scrollY, width1, height1, "rgba(255,255,255,0.5)");
+    var ac = this.iQ(canvas);
+    
+    ac.show();
+    ac.css({
+      top: top1,
+      left: left1,
+      width:  width1,
+      height: height1,
+      opacity: 0.9
+    });
+    ac.animate({
+      top: top2,
+      left: left2,
+      width:  width2,
+      height: height2,
+      opacity: 0.5
+    }, {
+      duration: 900,
+      complete: function undo_close_animate_complete() {
+        ac.hide();
+      }
+    });
+  },
+};
 var tcm = {
   init : function(){
     try{
@@ -146,6 +570,7 @@ var tcm = {
               ,$("context_closeOtherTabs")//closeOtherTabs
               ,btn_closeRight//[closeRight]
               ,$M("context_undoCloseTab",{ key:"key_undoCloseTab" })//undoClose
+              ,$("ce-undo-close-tab-contextmenu")
               ,$E("menuseparator")  //--------------------
               ,btn_bookmark//[bookmark]
               ,$M("context_bookmarkAllTabs",{ label: getString("cp.tabs.bookmark.all") })//bookmarkAll
@@ -178,6 +603,9 @@ var tcm = {
     }).bind(TabContextMenu);
   },
 }
+
 window.addEventListener('load', tcm.init, false);
+window.addEventListener('load', undoclose, false);
+window.addEventListener('unload', undoclose, false);
 
 })();

@@ -55,7 +55,10 @@ locale  cmimprove  zh-CN         improve/locale/zh-CN/
 skin	  cmimprove  classic/1.0	 improve/skin/
 skin	  cmimprove-os  classic/1.0	 improve/skin/
 skin	  cmimprove-os  classic/1.0	 improve/skin/mac/ os=Darwin
+
 overlay chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
+style chrome://global/content/customizeToolbar.xul chrome://cmimprove-os/skin/cm_menu_maintenance.css
+
  
 component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js
 contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
