@@ -1,0 +1,14 @@
+#ce-undo-close-toolbar-button {
+  list-style-image: url("chrome://cmimprove-os/skin/undo-close-tb.png");
+}
+#ce-undo-close-toolbar-button[disabled="true"] {
+  list-style-image: url("chrome://cmimprove-os/skin/undo-close-tb-disabled.png");
+}
+.animation-content {
+  position:fixed;
+  top: 0px;
+  left: 0px;
+  width: 0px;
+  height: 0px;
+  opacity: 0;
+}

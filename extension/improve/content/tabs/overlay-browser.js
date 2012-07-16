@@ -30,7 +30,9 @@ ceUndoCloseTabMenu.prototype = {
       max = 10;
       Services.prefs.setIntPref("browser.sessionstore.max_tabs_undo", max);
     }
-    this.toggleRecentlyClosedTabs();
+    var evt = document.createEvent("Events");
+    evt.initEvent("clearrecentlyclosedtabs", true, false);
+    document.dispatchEvent(evt);
   },
   toggleRecentlyClosedTabs: function UCTM_toggleRecentlyClosedTabs() {
     // enable/disable the Recently Closed Tabs sub menu
@@ -42,7 +44,7 @@ ceUndoCloseTabMenu.prototype = {
     else
       undoMenu.removeAttribute("disabled");
   },
-  
+
   /**
     * Re-open a closed tab and put it to the end of the tab strip.
     * Used for a middle click.
@@ -229,7 +231,8 @@ var undoclose = {
         this.enableClearMenu();
       case "TabOpen":
       case "aftercustomization":
-          this.toggleRecentlyClosedTabs();
+      case "clearrecentlyclosedtabs":
+        this.toggleRecentlyClosedTabs();
         break;
     }
   },
@@ -247,11 +250,29 @@ var undoclose = {
       menu._placesView.enableClearMenu();
     }
   },
+  installButton: function() {
+    try{
+      if(Application.prefs.getValue("extensions.cmimprove.undoclose.installButton", false))
+        return;
+      var navbar = document.getElementById("nav-bar");
+      var str = navbar.currentSet + "";
+      if(str.indexOf("ce-undo-close-toolbar-button") != -1)
+        return;
+      str = str + ",ce-undo-close-toolbar-button";
+      navbar.setAttribute("currentset", str);
+      navbar.currentSet = str;
+      document.persist("nav-bar", "currentset");
+      BrowserToolboxCustomizeDone(true);
+      Application.prefs.setValue("extensions.cmimprove.undoclose.installButton", true);
+    } catch(e) {}
+  },
+
   init: function UC_init(){
     gBrowser.tabContainer.addEventListener("TabOpen", this, false);
     gBrowser.tabContainer.addEventListener("TabClose", this, false);
     var toolbox = $("navigator-toolbox");
     toolbox.addEventListener("aftercustomization",this,false)
+    this.installButton();
     setTimeout(this.toggleRecentlyClosedTabs,200);
   },
   uninit: function UC_uninit(){
@@ -288,7 +309,7 @@ var undoclose = {
       //   a: string, b: string/number - sets property specified by a to b
       css: function animation_content_css(a, b) {
         let properties = null;
-      
+
         if (typeof a === 'string') {
           let key = a;
           if (b === undefined) {
@@ -306,7 +327,7 @@ var undoclose = {
         } else {
           properties = a;
         }
-      
+
         let pixels = {
           'left': true,
           'top': true,
@@ -315,13 +336,13 @@ var undoclose = {
           'width': true,
           'height': true
         };
-      
+
         for (let key in properties) {
           let value = properties[key];
-      
+
           if (pixels[key] && typeof value != 'string')
             value += 'px';
-      
+
           if (value == null) {
             this.elem.style.removeProperty(key);
           } else if (key.indexOf('-') != -1)
@@ -331,7 +352,7 @@ var undoclose = {
         }
         return this;
       },
-      
+
       // ----------
       // Function: animate
       // Uses CSS transitions to animate the element.
@@ -349,16 +370,16 @@ var undoclose = {
       animate: function animation_content_animate(css, options) {
         if (!options)
           options = {};
-      
+
         let easings = {
-          tabviewBounce: "cubic-bezier(0.0, 0.63, .6, 1.29)", 
+          tabviewBounce: "cubic-bezier(0.0, 0.63, .6, 1.29)",
           easeInQuad: 'ease-in', // TODO: make it a real easeInQuad, or decide we don't care
           fast: 'cubic-bezier(0.7,0,1,1)'
         };
-      
+
         let duration = (options.duration || 400);
         let easing = (easings[options.easing] || 'ease');
-      
+
         if (css instanceof Rect) {
           css = {
             left: css.left,
@@ -367,7 +388,7 @@ var undoclose = {
             height: css.height
           };
         }
-      
+
         // The latest versions of Firefox do not animate from a non-explicitly
         // set css properties. So for each element to be animated, go through
         // and explicitly define 'em.
@@ -377,13 +398,13 @@ var undoclose = {
           prop = prop.replace(rupper, "-$1").toLowerCase();
           this.css(prop, cStyle.getPropertyValue(prop));
         }
-      
+
         this.css({
           '-moz-transition-property': Object.keys(css).join(", "),
           '-moz-transition-duration': (duration / 1000) + 's',
           '-moz-transition-timing-function': easing
         });
-      
+
         this.css(css);
         let self = this;
         setTimeout(function() {
@@ -392,14 +413,14 @@ var undoclose = {
             '-moz-transition-duration': '',
             '-moz-transition-timing-function': ''
           });
-      
+
           if (typeof options.complete == "function")
             options.complete.apply(self);
         }, duration);
-      
+
         return this;
       },
-      
+
       // ----------
       // Function: fadeOut
       // Animates the receiver to full transparency. Calls callback on completion.
@@ -415,10 +436,10 @@ var undoclose = {
               callback.apply(self);
           }
         });
-    
+
         return this;
       },
-    
+
       // ----------
       // Function: fadeIn
       // Animates the receiver to full opacity.
@@ -429,10 +450,10 @@ var undoclose = {
         }, {
           duration: 400
         });
-    
+
         return this;
       },
-    
+
       // ----------
       // Function: hide
       // Hides the receiver.
@@ -440,7 +461,7 @@ var undoclose = {
         this.css({display: 'none', opacity: 0});
         return this;
       },
-      
+
       // ----------
       // Function: show
       // Shows the receiver.
@@ -484,21 +505,20 @@ var undoclose = {
     let ctx = canvas.getContext("2d");
     ctx.drawWindow(win, win.scrollX, win.scrollY, width1, height1, "rgba(255,255,255,0.5)");
     var ac = this.iQ(canvas);
-    
+
     ac.show();
     ac.css({
       top: top1,
       left: left1,
       width:  width1,
       height: height1,
-      opacity: 0.9
+      opacity: 0.5
     });
     ac.animate({
       top: top2,
       left: left2,
       width:  width2,
       height: height2,
-      opacity: 0.5
     }, {
       duration: 900,
       complete: function undo_close_animate_complete() {
@@ -607,5 +627,5 @@ var tcm = {
 window.addEventListener('load', tcm.init, false);
 window.addEventListener('load', undoclose, false);
 window.addEventListener('unload', undoclose, false);
-
+document.addEventListener('clearrecentlyclosedtabs', undoclose, false);
 })();

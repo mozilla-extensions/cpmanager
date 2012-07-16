@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <?xml-stylesheet href="chrome://cmimprove-os/skin/cm_menu_maintenance.css" type="text/css" ?>
+<?xml-stylesheet href="chrome://cmimprove-os/skin/undo_closetab.css" type="text/css" ?>
 <!DOCTYPE window [
 <!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
 %improveDTD;
