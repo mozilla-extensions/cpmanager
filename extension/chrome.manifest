@@ -1,64 +1,66 @@
-content  cmtracking    tracking/content/  contentaccessible=yes
+content   cmtracking         tracking/content/  contentaccessible=yes
 
-resource cmtracking tracking/modules/
-locale cmtracking zh-CN tracking/locale/zh-CN/
-locale cmtracking en-US tracking/locale/en-US/
+resource  cmtracking         tracking/modules/
+locale    cmtracking  zh-CN  tracking/locale/zh-CN/
+locale    cmtracking  en-US  tracking/locale/en-US/
 
-resource cmsafeflag safeflag/modules/
+resource  cmsafeflag               safeflag/modules/
 
-content cmsafeflag safeflag/content/ contentaccessible=yes
-locale cmsafeflag  en-US  safeflag/locale/en-US/
-locale cmsafeflag  zh-CN  safeflag/locale/zh-CN/
-skin cmsafeflag classic/1.0 safeflag/skin/
+content   cmsafeflag               safeflag/content/  contentaccessible=yes
+locale    cmsafeflag  en-US        safeflag/locale/en-US/
+locale    cmsafeflag  zh-CN        safeflag/locale/zh-CN/
+skin      cmsafeflag  classic/1.0  safeflag/skin/
 
-content   cmnotification                 notification/content/
-skin      cmnotification   classic/1.0   notification/skin/
-locale    cmnotification   en-US         notification/locale/en-US/
-locale    cmnotification   zh-CN         notification/locale/zh-CN/
+content  cmnotification                 notification/content/
+skin     cmnotification   classic/1.0   notification/skin/
+locale   cmnotification   en-US         notification/locale/en-US/
+locale   cmnotification   zh-CN         notification/locale/zh-CN/
 
-content   cmfeedback  feedback/content/
-locale    cmfeedback   en-US         feedback/locale/en-US/
-locale    cmfeedback   zh-CN         feedback/locale/zh-CN/
-skin    cmfeedback   classic/1.0   feedback/skin/
+content  cmfeedback               feedback/content/
+locale   cmfeedback  en-US        feedback/locale/en-US/
+locale   cmfeedback  zh-CN        feedback/locale/zh-CN/
+skin     cmfeedback  classic/1.0  feedback/skin/
 
-overlay  chrome://browser/content/browser.xul  chrome://cmtracking/content/cpmanager.xul
+overlay   chrome://browser/content/browser.xul          chrome://cmtracking/content/cpmanager.xul
 
-overlay  chrome://browser/content/browser.xul  chrome://cmsafeflag/content/overlay.xul
-override chrome://safeflag/content/overlay.xul chrome://cmsafeflag/content/safeflag_blank.xul
-style  chrome://global/content/customizeToolbar.xul  chrome://cmsafeflag/skin/overlay.css
+overlay   chrome://browser/content/browser.xul          chrome://cmsafeflag/content/overlay.xul
+override  chrome://safeflag/content/overlay.xul         chrome://cmsafeflag/content/safeflag_blank.xul
+style     chrome://global/content/customizeToolbar.xul  chrome://cmsafeflag/skin/overlay.css
 
-style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/linux/overlay.css os=Linux
-style chrome://browser/content/browser.xul chrome://cmsafeflag/skin/mac/overlay.css os=Darwin
+style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin/linux/overlay.css  os=Linux
+style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin/mac/overlay.css    os=Darwin
 
-overlay   chrome://cmsafeflag/content/options.xul   chrome://cmnotification/content/optionsOverlay.xul appversion>=4.0
+overlay   chrome://cmsafeflag/content/options.xul            chrome://cmnotification/content/optionsOverlay.xul      appversion>=4.0
 
-overlay   chrome://browser/content/browser.xul   chrome://cmnotification/content/ff-overlay.xul appversion>=4.0
-override chrome://addonnotification/content/ff-overlay.xul chrome://cmnotification/content/notification_blank.xul
-style  chrome://browser/content/browser.xul chrome://cmnotification/skin/overlay-win.css os=WINNT
+overlay   chrome://browser/content/browser.xul               chrome://cmnotification/content/ff-overlay.xul          appversion>=4.0
+override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotification/content/notification_blank.xul
+style     chrome://browser/content/browser.xul               chrome://cmnotification/skin/overlay-win.css            os=WINNT
 
-style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/overlay.css
-overlay   chrome://browser/content/browser.xul   chrome://cmfeedback/content/overlay.xul appversion>=4.0
-style chrome://browser/content/browser.xul chrome://cmfeedback/skin/mac/overlay.css os=Darwin
-style chrome://browser/content/browser.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
-style chrome://global/content/customizeToolbar.xul chrome://cmfeedback/skin/linux/overlay.css os=Linux
+style    chrome://global/content/customizeToolbar.xul  chrome://cmfeedback/skin/overlay.css
+overlay  chrome://browser/content/browser.xul          chrome://cmfeedback/content/overlay.xul     appversion>=4.0
+style    chrome://browser/content/browser.xul          chrome://cmfeedback/skin/mac/overlay.css    os=Darwin
+style    chrome://browser/content/browser.xul          chrome://cmfeedback/skin/linux/overlay.css  os=Linux
+style    chrome://global/content/customizeToolbar.xul  chrome://cmfeedback/skin/linux/overlay.css  os=Linux
 
-content cmpfs  pfs/content/
-overlay chrome://mozapps/content/plugins/pluginInstallerWizard.xul chrome://cmpfs/content/overlay.xul
-content cmimprove                improve/content/
-locale  cmimprove  en-US         improve/locale/en-US/
-locale  cmimprove  zh-CN         improve/locale/zh-CN/
-skin    cmimprove  classic/1.0   improve/skin/
-skin    cmimprove-os  classic/1.0   improve/skin/
-skin    cmimprove-os  classic/1.0   improve/skin/mac/ os=Darwin
-skin	  cmimprove-os  classic/1.0	 improve/skin/linux/ os=Linux
+content  cmpfs                                                       pfs/content/
+overlay  chrome://mozapps/content/plugins/pluginInstallerWizard.xul  chrome://cmpfs/content/overlay.xul
 
-overlay chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
-overlay chrome://browser/content/browser.xul    chrome://cmimprove/content/sanitize/overlay-browser.xul
-overlay chrome://browser/content/sanitize.xul   chrome://cmimprove/content/sanitize/overlay-sanitize.xul
+content  cmimprove                   improve/content/
+locale   cmimprove     en-US         improve/locale/en-US/
+locale   cmimprove     zh-CN         improve/locale/zh-CN/
+skin     cmimprove     classic/1.0   improve/skin/
+skin     cmimprove-os  classic/1.0   improve/skin/
+skin     cmimprove-os  classic/1.0   improve/skin/mac/ os=Darwin
+skin     cmimprove-os  classic/1.0	 improve/skin/linux/ os=Linux
 
-style   chrome://global/content/customizeToolbar.xul chrome://cmimprove-os/skin/undo_closetab.css
-style   chrome://global/content/customizeToolbar.xul chrome://cmimprove/skin/ce-Toolbar.css
- 
+overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
+overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/privateBrowser/overlay-browser.xul
+overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/sanitize/overlay-browser.xul
+overlay  chrome://browser/content/sanitize.xul  chrome://cmimprove/content/sanitize/overlay-sanitize.xul
+
+style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove-os/skin/undo_closetab.css
+style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove/skin/ce-Toolbar.css
+
 component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js
 contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
 category profile-after-change trackingFactoryClass @mozilla.com.cn/tracking;1

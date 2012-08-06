@@ -2,11 +2,15 @@
   list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png");
 }
 
-#TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory) {
+#TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory, #ce_privateBrowser) {
   list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png");
 }
 
 #ce_sanitizeHistory{
   -moz-image-region: rect(0px, 137px, 18px, 119px);
   -moz-box-orient: horizontal;
+}
+
+#ce_privateBrowser{
+  -moz-image-region: rect(0px, 37px, 16px, 17px);
 }
