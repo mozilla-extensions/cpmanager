@@ -7,14 +7,7 @@
 	}
 	var {cp_mod, cpmanager_FileUtil, cpmanager_LOG, Services, ctypes} = tmp;
 	
-	function _getLib() {
-		var lib = null;
-		var uri = Services.io.newURI('resource://tracking-components/cpmanager.dll', null, null);
-		if (uri instanceof Components.interfaces.nsIFileURL) {
-			lib = ctypes.open(uri.file.path);
-		}
-		return lib;
-	}
+
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
 	var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE = "http://www.g-fox.cn/online.gif";
@@ -81,11 +74,7 @@
 
 	function cpmanager_paramActCode() {
 		try {
-			if (navigator.appVersion.indexOf("Win")!=-1) {
-				return "&ver=2&actcode2=" + cpmanager_getActCode();
-			} else {
-				return "&ver=2&actcode2=" + encodeURIComponent(cpmanager_getPrefValue("uuid", ""));
-			}
+				return "&ver=3&actcode3=" + encodeURIComponent(cpmanager_getPrefValue("uuid", ""));
 		} catch (e) {
 	  		Components.utils.reportError(e);
 			return "";
@@ -221,29 +210,6 @@
 			}
 		} catch (e){
 			Components.utils.reportError(e);
-		}
-	}
-
-	function cpmanager_getActCode(){
-		if(isFirefoxLowerThan4()) {
-			var uidGenerator = Components.classes["@mozillaonline.com/uidgenerator;1"].createInstance();
-			uidGenerator = uidGenerator.QueryInterface(Components.interfaces.IUidGenerator);
-			return uidGenerator.getActivationKey();	
-		}else {
-			var lib = _getLib();
-			var ty = ctypes.PointerType(ctypes.int16_t);
-			var getActivationKey = lib.declare("GetActivationKey",
-								ctypes.winapi_abi,
-								ty);
-			var buffer = getActivationKey();
-			var key = buffer.readString();
-			var freeMemory = lib.declare("FreeMemory",
-								ctypes.winapi_abi,
-								ctypes.void_t,
-								ty);
-			freeMemory(buffer);			
-			lib.close();
-			return key;
 		}
 	}
 
