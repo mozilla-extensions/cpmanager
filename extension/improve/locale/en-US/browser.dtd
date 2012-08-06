@@ -1,2 +1,7 @@
 <!ENTITY cp.menu.bookmarksShowAll "Show All Bookmarks">
 <!ENTITY cp.showAllBookmarks2.label "Show All Bookmarks">
+
+<!ENTITY cp.clearRecentHistory.none.label "Never Auto Clear">
+<!ENTITY cp.clearRecentHistory.7days.label "Clear 7 Days Ago">
+
+<!ENTITY cp.clearRecentHistory.clearOnClose.label "Clear On Close">

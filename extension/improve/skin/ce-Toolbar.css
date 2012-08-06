@@ -1,0 +1,12 @@
+.toolbarbutton-ce{
+  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png");
+}
+
+#TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory) {
+  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png");
+}
+
+#ce_sanitizeHistory{
+  -moz-image-region: rect(0px, 137px, 18px, 119px);
+  -moz-box-orient: horizontal;
+}

@@ -1,2 +1,7 @@
 <!ENTITY cp.menu.bookmarksShowAll "管理书签">
 <!ENTITY cp.showAllBookmarks2.label "管理书签">
+
+<!ENTITY cp.clearRecentHistory.none.label "不自动清除历史记录">
+<!ENTITY cp.clearRecentHistory.7days.label "仅保留7天内的历史记录">
+
+<!ENTITY cp.clearRecentHistory.clearOnClose.label "关闭时清除历史记录">

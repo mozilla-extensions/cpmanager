@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<?xml-stylesheet href="chrome://cmimprove/skin/ce-Toolbar.css" type="text/css" ?>
+<!DOCTYPE window [
+<!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
+%improveDTD;
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+%browserDTD;
+<!ENTITY % privacyDTD SYSTEM "chrome://browser/locale/preferences/privacy.dtd">
+%privacyDTD;
+]>
+<overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script src="chrome://cmimprove/content/sanitize/overlay-browser.js" />
+
+  <toolbarpalette id="BrowserToolbarPalette">
+    <toolbarbutton id="ce_sanitizeHistory"
+               type="menu"
+               class="toolbarbutton-1 toolbarbutton-ce"
+               label="&clearRecentHistory.label;"
+               tooltiptext="&clearRecentHistory.label;">
+      <menupopup id="ce_sanitizeHistory_popup" placespopup="true" onpopuphiding="ce_sanitizeHistory.onPopupHiding()" onpopupshowing="ce_sanitizeHistory.onPopupShowing()" >
+        <menuitem id="ce_sanitizeHistory_none" label="&cp.clearRecentHistory.none.label;" type="radio" group="ce_sanitizeHistory"/>
+        <!-- menuitem id="ce_sanitizeHistory_7days" label="&cp.clearRecentHistory.7days.label;" type="radio" group="ce_sanitizeHistory"/-->
+        <menuitem id="ce_sanitizeHistory_onclose" label="&cp.clearRecentHistory.clearOnClose.label;" type="radio" group="ce_sanitizeHistory"/>
+        <menuseparator/>
+        <menuitem id="ce_sanitizeHistory_dialog" label="&clearRecentHistory.label;" command="Tools:Sanitize"/>
+      </menupopup>
+    </toolbarbutton>
+  </toolbarpalette>
+</overlay>
