@@ -39,11 +39,15 @@ trackingFactoryClass.prototype = {
   //tracking数据 key:count
   data : {},
 
+  trackPrefs : function(key,value){
+    this.data[key] = value;
+  },
+  
   track : function(key){
     if(typeof this.data[key] == 'number'){
       this.data[key] ++;
     }else{
-      this.data[key]=1;
+      this.data[key] = 1;
     }
   },
 

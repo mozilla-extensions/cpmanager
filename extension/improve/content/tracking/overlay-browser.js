@@ -4,6 +4,11 @@ var ce_tracking = {
   track : function(key){
     this.ceTracking.track(key);
   },
+  // 检查prefs
+  hookPrefs : function(prefs,key){
+    var value = Application.prefs.getValue(prefs,"");
+    ceTracking.trackPrefs(key,value.toString());
+  },
   // 监视 node 的 event
   hookEvent : function(id,event,key){
     var ele = document.getElementById(id)
@@ -57,9 +62,33 @@ var trackList = [{"type":"event","data":["searchbar","focus"],"key":"searchbarfo
                 ,{"type":"event","data":["share-all-cn-bar","click"],"key":"shareall"}
                 ,{"type":"event","data":["tcfontsetter","click"],"key":"fontsetter"}
                 ,{"type":"event","data":["tczoompanel","click"],"key":"zoompanel"}
+                ,{"type":"event","data":["tczoompanel_zoom_in","click"],"key":"tczoompanel_zoom_in"}
+                ,{"type":"event","data":["tczoompanel_zoom_out","click"],"key":"tczoompanel_zoom_out"}
+                ,{"type":"event","data":["tczoompanel_zoom_50","click"],"key":"tczoompanel_zoom_50"}
+                ,{"type":"event","data":["tczoompanel_zoom_75","click"],"key":"tczoompanel_zoom_75"}
+                ,{"type":"event","data":["tczoompanel_zoom_100","click"],"key":"tczoompanel_zoom_100"}
+                ,{"type":"event","data":["tczoompanel_zoom_125","click"],"key":"tczoompanel_zoom_125"}
+                ,{"type":"event","data":["tczoompanel_zoom_150","click"],"key":"tczoompanel_zoom_150"}
+                ,{"type":"event","data":["tczoompanel_zoom_200","click"],"key":"tczoompanel_zoom_200"}
+                ,{"type":"event","data":["tczoompanel_zoom_300","click"],"key":"tczoompanel_zoom_300"}
+                ,{"type":"event","data":["tczoompanel_global","click"],"key":"tczoompanel_global"}
+                ,{"type":"event","data":["tczoompanel","click"],"key":"zoompanel"}
                 ,{"type":"event","data":["personas-toolbar-button","click"],"key":"personas-tb"}
                 ,{"type":"event","data":["mn-mailnotifier-status-icon","click"],"key":"mailnotifier"}
                 ,{"type":"event","data":["muter-toolbar-palette-button","click"],"key":"muter"}
+                ,{"type":"event","data":["ce-undo-close-toolbar-button","click"],"key":"undoclosetab"}
+                ,{"type":"event","data":["ce_privateBrowser","click"],"key":"privateBrowser-tb"}
+                ,{"type":"event","data":["ntabimprove","click"],"key":"ntabimprove"}
+                ,{"type":"event","data":["ntabimprove_closetab_dblclick","click"],"key":"ntabimprove_closetab_dblclick"}
+                ,{"type":"event","data":["ntabimprove_closetab_mclick","click"],"key":"ntabimprove_closetab_mclick"}
+                ,{"type":"event","data":["ntabimprove_closetab_rclick","click"],"key":"ntabimprove_closetab_rclick"}
+                ,{"type":"event","data":["ntabimprove_loadInBackground_disable","click"],"key":"ntabimprove_loadInBackground_disable"}
+                ,{"type":"event","data":["ntabimprove_loadInBackground_enable","click"],"key":"ntabimprove_loadInBackground_enable"}
+                ,{"type":"event","data":["ntabimprove_setting","click"],"key":"ntabimprove_setting"}
+                ,{"type":"event","data":["ce_sanitizeHistory","click"],"key":"ce_sanitizeHistory"}
+                ,{"type":"event","data":["ce_sanitizeHistory_none","click"],"key":"ce_sanitizeHistory_none"}
+                ,{"type":"event","data":["ce_sanitizeHistory_onclose","click"],"key":"ce_sanitizeHistory_onclose"}
+                ,{"type":"event","data":["ce_sanitizeHistory_dialog","click"],"key":"ce_sanitizeHistory_dialog"}
                 ];
 var init_once = false;
 function startTracking(){
@@ -79,6 +108,9 @@ function startTracking(){
           break;
         case "method":
           tracking.hookCode(obj.data[0],obj.key);
+          break;
+        case "prefs":
+          tracking.hookPrefs(obj.data[0],obj.key);
           break;
       }
     }catch(e){}
