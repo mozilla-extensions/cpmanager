@@ -483,8 +483,6 @@ var undoclose = {
       return;
     if(aTab != window.gBrowser.selectedTab)
       return;
-    if(this.animateCount++ > 0)
-      return;
     var panel = $("browser-panel");
 
     var linkedBrowser = window.gBrowser.selectedTab.linkedBrowser
@@ -498,6 +496,10 @@ var undoclose = {
     var width2 = 0;
     var height2 = 0;
 
+    if(left2 == 0) //no animation when close about:addons
+      return;
+    if(this.animateCount++ > 0)
+      return;
     var win = linkedBrowser.contentWindow.content;
     var canvas = $("ce-animation-canvas");
     canvas.width = width1;
