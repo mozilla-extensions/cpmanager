@@ -28,6 +28,7 @@ let cePrivateBrowsingUI = {
     toolbox.addEventListener("aftercustomization",this,false)
 
     this.initUI();
+    this.installButton("ce_privateBrowser");
   },
 
   uninit: function PBUI_unint() {
@@ -75,6 +76,29 @@ let cePrivateBrowsingUI = {
       else
         appmenupbMenuItem.removeAttribute("checked");
     }
+  },
+  installButton: function PBUI__installButton(buttonId,toolbarId) {
+    toolbarId = toolbarId || "addon-bar";
+    var key = "extensions.toolbarbutton.installed."+buttonId;
+    if(Application.prefs.getValue(key, false))
+      return;
+
+    var toolbar = window.document.getElementById(toolbarId);
+    let curSet = toolbar.currentSet;
+    if (-1 == curSet.indexOf(buttonId)){
+      let newSet = curSet + "," + buttonId;
+      toolbar.currentSet = newSet;
+      toolbar.setAttribute("currentset", newSet);
+      document.persist(toolbar.id, "currentset");
+      try{
+        BrowserToolboxCustomizeDone(true);
+      }catch(e){}
+    }
+    if (toolbar.getAttribute("collapsed") == "true") {
+      toolbar.setAttribute("collapsed", "false");
+    }
+    document.persist(toolbar.id, "collapsed");
+    Application.prefs.setValue(key, true);
   },
 };
 

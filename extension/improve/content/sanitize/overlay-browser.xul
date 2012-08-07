@@ -9,16 +9,19 @@
 %privacyDTD;
 ]>
 <overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
-      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script src="chrome://cmimprove/content/sanitize/overlay-browser.js" />
+  <script type="application/javascript" src="chrome://cmimprove/content/sanitize/overlay-browser.js" />
 
   <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="ce_sanitizeHistory"
-               type="menu"
+               type="button"
                class="toolbarbutton-1 toolbarbutton-ce"
                label="&clearRecentHistory.label;"
                tooltiptext="&clearRecentHistory.label;">
+    </toolbarbutton>
+  </toolbarpalette>
+  <popupset id="mainPopupSet">
       <menupopup id="ce_sanitizeHistory_popup" placespopup="true" onpopuphiding="ce_sanitizeHistory.onPopupHiding()" onpopupshowing="ce_sanitizeHistory.onPopupShowing()" >
         <menuitem id="ce_sanitizeHistory_none" label="&cp.clearRecentHistory.none.label;" type="radio" group="ce_sanitizeHistory"/>
         <!-- menuitem id="ce_sanitizeHistory_7days" label="&cp.clearRecentHistory.7days.label;" type="radio" group="ce_sanitizeHistory"/-->
@@ -26,6 +29,5 @@
         <menuseparator/>
         <menuitem id="ce_sanitizeHistory_dialog" label="&clearRecentHistory.label;" command="Tools:Sanitize"/>
       </menupopup>
-    </toolbarbutton>
-  </toolbarpalette>
+  </popupset>
 </overlay>

@@ -14,3 +14,7 @@
 #ce_privateBrowser{
   -moz-image-region: rect(0px, 37px, 16px, 17px);
 }
+
+#ce_privateBrowser[checked]{
+  -moz-image-region: rect(0px, 258px, 16px, 241px);
+}
