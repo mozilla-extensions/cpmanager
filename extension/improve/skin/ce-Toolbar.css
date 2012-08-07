@@ -1,9 +1,13 @@
-.toolbarbutton-ce{
-  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png");
+#ce_sanitizeHistory, #ce_privateBrowser{
+  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png") !important;
+}
+#ce_sanitizeHistory:-moz-lwtheme, 
+#ce_privateBrowser:-moz-lwtheme {
+  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png") !important;
 }
 
 #TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory, #ce_privateBrowser) {
-  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png");
+  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png") !important;
 }
 
 #ce_sanitizeHistory{
