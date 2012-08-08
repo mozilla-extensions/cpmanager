@@ -1,8 +1,8 @@
 #ce_sanitizeHistory, #ce_privateBrowser{
   list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png") !important;
 }
-#ce_sanitizeHistory:-moz-lwtheme, 
-#ce_privateBrowser:-moz-lwtheme {
+#ce_sanitizeHistory:-moz-lwtheme-brighttext,
+#ce_privateBrowser:-moz-lwtheme-brighttext {
   list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png") !important;
 }
 
@@ -16,9 +16,9 @@
 }
 
 #ce_privateBrowser{
-  -moz-image-region: rect(0px, 37px, 16px, 17px);
+  -moz-image-region: rect(0px, 38px, 16px, 20px);
 }
 
 #ce_privateBrowser[checked]{
-  -moz-image-region: rect(0px, 258px, 16px, 241px);
+  -moz-image-region: rect(0px, 259px, 16px, 241px);
 }

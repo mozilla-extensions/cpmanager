@@ -1,11 +1,11 @@
 #ce-undo-close-toolbar-button {
-  list-style-image: url("chrome://cmimprove/skin/undo-close-tb.png") ;
+  list-style-image: url("chrome://cmimprove/skin/undo-close-tb.png") !important;
 }
 #ce-undo-close-toolbar-button:-moz-lwtheme-brighttext {
-  list-style-image: url("chrome://cmimprove/skin/undo-close-tb-inverted.png") ;
+  list-style-image: url("chrome://cmimprove/skin/undo-close-tb-inverted.png") !important;
 }
 #TabsToolbar:last-child :-moz-any(#ce-undo-close-toolbar-button) {
-  list-style-image: url("chrome://cmimprove/skin/undo-close-tb-inverted.png") ;
+  list-style-image: url("chrome://cmimprove/skin/undo-close-tb-inverted.png") !important;
 }
 .animation-content {
   position:fixed;

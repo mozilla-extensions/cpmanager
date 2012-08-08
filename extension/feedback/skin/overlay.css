@@ -1,17 +1,71 @@
+#moz_cn_feedback {
+  list-style-image: url("chrome://cmfeedback/skin/feed_icon.png") !important;
+}
 
-#moz_cn_feedback { list-style-image: url("chrome://cmfeedback/skin/feed_icon.png"); }
-#moz-cn-feedback-popup { margin-left:-10px; text-align:center; -moz-appearance: none; }
-#moz-cn-feedback-popup-main { width:330px; }
-#moz-cn-feedback-checkbox { margin:0 2px; }
-#moz-cn-feedback-popup textbox.textarea { text-align:left; font-size:12px; height:75px; }
-#moz-cn-feedback-popup hbox.group, #moz-cn-feedback-popup vbox.group { margin:0 0 14px 0; }
-#moz-cn-feedback-popup  textbox.feedback_url { text-align:left; }
-#moz-cn-feedback-popup button { width:65px; text-align:center; cursor:pointer; }
-#moz-cn-feedback-popup label { -moz-margin-start:0; }
-#moz-cn-feedback-popup label.group_title { font-weight:bold; }
-#moz-cn-feedback-popup hbox.feedback_close { cursor:pointer; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent; }
-#moz-cn-feedback-messp, #moz-cn-feedback-messf, #moz-cn-feedback-messs{ height:21px; margin:10px 0 0 5px; }
-#moz-cn-feedback-messp vbox, #moz-cn-feedback-messf vbox { text-align:center; }
-#moz-cn-feedback-messf vbox.message { margin-left:5px; color:#07519A; cursor:pointer; }
-#moz-cn-feedback-popup hbox.text-link { margin:0 8px 0 4px; }
-#moz-cn-feedback-require { color:red; }
+#moz_cn_feedback:-moz-lwtheme-brighttext {
+  list-style-image: url("chrome://cmfeedback/skin/feed_icon-inverted.png") !important;
+}
+
+#TabsToolbar:last-child :-moz-any(#moz_cn_feedback) {
+  list-style-image: url("chrome://cmfeedback/skin/feed_icon-inverted.png") !important;
+}
+
+#moz-cn-feedback-popup {
+  margin-left:-10px; text-align:center; -moz-appearance: none;
+}
+
+#moz-cn-feedback-popup-main {
+  width:330px;
+}
+
+#moz-cn-feedback-checkbox {
+  margin:0 2px;
+}
+
+#moz-cn-feedback-popup textbox.textarea {
+  text-align:left; font-size:12px; height:75px;
+}
+
+#moz-cn-feedback-popup hbox.group, #moz-cn-feedback-popup vbox.group {
+  margin:0 0 14px 0;
+}
+
+#moz-cn-feedback-popup  textbox.feedback_url {
+  text-align:left;
+}
+
+#moz-cn-feedback-popup button {
+  width:65px; text-align:center; cursor:pointer;
+}
+
+#moz-cn-feedback-popup label {
+  -moz-margin-start:0;
+}
+
+#moz-cn-feedback-popup label.group_title {
+  font-weight:bold;
+}
+
+#moz-cn-feedback-popup hbox.feedback_close {
+  cursor:pointer; width:13px; height:13px; background:url("chrome://cmfeedback/skin/close.gif") no-repeat scroll transparent;
+}
+
+#moz-cn-feedback-messp, #moz-cn-feedback-messf, #moz-cn-feedback-messs{
+  height:21px; margin:10px 0 0 5px;
+}
+
+#moz-cn-feedback-messp vbox, #moz-cn-feedback-messf vbox {
+  text-align:center;
+}
+
+#moz-cn-feedback-messf vbox.message {
+  margin-left:5px; color:#07519A; cursor:pointer;
+}
+
+#moz-cn-feedback-popup hbox.text-link {
+  margin:0 8px 0 4px;
+}
+
+#moz-cn-feedback-require {
+  color:red;
+}
