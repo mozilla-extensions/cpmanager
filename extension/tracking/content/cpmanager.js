@@ -6,7 +6,7 @@
 		Components.utils.import("resource://gre/modules/ctypes.jsm", tmp);
 	}
 	var {cp_mod, cpmanager_FileUtil, cpmanager_LOG, Services, ctypes} = tmp;
-	
+
 
 	var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
 	var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
@@ -82,7 +82,7 @@
 	}
 
 	function cpmanager_paramSyncStatus() {
-		try {			
+		try {
 			if (!Weave) {
 				Cu.import('resource://services-sync/main.js');
 			}
@@ -156,14 +156,17 @@
 	  	try {
 	  		var prefName = "initialized";
 			var initialized = cpmanager_getPrefValue(prefName,false);
+
+			if (!cpmanager_getPrefValue("uuid", "")) {
+				var uuidgen = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
+				cpmanager_setPrefValue("uuid", uuidgen.generateUUID().number);
+			}
+
 	  		if (!initialized) {
 				//first time
 				cp_mod.firstTime = true;
 	  			cpmanager_setPrefValue(prefName, true);
 				cpmanager_LOG ("cpmanager: First Run ");
-
-				var uuidgen = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
-				cpmanager_setPrefValue("uuid", uuidgen.generateUUID().number);
 
 				//add for partner activate
 				var initTime = (new Date()).getTime().toString();
@@ -291,7 +294,7 @@
 		cpmanager_loadEventHandler();
 		setXpinstallWhitelist();
 	}, false);
-	
+
 	var ns = MOA.ns('CPManager');
 	ns.cpmanager_init = cpmanager_init;
 	ns.cpmanager_online = cpmanager_online;
