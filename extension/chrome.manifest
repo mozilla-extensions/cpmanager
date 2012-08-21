@@ -21,6 +21,8 @@ locale   cmfeedback  en-US        feedback/locale/en-US/
 locale   cmfeedback  zh-CN        feedback/locale/zh-CN/
 skin     cmfeedback  classic/1.0  feedback/skin/
 
+override  chrome://cmfeedback/skin/feed_icon.png         chrome://cmfeedback/skin/feed_icon-mac.png             os=Darwin
+
 overlay   chrome://browser/content/browser.xul          chrome://cmtracking/content/cpmanager.xul
 
 overlay   chrome://browser/content/browser.xul          chrome://cmsafeflag/content/overlay.xul
@@ -60,6 +62,9 @@ overlay  chrome://browser/content/sanitize.xul  chrome://cmimprove/content/sanit
 
 style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove-os/skin/undo_closetab.css
 style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove/skin/ce-Toolbar.css
+
+override  chrome://cmimprove/skin/ce-Toolbar.png         chrome://cmimprove/skin/ce-Toolbar-mac.png             os=Darwin
+override  chrome://cmimprove/skin/undo-close-tb.png      chrome://cmimprove/skin/undo-close-tb-mac.png          os=Darwin
 
 component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js
 contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
