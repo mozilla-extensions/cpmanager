@@ -130,17 +130,21 @@
 
 	var MOExtensions = "";
 	function cpmanager_paramMOExts() {
-		if (!MOExtensions) {
-			var extensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
-			var bootstrapped = JSON.parse(Application.prefs.getValue("extensions.bootstrappedAddons", ""));
-			for (var id in bootstrapped) {
-				extensions.push(id);
+		try {
+			if (!MOExtensions) {
+				var extensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
+				var bootstrapped = JSON.parse(Application.prefs.getValue("extensions.bootstrappedAddons", "{}"));
+				for (var id in bootstrapped) {
+					extensions.push(id);
+				}
+				MOExtensions = extensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name|personas@christopher\.beard)/.test(ext));
+				MOExtensions = MOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
+				MOExtensions = MOExtensions.join(",");
 			}
-			MOExtensions = extensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name|personas@christopher\.beard)/.test(ext));
-			MOExtensions = MOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
-			MOExtensions = MOExtensions.join(",");
+			return MOExtensions ? "&moexts=" + MOExtensions : "";
+		} catch(e) {
+			return "";
 		}
-		return MOExtensions ? "&moexts=" + MOExtensions : "";
 	}
 
 	function cpmanager_recordSessionLen() {
