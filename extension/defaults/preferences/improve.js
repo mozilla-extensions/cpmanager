@@ -1,10 +1,11 @@
 // In which folder do we bookmark the page:
+// -1 last selected
 // 1  the Places root
 // 2  the bookmarks menu folder
 // 3  the personal toolbar folder
 // 4  the top-level folder that contain the tag "folders"
 // 5  the unfiled-bookmarks folder
-pref("extensions.cmimprove.bookmarks.parentFolder", 3);
+pref("extensions.cmimprove.bookmarks.parentFolder", -1);
 
 // whether or not to show the edit-bookmark UI when adds a bookmark to the page
 pref("extensions.cmimprove.bookmarks.add.showEditUI", true);

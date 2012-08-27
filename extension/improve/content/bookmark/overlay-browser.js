@@ -1,3 +1,4 @@
+var ffid = 3;
 //bookmark
 (function() {
 function $(id){return document.getElementById(id);}
@@ -39,8 +40,21 @@ var cmImprove_BM = {
   },
   init : function(){
     PlacesStarButton.onClick = function (aEvent){
-      var tfID = Application.prefs.getValue("extensions.cmimprove.bookmarks.parentFolder",PlacesUtils.unfiledBookmarksFolderId);
-      var showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
+      var tfID = PlacesUtils.unfiledBookmarksFolderId;
+      var showUI = true;
+      try{
+        tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
+        if(tfID == -1){
+          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
+        }
+        showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
+        if(!showUI)
+          tfID = PlacesUtils.unfiledBookmarksFolderId;
+        var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
+      }catch(e){
+        tfID = PlacesUtils.unfiledBookmarksFolderId;
+        showUI = true;;
+      }
       if (aEvent.button == 0 && !this._pendingStmt) {
         PlacesCommandHook.bookmarkCurrentPage(showUI,tfID);
       }
@@ -61,7 +75,24 @@ var cmImprove_BM = {
 
     cmImprove_BM.bookmarksPopup && cmImprove_BM.bookmarksPopup.addEventListener("popupshowing",cmImprove_BM.bookmarksPopup_popupshowing,false);
 
-    cmImprove_BM.showBookmarkToolbar();
+    gEditItemOverlay.tempContainer = 0;
+    var _onFolderMenuListCommand = gEditItemOverlay.onFolderMenuListCommand.bind(gEditItemOverlay);
+    gEditItemOverlay.onFolderMenuListCommand = (function(event) {
+      _onFolderMenuListCommand(event);
+      var t = event.target.tagName;
+      if (event.target.id == "editBMPanel_chooseFolderMenuItem") 
+        return;
+      gEditItemOverlay.tempContainer = gEditItemOverlay._getFolderIdFromMenuList();
+    }).bind(gEditItemOverlay);
+
+    StarUI.panel.addEventListener("popupshowing",function(event){
+      if(event.target.id == "editBookmarkPanel")
+        gEditItemOverlay.tempContainer = 0;
+    },false);
+    StarUI.panel.addEventListener("popuphiding", function(event){
+      if(event.target.id == "editBookmarkPanel" && gEditItemOverlay.tempContainer && !StarUI._actionOnHide)
+        Application.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder",gEditItemOverlay.tempContainer)
+    },false);
   },
   uninit : function(){
     cmImprove_BM.bookmarksPopup && cmImprove_BM.bookmarksPopup.removeEventListener("popupshowing",cmImprove_BM.bookmarksPopup_popupshowing,false);
