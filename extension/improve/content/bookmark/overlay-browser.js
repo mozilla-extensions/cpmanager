@@ -80,7 +80,7 @@ var cmImprove_BM = {
     gEditItemOverlay.onFolderMenuListCommand = (function(event) {
       _onFolderMenuListCommand(event);
       var t = event.target.tagName;
-      if (event.target.id == "editBMPanel_chooseFolderMenuItem") 
+      if (event.target.id == "editBMPanel_chooseFolderMenuItem")
         return;
       gEditItemOverlay.tempContainer = gEditItemOverlay._getFolderIdFromMenuList();
     }).bind(gEditItemOverlay);
@@ -93,6 +93,8 @@ var cmImprove_BM = {
       if(event.target.id == "editBookmarkPanel" && gEditItemOverlay.tempContainer && !StarUI._actionOnHide)
         Application.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder",gEditItemOverlay.tempContainer)
     },false);
+
+    cmImprove_BM.showBookmarkToolbar();
   },
   uninit : function(){
     cmImprove_BM.bookmarksPopup && cmImprove_BM.bookmarksPopup.removeEventListener("popupshowing",cmImprove_BM.bookmarksPopup_popupshowing,false);
