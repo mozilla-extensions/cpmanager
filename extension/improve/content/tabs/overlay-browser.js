@@ -206,7 +206,10 @@ function cmd_bookmark(){
   if(!tab) {
     return;
   }
-  var tfID = Application.prefs.getValue("extensions.cmimprove.bookmarks.parentFolder",PlacesUtils.unfiledBookmarksFolderId);
+  var tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
+  if(tfID == -1){
+    tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
+  }
   PlacesCommandHook.bookmarkPage(tab.linkedBrowser,tfID,true);
 }
 function cmd_reloadSkipCache(){
