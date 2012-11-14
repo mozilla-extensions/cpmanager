@@ -133,6 +133,8 @@
 		try {
 			if (!MOExtensions) {
 				var extensions = Application.prefs.getValue("extensions.enabledAddons", "").split(",");
+				extensions = extensions.map(function(ext) ext.replace('%40', '@'));
+
 				var bootstrapped = JSON.parse(Application.prefs.getValue("extensions.bootstrappedAddons", "{}"));
 				for (var id in bootstrapped) {
 					extensions.push(id);
