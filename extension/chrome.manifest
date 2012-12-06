@@ -1,8 +1,7 @@
 content   cmtracking         tracking/content/  contentaccessible=yes
 
 resource  cmtracking         tracking/modules/
-locale    cmtracking  zh-CN  tracking/locale/zh-CN/
-locale    cmtracking  en-US  tracking/locale/en-US/
+resource  tracking-components        components/binary/
 
 resource  cmsafeflag               safeflag/modules/
 
