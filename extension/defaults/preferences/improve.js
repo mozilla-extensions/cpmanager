@@ -17,6 +17,3 @@ pref("extensions.cmimprove.iframe_cert_fix.whitelist", "dynamic.12306.cn");
 // features enable
 pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
 pref("extensions.cmimprove.features.undocloseanimation.enable", true);
-
-// it's like https://bugzil.la/792054 but we didn't catch that train
-pref("general.useragent.override.cmbchina.com","Gecko/[^ ]*#Gecko/20100101");
