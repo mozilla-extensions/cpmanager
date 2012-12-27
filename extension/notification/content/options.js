@@ -16,7 +16,7 @@
 					case 'ao-regexp':
 						return rule.regexp;
 					case 'ao-addon':
-						return reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title;
+						return reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title || reminder.provider_name;
 					case 'ao-desc':
 						return reminder.desc;
 					default:
