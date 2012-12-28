@@ -17,3 +17,5 @@ pref("extensions.cmimprove.iframe_cert_fix.whitelist", "dynamic.12306.cn");
 // features enable
 pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
 pref("extensions.cmimprove.features.undocloseanimation.enable", true);
+
+pref("extensions.cmimprove.socialapi.whitelist", "http://firefox.com.cn,http://www.firefox.com.cn");
