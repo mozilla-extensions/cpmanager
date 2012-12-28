@@ -12,9 +12,10 @@
 		<em:contributor>Conchshell</em:contributor>
 		<em:contributor>Ray Cheung</em:contributor>
 		<em:contributor>Xuan Xie</em:contributor>
+		<em:contributor>Jiao Feng</em:contributor>
 		<em:homepageURL>http://www.firefox.com.cn/</em:homepageURL>
 		<em:optionsURL>chrome://cmsafeflag/content/options.xul</em:optionsURL>
-
+		<em:unpack>true</em:unpack>
 		<em:targetApplication>
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
