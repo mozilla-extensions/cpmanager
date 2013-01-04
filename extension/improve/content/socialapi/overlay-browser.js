@@ -85,8 +85,9 @@
       }
 
       this._prefs.setBoolPref(this._restartPref, true);
+      var confirmTitle = MOA.AN.Lib.getString('socialapi.restartTitle');
       var confirmString = MOA.AN.Lib.getString('socialapi.restart', ['新浪微博侧栏']);
-      if (confirm(confirmString)) {
+      if (Services.prompt.confirm(null, confirmTitle, confirmString)) {
         var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
         appStartup.quit(Ci.nsIAppStartup.eAttemptQuit | Ci.nsIAppStartup.eRestart);
       }
