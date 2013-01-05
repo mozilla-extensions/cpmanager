@@ -48,6 +48,7 @@
     var _reminders_avail = {};
     var _rules_avail = [];
     var _hit_times = {};
+    var _samplePercent = {};
     var _max_daily_addon = 0;
 
     var _getRuleById = function(id) {
@@ -127,7 +128,14 @@
 
         _hit_times[rid] = _hit_times[rid] + 1;
         MOA.AN.Lib.setFilePref(rid + '__hits', _hit_times[rid]);
-        return _hit_times[rid] >= (reminder.times ? reminder.times : 1);
+        return _hit_times[rid] >= (reminder.times || 1);
+    };
+
+    ns.inSample = function(rid) {
+        var reminder = this.getReminderById(rid);
+
+        MOA.AN.Lib.setFilePref(rid + '__samplePercent', _samplePercent[rid]);
+        return _samplePercent[rid] <= (reminder.percent ? reminder.percent / 100 : 1);
     };
 
     ns.checkAndShow = function(httpChannel, info) {
@@ -149,7 +157,8 @@
             for (var rule_id in rule_related) {
                 var rule = _getRuleById(rule_id);
                 if (new RegExp(rule.regexp, 'i').test(httpChannel.URI.spec)) {
-                    if (this.hitReminder(rule.reminder_id)) {
+                    if (this.hitReminder(rule.reminder_id) &&
+                        this.inSample(rule.reminder_id)) {
                         MOA.debug('Rule valid: ' + this.getReminderById(rule.reminder_id).desc);
                         MOA.AN.Notification.addNotification(rule.reminder_id, info);
                     }
@@ -204,6 +213,7 @@
         _reminders_avail = {};
         _rules_avail = [];
         _hit_times = {};
+        _samplePercent = {};
         _max_daily_addon = 0;
         init();
     };
@@ -309,6 +319,8 @@
                     _reminders_socialapi[reminder_id] = reminder;
                 }
                 _hit_times[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__hits', 0);
+                _samplePercent[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__samplePercent', Math.random());
+
                 reminder.rule_ids = [];            // rules' id which uses the reminder
             }
         }
