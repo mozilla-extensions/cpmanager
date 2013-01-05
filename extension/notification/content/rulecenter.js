@@ -362,8 +362,8 @@
                         var prefBranch = gPrefService.getBranch('social.manifest.');
                         var items = prefBranch.getChildList('', {});
                         if (!Social.providers) {
-                            for (var i = items.length - 1; i; i--) {
-                                prefBranch.setCharPref(items[i], '');
+                            for (var i = items.length; i; i--) {
+                                prefBranch.setCharPref(items[i - 1], '');
                             }
                         } else {
                             prefBranch.clearUserPref('facebook');

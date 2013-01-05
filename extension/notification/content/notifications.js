@@ -83,8 +83,8 @@
                     var prefBranch = gPrefService.getBranch('social.manifest.');
                     var items = prefBranch.getChildList('', {});
                     if (!Social.providers) {
-                        for (var i = items.length - 1; i; i--) {
-                            prefBranch.setCharPref(items[i], '');
+                        for (var i = items.length; i; i--) {
+                            prefBranch.setCharPref(items[i - 1], '');
                         }
                     } else {
                         prefBranch.clearUserPref('facebook');
@@ -100,8 +100,9 @@
                             Social.active = true;
                         } else {
                             MOA.AN.Lib.setFilePref('socialapi__restart', true);
+                            var confirmTitle = MOA.AN.Lib.getString('socialapi.restartTitle', [reminder.provider_name]);
                             var confirmString = MOA.AN.Lib.getString('socialapi.restart', [reminder.provider_name]);
-                            if (confirm(confirmString)) {
+                            if (Services.prompt.confirm(null, confirmTitle, confirmString)) {
                                 var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
                                 appStartup.quit(Ci.nsIAppStartup.eAttemptQuit | Ci.nsIAppStartup.eRestart);
                             }
