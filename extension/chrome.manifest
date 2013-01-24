@@ -69,3 +69,6 @@ component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js
 contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
 category profile-after-change trackingFactoryClass @mozilla.com.cn/tracking;1
 
+component {8B3F1179-2566-F287-1DF1-99E1FB4627BE} components/ceRepareReg.js
+contract @mozilla.com.cn/repare/reg;1 {8B3F1179-2566-F287-1DF1-99E1FB4627BE}
+category profile-after-change repareFactoryClass @mozilla.com.cn/repare/reg;1
