@@ -172,17 +172,13 @@ const ONEDAY = 24*60*60*1000;
 
 function getActive() {
   try{
-    var now = (new Date()).getTime();
     var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
-  	if ((now - act) / ONEDAY >= 15) {
-  		return "&days=15";
-  	} else {
-  		return "";
-  	}
   } catch(e) {
+    var now = (new Date()).getTime();
     Services.prefs.setCharPref(ACTIVE_TIME_PREF,now);//activate,pref no find
     return "&activate=true";
   }
+	return "";
 }
 var activeStr = getActive();
 

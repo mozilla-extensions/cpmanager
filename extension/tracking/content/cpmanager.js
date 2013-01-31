@@ -388,7 +388,7 @@
 //             + cpmanager_paramSyncStatus() 
 //             + cpmanager_paramCEHome() 
                + cpmanager_paramPrevSessionLen() 
-               + cpmanager_paramActive() 
+//               + cpmanager_paramActive() 
                + cpmanager_paramLocale() 
                + cpmanager_paramMOExts()
                ;
