@@ -1,11 +1,3 @@
-#urlbar.sfbg_safe > .autocomplete-textbox-container {
-	background-color: #cf9;
-}
-
-#urlbar.sfbg_unsafe > .autocomplete-textbox-container {
-	background-color: red;
-}
-
 #safeflag-popup {
 	-moz-border-radius: 0px;
 }

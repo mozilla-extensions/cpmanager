@@ -1,16 +1,18 @@
 @namespace html url(http://www.w3.org/1999/xhtml);
 
-#urlbar.sfbg_safe {
+#urlbar.sfbg_safe,
+#urlbar.sfbg_safe > .autocomplete-textbox-container {
 	background-color: #cf9;
 }
 
-#urlbar.sfbg_unsafe {
+#urlbar.sfbg_unsafe,
+#urlbar.sfbg_unsafe > .autocomplete-textbox-container {
 	background-color: red;
 }
 
 #safeflag-contextpopup{
 	-moz-appearance: tooltip;
-} 
+}
 
 #safeflag-popup {
 	margin: 2px 0 0 0;
