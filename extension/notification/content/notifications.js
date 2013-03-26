@@ -80,34 +80,29 @@
                 } else if (reminder.type == 'text') {
                     gBrowser.selectedTab = gBrowser.addTab(reminder.learnmore_url);
                 } else if (reminder.type == 'socialapi') {
-                    var prefBranch = gPrefService.getBranch('social.manifest.');
-                    var items = prefBranch.getChildList('', {});
-                    if (!Social.providers) {
-                        for (var i = items.length; i; i--) {
-                            prefBranch.setCharPref(items[i - 1], '');
-                        }
-                    } else {
-                        prefBranch.clearUserPref('facebook');
-                    }
-                    var prefValue = reminder.provider_value;
-                    var origin = JSON.parse(prefValue).origin;
-                    prefBranch.setCharPref(reminder.provider_slug, prefValue);
+                    let providerOrigin = JSON.parse(reminder.provider_value).origin;
+                    let oldOrigin = Social.provider ? Social.provider.origin : "";
 
-                    if (Social.activateFromOrigin) {
-                        var provider = Social.activateFromOrigin(origin)
-                    } else {
-                        if (Social.provider && Social.provider.origin == origin) {
-                            Social.active = true;
-                        } else {
-                            MOA.AN.Lib.setFilePref('socialapi__restart', true);
-                            var confirmTitle = MOA.AN.Lib.getString('socialapi.restartTitle', [reminder.provider_name]);
-                            var confirmString = MOA.AN.Lib.getString('socialapi.restart', [reminder.provider_name]);
-                            if (Services.prompt.confirm(null, confirmTitle, confirmString)) {
-                                var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-                                appStartup.quit(Ci.nsIAppStartup.eAttemptQuit | Ci.nsIAppStartup.eRestart);
-                            }
-                        }
+                    let provider = Social.activateFromOrigin(providerOrigin);
+
+                    if (!provider) {
+                        return;
                     }
+
+                    let description = document.getElementById("social-activation-message");
+                    let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
+                    let message = gNavigatorBundle.getFormattedString("social.activated.description",
+                                                                      [provider.name, brandShortName]);
+                    description.value = message;
+
+                    let notificationPanel = SocialUI.notificationPanel;
+                    notificationPanel.setAttribute("origin", provider.origin);
+                    notificationPanel.setAttribute("oldorigin", oldOrigin);
+
+                    notificationPanel.hidden = false;
+                    setTimeout(function () {
+                        notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
+                    }, 0);
                 }
                 _closeInstallNoti(tabId);
                 MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);

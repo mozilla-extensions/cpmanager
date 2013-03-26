@@ -1,5 +1,10 @@
 (function() {
     var ns = MOA.ns('AN.RuleCenter');
+
+    var jsm = {};
+    try {
+        Cu.import("resource://gre/modules/SocialService.jsm", jsm);
+    } catch(e) {}
     /**
      * _reminders, _rules & _regexps generated from lists in rules.json
      * _*_avail is also generated for display in option window
@@ -258,6 +263,22 @@
         return reminder_rules;
     }
 
+    function ensureProvider(reminder_id, provider_slug, provider_value) {
+        var provider = JSON.parse(provider_value);
+        jsm.SocialService.getProvider(provider.origin, function(existedProvider) {
+            var prefBranch = gPrefService.getBranch('social.manifest.');
+            if (!existedProvider) {
+                prefBranch.setCharPref(provider_slug, provider_value);
+                jsm.SocialService.addProvider(provider, function() {});
+            } else {
+                if (existedProvider.active) {
+                    delete _reminders_socialapi[reminder_id];
+                }
+                prefBranch.clearUserPref('facebook');
+            }
+        });
+    }
+
     function init() {
         var defaultRules = _getAvailableRules();
         defaultRules = MOA.AN.Lib.extend(defaultRules, {
@@ -346,31 +367,12 @@
         for (var i in plugins) {
             delete _reminders_plugin_pfs[plugins[i]]
         }
-        if (prefs['socialapi__restart']) {
-            Social.active = true;
-            MOA.AN.Lib.setFilePref('socialapi__restart', false);
-        }
-        if (!window.Social || Social.enabled) {
+        if (!(window.Social && Social.activateFromOrigin)) {
             _reminders_socialapi = {}
         } else {
-            var weibo = _reminders_socialapi['weibo__socialapi'];
-            if (weibo) {
-                setTimeout(function() {
-                    // Social.provider may not be inited quickly enough
-                    var origin = JSON.parse(weibo.provider_value).origin;
-                    if (Social.provider && Social.provider.origin != origin) {
-                        var prefBranch = gPrefService.getBranch('social.manifest.');
-                        var items = prefBranch.getChildList('', {});
-                        if (!Social.providers) {
-                            for (var i = items.length; i; i--) {
-                                prefBranch.setCharPref(items[i - 1], '');
-                            }
-                        } else {
-                            prefBranch.clearUserPref('facebook');
-                        }
-                        prefBranch.setCharPref(weibo.provider_slug, weibo.provider_value);
-                    }
-                }, 1000);
+            for (var socialapi in _reminders_socialapi) {
+                var provider = _reminders_socialapi[socialapi];
+                ensureProvider(socialapi, provider.provider_slug, provider.provider_value);
             }
         }
 
