@@ -56,3 +56,4 @@ component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js
 contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
 category profile-after-change trackingFactoryClass @mozilla.com.cn/tracking;1
 
+overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/placeholder/overlay-browser.xul      os=WINNT
