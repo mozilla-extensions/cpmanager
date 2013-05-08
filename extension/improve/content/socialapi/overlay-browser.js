@@ -20,7 +20,9 @@
         if (!existedProvider) {
           prefBranch.setCharPref('weibo', JSON.stringify(weibo));
 
-          jsm.SocialService.addProvider(weibo, function() {});
+          if (!jsm.SocialService.canActivateOrigin) {
+            jsm.SocialService.addProvider(weibo, function() {});
+          }
         } else {
           prefBranch.clearUserPref('facebook');
         }
@@ -78,26 +80,31 @@
 
       let oldOrigin = Social.provider ? Social.provider.origin : "";
 
-      let provider = Social.activateFromOrigin(this._weibo.origin);
+      let provider = Social.activateFromOrigin(this._weibo.origin, this.activeNotification(oldOrigin));
 
-      if (!provider) {
-        return;
+      this.activeNotification(oldOrigin)(provider);
+    },
+    activeNotification: function SocialAPIHack__activeNotification(oldOrigin) {
+      return function(provider) {
+        if (!provider) {
+          return;
+        }
+
+        let description = document.getElementById("social-activation-message");
+        let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
+        let message = gNavigatorBundle.getFormattedString("social.activated.description",
+                                                          [provider.name, brandShortName]);
+        description.value = message;
+
+        let notificationPanel = SocialUI.notificationPanel;
+        notificationPanel.setAttribute("origin", provider.origin);
+        notificationPanel.setAttribute("oldorigin", oldOrigin);
+
+        notificationPanel.hidden = false;
+        setTimeout(function () {
+          notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
+        }, 0);
       }
-
-      let description = document.getElementById("social-activation-message");
-      let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
-      let message = gNavigatorBundle.getFormattedString("social.activated.description",
-                                                        [provider.name, brandShortName]);
-      description.value = message;
-
-      let notificationPanel = SocialUI.notificationPanel;
-      notificationPanel.setAttribute("origin", provider.origin);
-      notificationPanel.setAttribute("oldorigin", oldOrigin);
-
-      notificationPanel.hidden = false;
-      setTimeout(function () {
-        notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
-      }, 0);
     },
   }
   window.addEventListener('load', SocialAPIHack, false);

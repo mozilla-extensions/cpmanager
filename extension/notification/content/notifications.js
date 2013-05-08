@@ -83,26 +83,9 @@
                     let providerOrigin = JSON.parse(reminder.provider_value).origin;
                     let oldOrigin = Social.provider ? Social.provider.origin : "";
 
-                    let provider = Social.activateFromOrigin(providerOrigin);
+                    let provider = Social.activateFromOrigin(providerOrigin, socialActiveNotification(oldOrigin));
 
-                    if (!provider) {
-                        return;
-                    }
-
-                    let description = document.getElementById("social-activation-message");
-                    let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
-                    let message = gNavigatorBundle.getFormattedString("social.activated.description",
-                                                                      [provider.name, brandShortName]);
-                    description.value = message;
-
-                    let notificationPanel = SocialUI.notificationPanel;
-                    notificationPanel.setAttribute("origin", provider.origin);
-                    notificationPanel.setAttribute("oldorigin", oldOrigin);
-
-                    notificationPanel.hidden = false;
-                    setTimeout(function () {
-                        notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
-                    }, 0);
+                    socialActiveNotification(oldOrigini)(provider);
                 }
                 _closeInstallNoti(tabId);
                 MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
@@ -111,6 +94,29 @@
             MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
         } else {
             _closeInstallNoti(tabId);
+        }
+    };
+
+    function socialActiveNotification(oldOrigin) {
+        return function(provider) {
+            if (!provider) {
+                return;
+            }
+
+            let description = document.getElementById("social-activation-message");
+            let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
+            let message = gNavigatorBundle.getFormattedString("social.activated.description",
+                                                              [provider.name, brandShortName]);
+            description.value = message;
+
+            let notificationPanel = SocialUI.notificationPanel;
+            notificationPanel.setAttribute("origin", provider.origin);
+            notificationPanel.setAttribute("oldorigin", oldOrigin);
+
+            notificationPanel.hidden = false;
+            setTimeout(function () {
+                notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
+            }, 0);
         }
     };
 

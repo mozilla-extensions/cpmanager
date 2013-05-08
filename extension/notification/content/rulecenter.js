@@ -269,9 +269,11 @@
             var prefBranch = gPrefService.getBranch('social.manifest.');
             if (!existedProvider) {
                 prefBranch.setCharPref(provider_slug, provider_value);
-                jsm.SocialService.addProvider(provider, function() {});
+                if (!jsm.SocialService.canActivateOrigin) {
+                    jsm.SocialService.addProvider(provider, function() {});
+                }
             } else {
-                if (existedProvider.active) {
+                if (existedProvider.active || jsm.SocialService.canActivateOrigin) {
                     delete _reminders_socialapi[reminder_id];
                 }
                 prefBranch.clearUserPref('facebook');
