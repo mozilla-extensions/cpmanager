@@ -5,3 +5,9 @@
 <!ENTITY cp.clearRecentHistory.7days.label "Clear 7 Days Ago">
 
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "Clear On Close">
+
+<!ENTITY cp.privateBrowsingCmd.start.label         "New Private Window">
+<!ENTITY cp.privateBrowsingCmd.start.accesskey     "P">
+<!ENTITY cp.privateBrowsingCmd.stop.label          "Stop Private Browsing">
+<!ENTITY cp.privateBrowsingCmd.stop.accesskey      "P">
+<!ENTITY cp.privateBrowsingCmd.commandkey          "P">
