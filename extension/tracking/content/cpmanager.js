@@ -7,7 +7,7 @@
     Components.utils.import("resource://gre/modules/ctypes.jsm", tmp);
   } else {
     tmp.Services = {};
-    
+
     XPCOMUtils.defineLazyGetter(tmp.Services, "prefs", function () {
       return Cc["@mozilla.org/preferences-service;1"]
                .getService(Ci.nsIPrefService)
@@ -21,7 +21,7 @@
     XPCOMUtils.defineLazyServiceGetter(tmp.Services, "obs",
                                        "@mozilla.org/observer-service;1",
                                        "nsIObserverService");
-    
+
     XPCOMUtils.defineLazyGetter(tmp.Services, "dirsvc", function () {
       return Cc["@mozilla.org/file/directory_service;1"]
                .getService(Ci.nsIDirectoryService)
@@ -120,7 +120,7 @@
                                     ctypes.winapi_abi,
                                     ctypes.void_t,
                                     ty);
-      freeMemory(buffer);      
+      freeMemory(buffer);
       lib.close();
       return key;
     } catch(e){
@@ -159,7 +159,7 @@
         let fstream = Cc["@mozilla.org/network/file-input-stream;1"].
             createInstance(Ci.nsIFileInputStream);
         fstream.init(file, -1, 0, 0);
-    
+
         let cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
             createInstance(Ci.nsIConverterInputStream);
         cstream.init(fstream, "UTF-8", 0, 0);
@@ -192,7 +192,7 @@
           createInstance(Ci.nsIFileOutputStream);
       // flags are write, create, truncate
       foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0);
-    
+
       let converter = Cc["@mozilla.org/intl/converter-output-stream;1"].
           createInstance(Ci.nsIConverterOutputStream);
       converter.init(foStream, "UTF-8", 0, 0);
@@ -212,7 +212,7 @@
     }
     return encodeURIComponent(uuid);
   }
-  
+
   //profile key
   function getPK(){
     let uuid = "";
@@ -227,7 +227,7 @@
     }
   	return encodeURIComponent(uuid);
   }
-  
+
   function cpmanager_paramActCode() {
     var str = "";
     try {
@@ -304,7 +304,7 @@
         } catch (e){}
         var extensions = extstr.split(",");
         extensions = extensions.map(function(ext) ext.replace('%40', '@'));
-  
+
         var bootstrapped = {};
         try{
           var bsstr = Services.prefs.getCharPref("extensions.bootstrappedAddons");
@@ -381,15 +381,34 @@
 
   //get AddonListNew and start the installation check.
   function cpmanager_startUpdate(updateUrl, fuodPref){
-    updateUrl += "?channelid="+Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn") 
-               + cpmanager_paramFUOD(fuodPref) 
-               + cpmanager_paramCEVersion() 
-               + cpmanager_paramActCode() 
-//             + cpmanager_paramSyncStatus() 
-//             + cpmanager_paramCEHome() 
-               + cpmanager_paramPrevSessionLen() 
-//               + cpmanager_paramActive() 
-               + cpmanager_paramLocale() 
+    function hasPref(key) {
+      return Application.prefs.has(key);
+    }
+
+    function getPrefStr(key, defValue) {
+      return Application.prefs.getValue(key, defValue);
+    }
+
+    let fx21Prefix = "fx21.";
+    let CHANNEL_PREF = "app.chinaedition.channel";
+    let channelidstr = "?channelid=";
+    if(hasPref(CHANNEL_PREF)){
+      let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
+      channelidstr += channelid;
+    } else {
+      let channelid = getPrefStr(fx21Prefix + CHANNEL_PREF,"www.mozilla.com.cn");
+      channelidstr += channelid;
+      channelidstr += "&noid=true";
+    }
+    updateUrl += channelidstr
+               + cpmanager_paramFUOD(fuodPref)
+               + cpmanager_paramCEVersion()
+               + cpmanager_paramActCode()
+//             + cpmanager_paramSyncStatus()
+//             + cpmanager_paramCEHome()
+               + cpmanager_paramPrevSessionLen()
+//               + cpmanager_paramActive()
+               + cpmanager_paramLocale()
                + cpmanager_paramMOExts()
                ;
     cpmanager_LOG("cpmanager: start getting new Addon List at :" + updateUrl);

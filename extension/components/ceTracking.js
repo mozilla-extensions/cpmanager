@@ -16,7 +16,6 @@ const LOCALE_PREF = "general.useragent.locale";
 const CHANNEL_PREF = "app.chinaedition.channel"
 const DISTRIBUTION_PREF = "distribution.version"
 
-
 //Cu.import("resource://gre/modules/Services.jsm");
 let Services = {};
 
@@ -39,8 +38,60 @@ XPCOMUtils.defineLazyServiceGetter(Services, "obs",
 
 function LOG(txt){
   var consoleService = Cc["@mozilla.org/consoleservice;1"]
-                       .getService(Ci.nsIConsoleService);    
+                       .getService(Ci.nsIConsoleService);
                        consoleService.logStringMessage("tracking" + txt);
+}
+
+function hasPref(name) {
+  try {
+  	Services.prefs.getCharPref(name);
+    return true;
+  } catch (e) {
+  	return false;
+  }
+}
+
+function getPrefStr(name, defValue) {
+  try {
+  	return Services.prefs.getCharPref(name);
+  } catch (e) {
+  	return defValue;
+  }
+}
+
+function setPrefStr(name, value) {
+  try {
+  	Services.prefs.setCharPref(name, value);
+  } catch (e) {
+  	Components.utils.reportError(e);
+  }
+}
+
+const fx21Prefix = "fx21.";
+var fx21List = [
+    "distribution.about",
+    "distribution.id",
+    "distribution.version",
+    "mozilla.partner.id",
+    "app.distributor",
+    "app.distributor.channel",
+    "app.partner.mozillaonline",
+    "app.chinaedition.channel",
+];
+
+function backupPref(){
+  let backTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  backTimer.initWithCallback({
+    notify: function() {
+      fx21List.forEach(function(item){
+        var newItem = fx21Prefix + item;
+        if(hasPref(item)){
+          let value = getPrefStr(item,"");
+          setPrefStr(newItem,value);
+        }
+      });
+    }
+  }, 1000, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
 function generateUUID() {
@@ -75,7 +126,7 @@ function getUK(){
       let fstream = Cc["@mozilla.org/network/file-input-stream;1"].
           createInstance(Ci.nsIFileInputStream);
       fstream.init(file, -1, 0, 0);
-  
+
       let cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
           createInstance(Ci.nsIConverterInputStream);
       cstream.init(fstream, "UTF-8", 0, 0);
@@ -108,7 +159,7 @@ function getUK(){
         createInstance(Ci.nsIFileOutputStream);
     // flags are write, create, truncate
     foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0);
-  
+
     let converter = Cc["@mozilla.org/intl/converter-output-stream;1"].
         createInstance(Ci.nsIConverterOutputStream);
     converter.init(foStream, "UTF-8", 0, 0);
@@ -164,7 +215,7 @@ function getPK(){
 //                    						ctypes.winapi_abi,
 //                    						ctypes.void_t,
 //                    						ty);
-//	freeMemory(buffer);			
+//	freeMemory(buffer);
 //	lib.close();
 //	return key;
 //}
@@ -217,29 +268,31 @@ function getMOExts() {
 }
 
 function getADUData(){
-  function getPrefStr(name, defValue) {
-    try {
-    	return Services.prefs.getCharPref(name);
-    } catch (e) {
-    	Components.utils.reportError(e);
-    	return defValue;
-    }
+
+  let channelidstr = "?channelid=";
+  if(hasPref(CHANNEL_PREF)){
+    let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
+    channelidstr += channelid;
+  } else {
+    let channelid = getPrefStr(fx21Prefix + CHANNEL_PREF,"www.mozilla.com.cn");
+    channelidstr += channelid;
+    channelidstr += "&noid=true";
   }
+
   let pk = getPK();
   let uk = getUK();
-  let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
   let ver = getPrefStr("extensions.lastAppVersion","");
   let cev = getPrefStr(DISTRIBUTION_PREF,"");
-	return "?channelid=" + channelid
-    // + cpmanager_paramFUOD(fuodPref) 
+	return channelidstr
+    // + cpmanager_paramFUOD(fuodPref)
        + "&fxversion=" + ver                       //cpmanager_paramCEVersion
        + "&ceversion=" + cev                       //cpmanager_paramCEVersion
-       + "&ver=1_0&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode() 
-    // + cpmanager_paramSyncStatus() 
-    // + cpmanager_paramCEHome() 
-    // + cpmanager_paramPrevSessionLen() 
-       + activeStr                                 //cpmanager_paramActive() 
-       + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale() 
+       + "&ver=1_0&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode()
+    // + cpmanager_paramSyncStatus()
+    // + cpmanager_paramCEHome()
+    // + cpmanager_paramPrevSessionLen()
+       + activeStr                                 //cpmanager_paramActive()
+       + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
        + getMOExts()    //cpmanager_paramMOExts()
 }
 
@@ -307,7 +360,7 @@ trackingFactoryClass.prototype = {
   trackPrefs : function(key,value){
     this.data[key] = value;
   },
-  
+
   track : function(key){
     if(typeof this.data[key] == 'number'){
       this.data[key] ++;
@@ -341,6 +394,7 @@ trackingFactoryClass.prototype = {
         break;
 
       case "final-ui-startup":
+        backupPref();
         sendADU(0);
         break;
       case "quit-application":
