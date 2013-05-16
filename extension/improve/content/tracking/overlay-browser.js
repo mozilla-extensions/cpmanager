@@ -7,7 +7,7 @@ var ce_tracking = {
   // 检查prefs
   hookPrefs : function(prefs,key){
     var value = Application.prefs.getValue(prefs,"");
-    ceTracking.trackPrefs(key,value.toString());
+    this.ceTracking.trackPrefs(key,value.toString());
   },
   // 监视 node 的 event
   hookEvent : function(id,event,key){
@@ -36,12 +36,12 @@ var ce_tracking = {
       }catch(e){}
     }
   },
-  // 替换函数部分源码 
+  // 替换函数部分源码
   hookCode : function (orgFunc, key) {
     var orgCode = /{/;
     var myCode = "$& ce_tracking.track('" + key + "');"
     try {
-      if (eval(orgFunc).toString() == eval(orgFunc + "=" + eval(orgFunc).toString().replace(orgCode, myCode))) 
+      if (eval(orgFunc).toString() == eval(orgFunc + "=" + eval(orgFunc).toString().replace(orgCode, myCode)))
         throw orgFunc;
     } catch (e) {
     }
@@ -89,8 +89,28 @@ var trackList = [{"type":"event","data":["searchbar","focus"],"key":"searchbarfo
                 ,{"type":"event","data":["ce_sanitizeHistory_none","click"],"key":"ce_sanitizeHistory_none"}
                 ,{"type":"event","data":["ce_sanitizeHistory_onclose","click"],"key":"ce_sanitizeHistory_onclose"}
                 ,{"type":"event","data":["ce_sanitizeHistory_dialog","click"],"key":"ce_sanitizeHistory_dialog"}
+
+                ,{"type":"event","data":["social-provider-button","click"],"key":"social-provider-button"}
+                ,{"type":"event","data":["social-notification-container-message","click"],"key":"social-provider-message"}
                 ];
 var init_once = false;
+function trackSocial(){
+  try{
+    var enabled = (Application.prefs.getValue("social.enabled", false) == true);
+    tracking.ceTracking.trackPrefs("social-enabled", enabled ? '1' : '0');
+
+    var hasWeibo = (Application.prefs.getValue("social.manifest.weibo", "") != "");
+    tracking.ceTracking.trackPrefs("social-weibo-install", hasWeibo ? '1' : '0');
+
+    var currentWeibo = (Application.prefs.getValue("social.provider.current", "") == "http://m.weibo.cn");
+    tracking.ceTracking.trackPrefs("social-weibo-current", currentWeibo ? '1' : '0');
+
+    var activeWeibo = !! JSON.parse(Application.prefs.getValue("social.activeProviders", "{}"))["http://m.weibo.cn"];
+    tracking.ceTracking.trackPrefs("social-weibo-active", activeWeibo ? '1' : '0');
+  } catch(e) {
+    Application.console.log(e)
+  }
+}
 function startTracking(){
   if(init_once)
     return;
@@ -115,10 +135,11 @@ function startTracking(){
       }
     }catch(e){}
   }
+  trackSocial();
 }
 function stopTracking(){
   ce_tracking.unHookObs();
-}   
+}
 
 window.addEventListener('load', startTracking, false)
 window.addEventListener('close', stopTracking, false)
