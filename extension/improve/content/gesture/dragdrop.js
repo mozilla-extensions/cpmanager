@@ -391,12 +391,7 @@
   };
 
   function registerDndHandler() {
-    window.addEventListener("load", function dnd_onload() {
-      window.removeEventListener("load", dnd_onload, false);
-      window.setTimeout(function() {
-        dndHandler.init();
-      }, 1000);
-    }, false);
+    dndHandler.init();
 
     window.addEventListener("unload", function dnd_onunload() {
       window.removeEventListener("unload", dnd_onunload, false);
@@ -404,17 +399,23 @@
     }, false);
   }
 
-  // FF4.0+
-  if(typeof Application.getExtensions != "undefined") {
-    Cu.import("resource://gre/modules/AddonManager.jsm");
-    AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
-      if(!addon || addon.userDisabled || addon.appDisabled) {
+  window.addEventListener("load", function dnd_onload() {
+    window.removeEventListener("load", dnd_onload, false);
+
+    window.setTimeout(function() {
+      // FF4.0+
+      if(typeof Application.getExtensions != "undefined") {
+        Cu.import("resource://gre/modules/AddonManager.jsm");
+        AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
+          if(!addon || addon.userDisabled || addon.appDisabled) {
+            registerDndHandler();
+          }
+        });
+      } else {
+        // Appcenter only supports FF5+
         registerDndHandler();
       }
-    });
-  } else {
-    // Appcenter only supports FF5+
-    registerDndHandler();
-  }
+    }, 1000);
+  }, false);
 })();
 
