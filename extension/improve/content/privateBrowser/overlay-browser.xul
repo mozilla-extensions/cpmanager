@@ -11,13 +11,9 @@
   <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="ce_privateBrowser" type="button"
           class="toolbarbutton-1 toolbarbutton-ce"
-          label="&cp.privateBrowsingCmd.start.label;"
-          accesskey="&cp.privateBrowsingCmd.start.accesskey;"
-          startlabel="&cp.privateBrowsingCmd.start.label;"
-          startaccesskey="&cp.privateBrowsingCmd.start.accesskey;"
-          stoplabel="&cp.privateBrowsingCmd.stop.label;"
-          stopaccesskey="&cp.privateBrowsingCmd.stop.accesskey;"
-          tooltiptext="&cp.privateBrowsingCmd.start.label;"
+          label="&cp.newPrivateWindow.label;"
+          accesskey="&cp.newPrivateWindow.accesskey;"
+          tooltiptext="&cp.newPrivateWindow.label;"
           key="key_privatebrowsing"
           command="Tools:PrivateBrowsing"/>
   </toolbarpalette>
