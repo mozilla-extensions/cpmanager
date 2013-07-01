@@ -268,7 +268,10 @@
         jsm.SocialService.getProvider(provider.origin, function(existedProvider) {
             var prefBranch = gPrefService.getBranch('social.manifest.');
             if (!existedProvider) {
-                prefBranch.setCharPref(provider_slug, provider_value);
+                var string = Cc["@mozilla.org/supports-string;1"]
+                               .createInstance(Ci.nsISupportsString);
+                string.data = provider_value;
+                prefBranch.setComplexValue(provider_slug, Ci.nsISupportsString, string);
                 if (!jsm.SocialService.canActivateOrigin &&
                     !jsm.SocialService.getOriginActivationType) {
                     jsm.SocialService.addProvider(provider, function() {});
