@@ -19,3 +19,5 @@ pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
 pref("extensions.cmimprove.features.undocloseanimation.enable", true);
 
 pref("extensions.cmimprove.socialapi.whitelist", "http://firefox.com.cn,http://www.firefox.com.cn");
+
+pref("extensions.cmimprove.gesture.enabled", true);

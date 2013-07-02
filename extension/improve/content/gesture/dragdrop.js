@@ -2,6 +2,9 @@
   const { classes:Cc, interfaces:Ci, utils:Cu } = Components;
 
   var jsm = { };
+
+  var appcenterEnabled = false;
+
   if (typeof XPCOMUtils == "undefined") {
     Cu.import("resource://gre/modules/XPCOMUtils.jsm");
   }
@@ -331,10 +334,21 @@
 
     dndObserver: null,
 
+    get enabled() {
+      var enabled = true;
+      try {
+        enabled = Services.prefs.getBoolPref(this.prefKey);
+      } catch(e) {}
+
+      return !appcenterEnabled && enabled;
+    },
+
     init: function() {
-      this.dndObserver = new DragDropObserver();
-      this.dndObserver.attachWindow(window);
-      this.dndObserver.addDragGestureListener(this);
+      if (this.enabled) {
+        this.dndObserver = new DragDropObserver();
+        this.dndObserver.attachWindow(window);
+        this.dndObserver.addDragGestureListener(this);
+      }
     },
 
     unload: function() {
@@ -387,11 +401,43 @@
       }
 
       return false;
+    },
+
+    prefKey: 'extensions.cmimprove.gesture.enabled',
+
+    _observer: {
+      QueryInterface: function(aIID) {
+        if (aIID.equals(Ci.nsIObserver) ||
+            aIID.equals(Ci.nsISupports) ||
+            aIID.equals(Ci.nsISupportsWeakReference)) {
+            return this;
+        }
+        throw Cr.NS_NOINTERFACE;
+      },
+
+      observe: function(aSubject, aTopic, aData) {
+        if (aTopic == 'nsPref:changed') {
+          switch (aData) {
+            case dndHandler.prefKey:
+              if (dndHandler.enabled) {
+                dndHandler.init();
+              } else {
+                dndHandler.unload();
+              }
+              break;
+          }
+        }
+      }
+    },
+
+    addObserver: function() {
+      Services.prefs.addObserver(this.prefKey, this._observer, true);
     }
   };
 
   function registerDndHandler() {
     dndHandler.init();
+    dndHandler.addObserver();
 
     window.addEventListener("unload", function dnd_onunload() {
       window.removeEventListener("unload", dnd_onunload, false);
@@ -407,9 +453,10 @@
       if(typeof Application.getExtensions != "undefined") {
         Cu.import("resource://gre/modules/AddonManager.jsm");
         AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
-          if(!addon || addon.userDisabled || addon.appDisabled) {
-            registerDndHandler();
+          if(addon && !addon.userDisabled && !addon.appDisabled) {
+            appcenterEnabled = true;
           }
+          registerDndHandler();
         });
       } else {
         // Appcenter only supports FF5+
