@@ -60,3 +60,5 @@ contract @mozilla.com.cn/tracking;1 {C40350A8-F734-4CFF-99D9-95274D408143}
 category profile-after-change trackingFactoryClass @mozilla.com.cn/tracking;1
 
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/placeholder/overlay-browser.xul      os=WINNT
+
+overlay chrome://mozapps/content/downloads/unknownContentType.xul chrome://cmimprove/content/downloads/overlay-unknownContentType.xul
