@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>cpmanager@mozillaonline.com</em:id>
-		<em:version>0.6.26</em:version>
+		<em:version>1.0.0</em:version>
 		<em:name>Addons Manager</em:name>
 		<em:description>To manage the addons package in Firefox.</em:description>
 		<em:creator>Mozilla Online Limited</em:creator>
@@ -19,12 +19,12 @@
 		<em:targetApplication>
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-				<em:minVersion>3.0a1</em:minVersion>
+				<em:minVersion>20.0</em:minVersion>
 				<em:maxVersion>23.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
-		
+
 		<em:updateURL>http://g-fox.cn/chinaedition/addons/cpmanager/update.rdf?version=%ITEM_VERSION%</em:updateURL>
 		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2zWwTHIR23xreMABqMJXj1YrFowjiaBieTNqC2bE9PImSaMBxmYqrQ/UryquunGB0LJVE6tzzdioK9KFp+8ZO4eZL0fpxA9I+8mp+g3MTwqMVZD5ma3qwEGDngATaJwlcWY5xmrWcWNUgogP7n6JYuw0Giuc7crDNK3n1/nCbhwIDAQAB</em:updateKey>
 		<em:localized>
@@ -36,6 +36,6 @@
 				<em:homepageURL>http://www.firefox.com.cn/</em:homepageURL>
 			</Description>
 		</em:localized>
-				
+
 	</Description>
 </RDF>

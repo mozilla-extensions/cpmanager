@@ -87,11 +87,21 @@ var trackList = [{"type":"event","data":["searchbar","focus"],"key":"searchbarfo
                 ,{"type":"event","data":["ntabimprove_setting","click"],"key":"ntabimprove_setting"}
                 ,{"type":"event","data":["ce_sanitizeHistory","click"],"key":"ce_sanitizeHistory"}
                 ,{"type":"event","data":["ce_sanitizeHistory_none","click"],"key":"ce_sanitizeHistory_none"}
+                ,{"type":"event","data":["ce_sanitizeHistory_daily","click"],"key":"ce_sanitizeHistory_daily"}
+                ,{"type":"event","data":["ce_sanitizeHistory_weekly","click"],"key":"ce_sanitizeHistory_weekly"}
+                ,{"type":"event","data":["ce_sanitizeHistory_monthly","click"],"key":"ce_sanitizeHistory_monthly"}
+                ,{"type":"event","data":["ce_sanitizeHistory_quarterly","click"],"key":"ce_sanitizeHistory_quarterly"}
+                ,{"type":"event","data":["ce_sanitizeHistory_yearly","click"],"key":"ce_sanitizeHistory_yearly"}
                 ,{"type":"event","data":["ce_sanitizeHistory_onclose","click"],"key":"ce_sanitizeHistory_onclose"}
                 ,{"type":"event","data":["ce_sanitizeHistory_dialog","click"],"key":"ce_sanitizeHistory_dialog"}
 
                 ,{"type":"event","data":["social-provider-button","click"],"key":"social-provider-button"}
                 ,{"type":"event","data":["social-notification-container-message","click"],"key":"social-provider-message"}
+
+                ,{"type":"event","data":["ce_easyscreenshot","click"],"key":"ce_easyscreenshot"}
+                ,{"type":"event","data":["easyscreenshot-snapshot-select","click"],"key":"easyscreenshot-snapshot-select"}
+                ,{"type":"event","data":["easyscreenshot-snapshot-entire","click"],"key":"easyscreenshot-snapshot-entire"}
+                ,{"type":"event","data":["easyscreenshot-snapshot-visible","click"],"key":"easyscreenshot-snapshot-visible"}
                 ];
 var init_once = false;
 function trackSocial(){

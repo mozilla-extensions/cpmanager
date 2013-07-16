@@ -21,3 +21,12 @@ pref("extensions.cmimprove.features.undocloseanimation.enable", true);
 pref("extensions.cmimprove.socialapi.whitelist", "http://firefox.com.cn,http://www.firefox.com.cn");
 
 pref("extensions.cmimprove.gesture.enabled", true);
+
+// number of days for auto clear history
+// 0   =  disable auto clear
+// -1  =  daily
+// -2  =  weekly
+// -3  =  monthly
+// -4  =  querterly
+// -6  =  yearly
+pref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", -4);

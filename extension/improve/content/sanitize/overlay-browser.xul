@@ -22,12 +22,10 @@
     </toolbarbutton>
   </toolbarpalette>
   <popupset id="mainPopupSet">
-      <menupopup id="ce_sanitizeHistory_popup" placespopup="true" onpopuphiding="ce_sanitizeHistory.onPopupHiding()" onpopupshowing="ce_sanitizeHistory.onPopupShowing()" >
-        <menuitem id="ce_sanitizeHistory_none" label="&cp.clearRecentHistory.none.label;" type="radio" group="ce_sanitizeHistory"/>
-        <!-- menuitem id="ce_sanitizeHistory_7days" label="&cp.clearRecentHistory.7days.label;" type="radio" group="ce_sanitizeHistory"/-->
-        <menuitem id="ce_sanitizeHistory_onclose" label="&cp.clearRecentHistory.clearOnClose.label;" type="radio" group="ce_sanitizeHistory"/>
-        <menuseparator/>
+      <menupopup id="ce_sanitizeHistory_popup" placespopup="true" >
         <menuitem id="ce_sanitizeHistory_dialog" label="&clearRecentHistory.label;" command="Tools:Sanitize"/>
+        <menuseparator/>
+        <menuitem id="ce_sanitizeHistory_settings" label="&cp.history.settings.label;" oncommand="openPreferences('paneMain');"/>
       </menupopup>
   </popupset>
 </overlay>
