@@ -67,20 +67,20 @@ function clearHistory()
   var range = getClearRange(days)
   var globalHistory = PlacesUtils.history.QueryInterface(Ci.nsIBrowserHistory);
   globalHistory.removeVisitsByTimeframe(range[0], range[1]);
-  try {
-    var os = Components.classes["@mozilla.org/observer-service;1"]
-                       .getService(Components.interfaces.nsIObserverService);
-    os.notifyObservers(null, "browser:purge-session-history", "");
-  }
-  catch (e) { }
-
-  // Clear last URL of the Open Web Location dialog
-  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                        .getService(Components.interfaces.nsIPrefBranch);
-  try {
-    prefs.clearUserPref("general.open_location.last_url");
-  }
-  catch (e) { }
+//  try {
+//    var os = Components.classes["@mozilla.org/observer-service;1"]
+//                       .getService(Components.interfaces.nsIObserverService);
+//    os.notifyObservers(null, "browser:purge-session-history", "");
+//  }
+//  catch (e) { }
+//
+//  // Clear last URL of the Open Web Location dialog
+//  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+//                        .getService(Components.interfaces.nsIPrefBranch);
+//  try {
+//    prefs.clearUserPref("general.open_location.last_url");
+//  }
+//  catch (e) { }
 }
 
 function getClearRange (days){
