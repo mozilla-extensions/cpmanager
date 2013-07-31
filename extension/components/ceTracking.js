@@ -221,6 +221,23 @@ function getPK(){
 //}
 const ONEDAY = 24*60*60*1000;
 
+var prefileAge = -1;
+function getAge() {
+  function onSuccess(times) {
+    if (times && times.created) {
+      var days = (new Date() - times.created) / ONEDAY;
+      prefileAge = parseInt(days);
+    }
+  }
+  try{
+    Components.utils.import("resource://services-common/utils.js");
+    var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
+    file.append("times.json")
+    CommonUtils.readJSON(file.path).then(onSuccess)
+  } catch (e){
+  }
+};
+
 function getActive() {
   try{
     var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
@@ -294,6 +311,7 @@ function getADUData(){
        + activeStr                                 //cpmanager_paramActive()
        + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
        + getMOExts()    //cpmanager_paramMOExts()
+       + "&age=" + prefileAge
 }
 
 function httpGet (url) {
@@ -386,6 +404,7 @@ trackingFactoryClass.prototype = {
   observe: function (aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
+        getAge();
         Services.obs.addObserver(this, "quit-application", true);
         Services.obs.addObserver(this, "final-ui-startup", true);
         let tracking_random = Math.random();
