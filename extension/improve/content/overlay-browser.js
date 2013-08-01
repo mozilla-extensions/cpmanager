@@ -4,8 +4,35 @@ var UIC = {
     switch (aEvent.type) {
       case "load":
         this.init();
+        setTimeout(this.fixUrlbar.bind(this), 1000);
         break;
     }
+  },
+  fixUrlbar: function UIC__fixUrlbar(){
+    if(!!document.getElementById("urlbar-container"))
+      return;
+    var toolbar = document.getElementById("nav-bar");
+    let curSet = toolbar.currentSet;
+    let arr = curSet.split(",");
+    let needs = ["unified-back-forward-button",
+                 "urlbar-container",
+                 "reload-button",
+                 "stop-button",
+                 "search-container",
+                ];
+   needs.forEach(function(id){
+      var index = arr.indexOf(id);
+      if (-1 != index){
+        arr.splice(index,1);
+      }
+    });
+    curSet = needs.concat(arr).join(",");
+    toolbar.currentSet = curSet;
+    toolbar.setAttribute("currentset", curSet);
+    document.persist(toolbar.id, "currentset");
+    try{
+      BrowserToolboxCustomizeDone(true);
+    }catch(e){}
   },
   init: function UIC__init(){
     this.installButton("downloads-button");
