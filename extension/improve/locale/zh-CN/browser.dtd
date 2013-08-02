@@ -1,6 +1,3 @@
-<!ENTITY cp.menu.bookmarksShowAll "管理书签">
-<!ENTITY cp.showAllBookmarks2.label "管理书签">
-
 <!ENTITY cp.history.settings.label "自动清除历史选项">
 <!ENTITY cp.history.label "历史">
 <!ENTITY cp.clearHistory.label "自动清除历史记录:">

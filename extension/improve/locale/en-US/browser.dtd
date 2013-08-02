@@ -1,6 +1,3 @@
-<!ENTITY cp.menu.bookmarksShowAll "Show All Bookmarks">
-<!ENTITY cp.showAllBookmarks2.label "Show All Bookmarks">
-
 <!ENTITY cp.history.settings.label "Auto Clear History Settings">
 <!ENTITY cp.history.label "History">
 <!ENTITY cp.clearHistory.label "Auto Clear History:">

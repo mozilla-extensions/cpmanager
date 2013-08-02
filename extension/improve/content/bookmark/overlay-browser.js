@@ -1,5 +1,3 @@
-var ffid = 3;
-//bookmark
 (function() {
 function $(id){return document.getElementById(id);}
 var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
@@ -10,17 +8,31 @@ function getString(key){
 }
 
 var cmImprove_BM = {
+  handleEvent: function (aEvent) {
+    switch (aEvent.type) {
+      case "load":
+        this.init();
+        break;
+      case "unload":
+        this.uninit();
+        break;
+      case "popupshowing":
+        this.bookmarksPopup_popupshowing();
+        break;
+
+    }
+  },
   get bookmarksPopup() {
     delete this.bookmarksPopup;
     return this.bookmarksPopup = $("BMB_bookmarksPopup");
   },
-  bookmarksPopup_popupshowing : function() {
+  bookmarksPopup_popupshowing: function() {
     var item_t = $("BMB_viewBookmarksToolbar");
     item_t && item_t.setAttribute("label",getString("menu.bookmarksToolbar"));
     var item_s = $("cm_menu_bookmarksSidebar");
     item_s && item_s.setAttribute("label",getString("menu.bookmarksSidebar"));
   },
-  showBookmarkToolbar : function() {
+  showBookmarkToolbar: function() {
     // If pref "initialized" has been set to True, this means it's not a new profile.
     var prefs = Application.prefs;
     if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
@@ -38,34 +50,62 @@ var cmImprove_BM = {
                setToolbarVisibility($("PersonalToolbar"), true);
     }
   },
-  init : function(){
-    PlacesStarButton.onClick = function (aEvent){
-      var tfID = PlacesUtils.unfiledBookmarksFolderId;
-      var showUI = true;
-      try{
-        tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-        if(tfID == -1){
-          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
-        }
-        showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
-        if(!showUI)
+  init: function(){
+    if(window.PlacesStarButton){
+      PlacesStarButton.onClick = function (aEvent){
+        var tfID = PlacesUtils.unfiledBookmarksFolderId;
+        var showUI = true;
+        try{
+          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
+          if(tfID == -1){
+            tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
+          }
+          showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
+          if(!showUI)
+            tfID = PlacesUtils.unfiledBookmarksFolderId;
+          var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
+        }catch(e){
           tfID = PlacesUtils.unfiledBookmarksFolderId;
-        var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
-      }catch(e){
-        tfID = PlacesUtils.unfiledBookmarksFolderId;
-        showUI = true;;
+          showUI = true;;
+        }
+        if (aEvent.button == 0 && !this._pendingStmt) {
+          PlacesCommandHook.bookmarkCurrentPage(showUI,tfID);
+        }
+        aEvent.stopPropagation();
       }
-      if (aEvent.button == 0 && !this._pendingStmt) {
-        PlacesCommandHook.bookmarkCurrentPage(showUI,tfID);
+      PlacesStarButton.__defineGetter__("_unstarredTooltip", function(){
+        delete this._unstarredTooltip;
+        return this._unstarredTooltip =
+          getString("starButtonOff.tooltip");
+      });
+    } else {
+      BookmarkingUI.onCommand = function (aEvent){
+        var tfID = PlacesUtils.unfiledBookmarksFolderId;
+        var showUI = true;
+        try{
+          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
+          if(tfID == -1){
+            tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
+          }
+          showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI",false);
+          if(!showUI)
+            tfID = PlacesUtils.unfiledBookmarksFolderId;
+          var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
+        }catch(e){
+          tfID = PlacesUtils.unfiledBookmarksFolderId;
+          showUI = true;;
+        }
+        if (aEvent.button == 0 && !this._pendingStmt) {
+          PlacesCommandHook.bookmarkCurrentPage(showUI,tfID);
+        }
+        aEvent.stopPropagation();
       }
-      aEvent.stopPropagation();
+      BookmarkingUI.__defineGetter__("_unstarredTooltip", function(){
+        delete this._unstarredTooltip;
+        return this._unstarredTooltip =
+          getString("starButtonOff.tooltip");
+      });
     }
-    PlacesStarButton.__defineGetter__("_unstarredTooltip", function(){
-      delete this._unstarredTooltip;
-      return this._unstarredTooltip =
-        getString("starButtonOff.tooltip");
-    });
-
     StarUI.panel.addEventListener("popupshown", function () {
       StarUI._element("editBookmarkPanelTitle").value = getString("editBookmarkPanel.addBookmarkTitle");
       var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");
@@ -73,7 +113,7 @@ var cmImprove_BM = {
       link.setAttribute("href", "http://www.firefox.com.cn/sync/");
     },false);
 
-    cmImprove_BM.bookmarksPopup && cmImprove_BM.bookmarksPopup.addEventListener("popupshowing",cmImprove_BM.bookmarksPopup_popupshowing,false);
+    this.bookmarksPopup && this.bookmarksPopup.addEventListener("popupshowing",this,false);
 
     gEditItemOverlay.tempContainer = 0;
     var _onFolderMenuListCommand = gEditItemOverlay.onFolderMenuListCommand.bind(gEditItemOverlay);
@@ -94,13 +134,13 @@ var cmImprove_BM = {
         Application.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder",gEditItemOverlay.tempContainer)
     },false);
 
-    cmImprove_BM.showBookmarkToolbar();
+    this.showBookmarkToolbar();
   },
-  uninit : function(){
-    cmImprove_BM.bookmarksPopup && cmImprove_BM.bookmarksPopup.removeEventListener("popupshowing",cmImprove_BM.bookmarksPopup_popupshowing,false);
+  uninit: function(){
+    this.bookmarksPopup && this.bookmarksPopup.removeEventListener("popupshowing",this,false);
   },
 }
 
-window.addEventListener('load'  , cmImprove_BM.init, false)
-window.addEventListener('unload', cmImprove_BM.uninit, false)
+window.addEventListener('load'  , cmImprove_BM, false)
+window.addEventListener('unload', cmImprove_BM, false)
 })();
