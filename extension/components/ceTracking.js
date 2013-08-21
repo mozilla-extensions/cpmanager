@@ -238,6 +238,18 @@ function getAge() {
   }
 };
 
+function getPluginVersion(name) {
+  var tags = Cc["@mozilla.org/plugin/host;1"]
+             .getService(Ci.nsIPluginHost)
+             .getPluginTags({});
+  for (var tag of tags) {
+    if (tag.name == name) {
+      return tag["version"];
+    }
+  }
+  return "";
+}
+
 function getActive() {
   try{
     var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
@@ -312,6 +324,7 @@ function getADUData(){
        + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
        + getMOExts()    //cpmanager_paramMOExts()
        + "&age=" + prefileAge
+       + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
 }
 
 function httpGet (url) {
