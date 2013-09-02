@@ -19,6 +19,7 @@
 			+ '&t=' + encodeURIComponent(option.type)
 			+ '&d=' + encodeURIComponent(option.rid)
 			+ '&a=' + encodeURIComponent(option.action)
+			+ '&e=' + encodeURIComponent(option.extra)
 			+ '&cid=' + Application.prefs.getValue("app.chinaedition.channel","www.firefox.com.cn");
 	};
 })();

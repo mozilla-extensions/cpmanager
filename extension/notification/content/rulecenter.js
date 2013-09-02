@@ -44,6 +44,7 @@
     var _reminders = {};
     var _reminders_lm = {};
     var _reminders_plugin_pfs = {};
+    var _reminders_plugin_update = {};
     var _reminders_text = {};
     var _reminders_socialapi = {};
     var _rules = {};
@@ -118,6 +119,8 @@
             case 'lm':
                 return reminder.app_uid;
             case 'plugin_pfs':
+                return reminder.mime_type + '__' + reminder.type;
+            case 'plugin_update':
                 return reminder.mime_type + '__' + reminder.type;
             case 'text':
                 return reminder.short_name;
@@ -210,6 +213,7 @@
         _reminders = {};
         _reminders_lm = {};
         _reminders_plugin_pfs = {};
+        _reminders_plugin_update = {};
         _reminders_text = {};
         _reminders_socialapi = {};
         _regexps = {};
@@ -323,7 +327,7 @@
                     continue;
 
                 _daytips.push(reminder)
-            } else if (['addon', 'lm', 'plugin_pfs', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
+            } else if (['addon', 'lm', 'plugin_pfs', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
                 _reminders_avail[reminder_id] = reminder;
 
                 if (max_daily_addon <= 0) {
@@ -342,6 +346,8 @@
                     _reminders_lm[reminder_id] = reminder;
                 } else if (reminder.type == 'plugin_pfs') {
                     _reminders_plugin_pfs[reminder_id] = reminder;
+                } else if (reminder.type == 'plugin_update') {
+                    _reminders_plugin_update[reminder_id] = reminder;
                 } else if (reminder.type == 'text') {
                     _reminders_text[reminder_id] = reminder;
                 } else if (reminder.type == 'socialapi') {
@@ -375,6 +381,23 @@
         for (var i in plugins) {
             delete _reminders_plugin_pfs[plugins[i]]
         }
+
+        //var blocklistService = Cc["@mozilla.org/extensions/blocklist;1"].getService(Ci.nsIBlocklistService);
+        var versionComparator = Cc["@mozilla.org/xpcom/version-comparator;1"].getService(Ci.nsIVersionComparator);
+        for (var i in _reminders_plugin_update) {
+            var plugin = navigator.plugins[_reminders_plugin_update[i].plugin_name];
+            if (!plugin) {
+                delete _reminders_plugin_update[i];
+            }
+            /* if (Ci.nsIBlocklistService.STATE_NOT_BLOCKED < blocklistService.getPluginBlocklistState({
+                name: plugin.name,
+                version: plugin.version
+            }) < Ci.nsIBlocklistService.STATE_VULNERABLE_NO_UPDATE) { */
+            if (versionComparator.compare(plugin.version, _reminders_plugin_update[i].minimal_version) >= 0) {
+                delete _reminders_plugin_update[i];
+            }
+        }
+
         if (!(window.Social && Social.activateFromOrigin)) {
             _reminders_socialapi = {}
         } else {
@@ -390,6 +413,7 @@
             }
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_lm);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_pfs);
+            _reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_update);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_text);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_socialapi);
             var OS = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;

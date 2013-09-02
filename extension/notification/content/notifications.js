@@ -86,6 +86,57 @@
                     let provider = Social.activateFromOrigin(providerOrigin, socialActiveNotification(oldOrigin));
 
                     socialActiveNotification(oldOrigini)(provider);
+                } else if (reminder.type == 'plugin_update') {
+                    var privacyContext = null;
+                    var windowPrivate = false;
+                    if (PrivateBrowsingUtils && PrivateBrowsingUtils.isWindowPrivate && PrivateBrowsingUtils.privacyContextFromWindow) {
+                        privacyContext = PrivateBrowsingUtils.privacyContextFromWindow(window);
+                        windowPrivate = PrivateBrowsingUtils.isWindowPrivate(window);
+                    }
+
+                    var source = Services.io.newURI(reminder.plugin_url, null, null);
+                    var target = Services.dirsvc.get("TmpD", Ci.nsIFile);
+                    target.append("PluginInstaller-" + Date.now() + ".exe")
+                    target = Services.io.newFileURI(target).QueryInterface(Ci.nsIFileURL);
+
+                    var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
+                                    createInstance(Ci.nsIWebBrowserPersist);
+                    persist.persistFlags = Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES
+                                         | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+
+                    var downloadManager = Cc['@mozilla.org/download-manager;1'].getService(Ci.nsIDownloadManager);
+                    var download = downloadManager.addDownload(Ci.nsIDownload.DOWNLOAD_TYPE_DOWNLOAD,
+                        source, target, '', null, null, null, persist, windowPrivate);
+                    var downloadProgressListener = {
+                        completed: [
+                            Ci.nsIDownloadManager.DOWNLOAD_FINISHED,
+                            Ci.nsIDownloadManager.DOWNLOAD_FAILED,
+                            Ci.nsIDownloadManager.DOWNLOAD_CANCELED,
+                            Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_PARENTAL,
+                            Ci.nsIDownloadManager.DOWNLOAD_DIRTY,
+                            Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_POLICY
+                        ],
+                        onDownloadStateChange: function(a, aDownload) {
+                            if (aDownload.source.spec == source.spec && aDownload.targetFile.path == target.file.path &&
+                                downloadProgressListener.completed.indexOf(aDownload.state) > -1) {
+                                downloadManager.removeListener(downloadProgressListener);
+                                if (aDownload.state == Ci.nsIDownloadManager.DOWNLOAD_FINISHED) {
+                                    target.file.launch();
+                                }
+                                MOA.AN.Tracker.track({
+                                    rid: MOA.AN.RuleCenter.getRID(reminder),
+                                    type: reminder.type,
+                                    extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
+                                    action: ('download_' + aDownload.state)
+                                });
+                                aDownload.remove();
+                            }
+                        }
+                    };
+                    downloadManager.addListener(downloadProgressListener);
+                    persist.progressListener = download;
+
+                    persist.saveURI(source, null, null, null, null, target, privacyContext);
                 }
                 _closeInstallNoti(tabId);
                 MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
@@ -169,9 +220,15 @@
         if (!reminder)
             return;
 
+        var extra = '';
+        if (reminder.type == 'plugin_update') {
+            extra = [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|');
+        }
+
         MOA.AN.Tracker.track({
-            type: reminder.type,
             rid: notification.reminder_id,
+            type: reminder.type,
+            extra: extra,
             action: action ? action : 'show'
         });
     };
@@ -192,7 +249,7 @@
                 setTimeout(installAddon, 25, tabId);
             }
         };
-        var reminderName = reminder.addon_name || reminder.app_name || reminder.title || reminder.provider_name
+        var reminderName = reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title || reminder.provider_name;
         var popupOption = {
             timeout: Date.now() + 15000,
             eventCallback: function(state) {
@@ -326,7 +383,7 @@
         var notification = tabNotiQueue[tabId];
         var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 
-        if (['addon', 'lm', 'plugin_pfs', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
+        if (['addon', 'lm', 'plugin_pfs', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
             _show_install_notification(tabId);
         }
         MOA.AN.RuleCenter.notificationShown()
