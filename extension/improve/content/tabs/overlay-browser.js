@@ -564,7 +564,7 @@ var tcm = {
                       id: "ce_context_cloneTab" ,
                       label: getString("cp.tabs.clone") ,
                     },{command: cmd_cloneTab});
-    var btn_closeRight = $E("menuitem",{
+    var btn_closeRight = $("context_closeTabsToTheEnd") || $E("menuitem",{
                       id: "ce_context_closeRight" ,
                       label: getString("cp.tabs.close.right"),
                     },{command: cmd_closeRight});
@@ -613,6 +613,13 @@ var tcm = {
         parent.insertBefore(m,anchor);
       }
     });
+    //hide all menuseparator after anchor
+    while (anchor.nextElementSibling) {
+      anchor = anchor.nextElementSibling;
+      if (anchor.tagName == "menuseparator") {
+        anchor.setAttribute("hidden", "true")
+      }
+    }
 
     var _updateContextMenuOrig = TabContextMenu.updateContextMenu.bind(TabContextMenu);
     TabContextMenu.updateContextMenu = (function(aPopupMenu) {
