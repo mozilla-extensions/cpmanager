@@ -74,7 +74,7 @@
     },
 
   };
-  window.addEventListener("load", gCHNotificationInfoBar, false)
+//  window.addEventListener("load", gCHNotificationInfoBar, false)
 })();
 
 var ce_sanitizeHistory = {
