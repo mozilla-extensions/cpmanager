@@ -12,11 +12,6 @@ var UIC = {
     if(!!document.getElementById("urlbar-container"))
       return;
 
-    var _trackurl = 'http://adu.g-fox.cn/disurlbar.gif';
-    var image = new Image();
-    image.src = _trackurl + "?r=" + Math.random()
-              + "&pk=" + Application.prefs.getValue("extensions.cpmanager@mozillaonline.com.uuid","");
-
     var toolbar = document.getElementById("nav-bar");
     let curSet = toolbar.currentSet;
     let arr = curSet.split(",");

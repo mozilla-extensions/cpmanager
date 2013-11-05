@@ -34,12 +34,8 @@
   var PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
   var CPMANAGER_ADDON_LIST_NEW_URL = "http://www.g-fox.cn/live.gif";
   var CPMANAGER_ADDON_LIST_NEW_URL_FIRSTTIME = "http://www.g-fox.cn/activate.gif";
-  var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE = "http://www.g-fox.cn/online.gif";
-  var CPMANAGER_ADDON_LIST_NEW_URL_ONLINE2 = "http://www.g-fox.cn/online15.gif";
   var cpmanager_xmlHttp = null;
   var cpmanager_init_delay = 5000;
-  var cpmanager_online_delay = 5*60*1000;
-  var cpmanager_online_delay2 = 15*60*1000;
   var cpmanager_relive_delay = 24*60*60*1000;
   //var cpmanager_partner_activate_interval = 7*24*60*60*1000
   var cpmanager_partner_activate_interval = 0;
@@ -361,24 +357,6 @@
       }
   }
 
-  function cpmanager_online(){
-    cpmanager_LOG("cpmanager: cpmanager online");
-      try {
-        cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE, 'online_date');
-      } catch (e) {
-        Components.utils.reportError(e);
-      }
-  }
-
-  function cpmanager_online2(){
-    cpmanager_LOG("cpmanager: cpmanager online2");
-      try {
-        cpmanager_startUpdate(CPMANAGER_ADDON_LIST_NEW_URL_ONLINE2, 'online_date2');
-      } catch (e) {
-        Components.utils.reportError(e);
-      }
-  }
-
   //get AddonListNew and start the installation check.
   function cpmanager_startUpdate(updateUrl, fuodPref){
     function hasPref(key) {
@@ -389,17 +367,10 @@
       return Application.prefs.getValue(key, defValue);
     }
 
-    let fx21Prefix = "fx21.";
     let CHANNEL_PREF = "app.chinaedition.channel";
     let channelidstr = "?channelid=";
-    if(hasPref(CHANNEL_PREF)){
-      let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
-      channelidstr += channelid;
-    } else {
-      let channelid = getPrefStr(fx21Prefix + CHANNEL_PREF,"www.mozilla.com.cn");
-      channelidstr += channelid;
-      channelidstr += "&noid=true";
-    }
+    let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
+    channelidstr += channelid;
     updateUrl += channelidstr
                + cpmanager_paramFUOD(fuodPref)
                + cpmanager_paramCEVersion()
@@ -439,8 +410,6 @@
     if (cp_mod.touched) return;
     cp_mod.touched = true;
     window.setTimeout(cpmanager_init,cpmanager_init_delay);
-    window.setTimeout(cpmanager_online,cpmanager_online_delay);
-    window.setTimeout(cpmanager_online2,cpmanager_online_delay2);
     //switch to nsITimer, notice that, in order to use nsITimer, you have to know what is GCed when the window is closed.
     cp_mod.timer = Components.classes["@mozilla.org/timer;1"]
          .createInstance(Components.interfaces.nsITimer);
@@ -451,8 +420,6 @@
             if (win && win.MOA && win.MOA.CPManager) {
             //  win.cpmanager_LOG("lalalalala");
               win.setTimeout(win.MOA.CPManager.cpmanager_init(), win.MOA.CPManager.cpmanager_init_delay);
-              win.setTimeout(win.MOA.CPManager.cpmanager_online(), win.MOA.CPManager.cpmanager_online_delay);
-              win.setTimeout(win.MOA.CPManager.cpmanager_online2(), win.MOA.CPManager.cpmanager_online_delay2);
             }
         } };
 
@@ -507,9 +474,5 @@
 
   var ns = MOA.ns('CPManager');
   ns.cpmanager_init = cpmanager_init;
-  ns.cpmanager_online = cpmanager_online;
-  ns.cpmanager_online2 = cpmanager_online2;
   ns.cpmanager_init_delay = cpmanager_init_delay;
-  ns.cpmanager_online_delay = cpmanager_online_delay;
-  ns.cpmanager_online_delay2 = cpmanager_online_delay2;
 })();

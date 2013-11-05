@@ -67,33 +67,6 @@ function setPrefStr(name, value) {
   }
 }
 
-const fx21Prefix = "fx21.";
-var fx21List = [
-    "distribution.about",
-    "distribution.id",
-    "distribution.version",
-    "mozilla.partner.id",
-    "app.distributor",
-    "app.distributor.channel",
-    "app.partner.mozillaonline",
-    "app.chinaedition.channel",
-];
-
-function backupPref(){
-  let backTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-  backTimer.initWithCallback({
-    notify: function() {
-      fx21List.forEach(function(item){
-        var newItem = fx21Prefix + item;
-        if(hasPref(item)){
-          let value = getPrefStr(item,"");
-          setPrefStr(newItem,value);
-        }
-      });
-    }
-  }, 1000, Ci.nsITimer.TYPE_ONE_SHOT);
-}
-
 function generateUUID() {
   return Cc["@mozilla.org/uuid-generator;1"]
           .getService(Ci.nsIUUIDGenerator)
@@ -310,14 +283,8 @@ function getMOExts() {
 function getADUData(){
 
   let channelidstr = "?channelid=";
-  if(hasPref(CHANNEL_PREF)){
-    let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
-    channelidstr += channelid;
-  } else {
-    let channelid = getPrefStr(fx21Prefix + CHANNEL_PREF,"www.mozilla.com.cn");
-    channelidstr += channelid;
-    channelidstr += "&noid=true";
-  }
+  let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
+  channelidstr += channelid;
 
   let pk = getPK();
   let uk = getUK();
@@ -434,15 +401,14 @@ trackingFactoryClass.prototype = {
         Services.obs.addObserver(this, "final-ui-startup", true);
         let tracking_random = Math.random();
         let str = USAGE_URI + '?when=run';
-        httpGet(str);
+        //httpGet(str);
         break;
 
       case "final-ui-startup":
-        backupPref();
         sendADU(0);
         break;
       case "quit-application":
-        this.sendUsageData();
+        //this.sendUsageData();
         break;
     };
   },
