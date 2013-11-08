@@ -54,7 +54,8 @@ overlay  chrome://cmsafeflag/content/options.xul  chrome://cmimprove/content/ges
 style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove-os/skin/undo_closetab.css
 style  chrome://global/content/customizeToolbar.xul  chrome://cmimprove/skin/ce-Toolbar.css
 
-override  chrome://cmimprove/skin/ce-Toolbar.png         chrome://cmimprove/skin/ce-Toolbar-mac.png             os=Darwin
+override  chrome://cmimprove/skin/private.png         chrome://cmimprove/skin/private-mac.png             os=Darwin
+override  chrome://cmimprove/skin/sanitize.png         chrome://cmimprove/skin/sanitize-mac.png             os=Darwin
 override  chrome://cmimprove/skin/undo-close-tb.png      chrome://cmimprove/skin/undo-close-tb-mac.png          os=Darwin
 
 component {C40350A8-F734-4CFF-99D9-95274D408143} components/ceTracking.js

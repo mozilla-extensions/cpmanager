@@ -1,24 +1,22 @@
-#ce_sanitizeHistory, #ce_privateBrowser{
-  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar.png") !important;
-}
-#ce_sanitizeHistory:-moz-lwtheme-brighttext,
-#ce_privateBrowser:-moz-lwtheme-brighttext {
-  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png") !important;
-}
-
-#TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory, #ce_privateBrowser) {
-  list-style-image: url("chrome://cmimprove/skin/ce-Toolbar-inverted.png") !important;
-}
-
 #ce_sanitizeHistory{
-  -moz-image-region: rect(0px, 137px, 18px, 119px);
+  list-style-image: url("chrome://cmimprove/skin/sanitize.png") !important;
   -moz-box-orient: horizontal;
+}
+#ce_sanitizeHistory:-moz-lwtheme-brighttext {
+  list-style-image: url("chrome://cmimprove/skin/sanitize-inverted.png") !important;
+}
+
+#TabsToolbar:last-child :-moz-any(#ce_sanitizeHistory) {
+  list-style-image: url("chrome://cmimprove/skin/sanitize-inverted.png") !important;
 }
 
 #ce_privateBrowser{
-  -moz-image-region: rect(0px, 38px, 16px, 20px);
+  list-style-image: url("chrome://cmimprove/skin/private.png") !important;
+}
+#ce_privateBrowser:-moz-lwtheme-brighttext {
+  list-style-image: url("chrome://cmimprove/skin/private-inverted.png") !important;
 }
 
-#ce_privateBrowser[checked]{
-  -moz-image-region: rect(0px, 259px, 16px, 241px);
+#TabsToolbar:last-child :-moz-any(#ce_privateBrowser) {
+  list-style-image: url("chrome://cmimprove/skin/private-inverted.png") !important;
 }
