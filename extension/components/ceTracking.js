@@ -307,12 +307,20 @@ function getADUData(){
 }
 
 function httpGet (url) {
+  try {
     let xmlHttpRequest = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
     xmlHttpRequest.QueryInterface(Ci.nsIJSXMLHttpRequest);
     xmlHttpRequest.open('GET', url, true);
     xmlHttpRequest.send(null);
-    xmlHttpRequest.onreadystatechange = function() {
+    xmlHttpRequest.onload = function() {
+      LOG('httpGet:load');
     };
+    xmlHttpRequest.onerror = function() {
+      LOG('httpGet:error');
+    };
+  } catch(e) {
+    LOG(e);
+  }
 };
 const RETRY_DELAY = 20*1000;
 let ADU_Task = [
@@ -389,7 +397,7 @@ trackingFactoryClass.prototype = {
       return;
     }
     let tracking_random = Math.random();
-    str =  USAGE_URI + '?when=quit?r='+tracking_random + str;
+    str = USAGE_URI + '?when=quit&r=' + tracking_random + str;
     httpGet(str);
   },
 
@@ -400,15 +408,15 @@ trackingFactoryClass.prototype = {
         Services.obs.addObserver(this, "quit-application", true);
         Services.obs.addObserver(this, "final-ui-startup", true);
         let tracking_random = Math.random();
-        let str = USAGE_URI + '?when=run';
-        //httpGet(str);
+        let str = USAGE_URI + '?when=run&r=' + tracking_random;
+        httpGet(str);
         break;
 
       case "final-ui-startup":
         sendADU(0);
         break;
       case "quit-application":
-        //this.sendUsageData();
+        this.sendUsageData();
         break;
     };
   },

@@ -4,9 +4,18 @@ SDI = {
   handleEvent: function SDI__handleEvent(aEvent) {
     switch (aEvent.type) {
       case "load":
+        this.tracking();
         this.init();
         break;
     }
+  },
+
+  tracking: function SDI__tracking() {
+    try {
+      var ceTracking = Cc["@mozilla.com.cn/tracking;1"].
+                         getService().wrappedJSObject;
+      ceTracking.track("unknownContentType-load");
+    } catch(e) {}
   },
 
   init: function SDI__init(){
