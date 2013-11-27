@@ -168,6 +168,17 @@ function getPK(){
 	return encodeURIComponent(uuid);
 }
 
+function cpmanager_paramCEHome() {
+  var usingCEHome = 'badpref';
+  try {
+    var homePref = Services.prefs.getComplexValue("browser.startup.homepage", Ci.nsIPrefLocalizedString).data;
+    usingCEHome = [/^about:cehome$/, /^http:\/\/[a-z]+\.firefoxchina\.cn/, /^http:\/\/[iz]\.g-fox\.cn/].some(function(regex) {
+      return regex.test(homePref);
+    }).toString();
+  } catch(e) {}
+  return "&cehome=" + usingCEHome;
+}
+
 ////dll key
 //function getDK(){
 //  function getLib() {
@@ -296,7 +307,7 @@ function getADUData(){
        + "&ceversion=" + cev                       //cpmanager_paramCEVersion
        + "&ver=1_0&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode()
     // + cpmanager_paramSyncStatus()
-    // + cpmanager_paramCEHome()
+       + cpmanager_paramCEHome()
     // + cpmanager_paramPrevSessionLen()
        + activeStr                                 //cpmanager_paramActive()
        + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()

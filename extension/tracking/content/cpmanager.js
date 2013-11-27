@@ -263,11 +263,14 @@
   }
 
   function cpmanager_paramCEHome() {
-    var homePrefBranch = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService).getBranch('browser.startup.');
-    var homePref = homePrefBranch.getComplexValue("homepage", Ci.nsIPrefLocalizedString).data;
-    var usingCEHome = [/^about:cehome$/, /^http:\/\/[a-z]+\.firefoxchina\.cn/, /^http:\/\/[iz]\.g-fox\.cn/].some(function(regex) {
-      return regex.test(homePref);
-    });
+    var usingCEHome = 'badpref';
+    try {
+      var homePrefBranch = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefService).getBranch('browser.startup.');
+      var homePref = homePrefBranch.getComplexValue("homepage", Ci.nsIPrefLocalizedString).data;
+      usingCEHome = [/^about:cehome$/, /^http:\/\/[a-z]+\.firefoxchina\.cn/, /^http:\/\/[iz]\.g-fox\.cn/].some(function(regex) {
+        return regex.test(homePref);
+      }).toString();
+    } catch(e) {}
     return "&cehome=" + usingCEHome;
   }
 
@@ -376,7 +379,7 @@
                + cpmanager_paramCEVersion()
                + cpmanager_paramActCode()
 //             + cpmanager_paramSyncStatus()
-//             + cpmanager_paramCEHome()
+               + cpmanager_paramCEHome()
                + cpmanager_paramPrevSessionLen()
 //               + cpmanager_paramActive()
                + cpmanager_paramLocale()
