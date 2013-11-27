@@ -173,7 +173,9 @@ function cpmanager_paramCEHome() {
   try {
     var homePref = Services.prefs.getComplexValue("browser.startup.homepage", Ci.nsIPrefLocalizedString).data;
     usingCEHome = [/^about:cehome$/, /^http:\/\/[a-z]+\.firefoxchina\.cn/, /^http:\/\/[iz]\.g-fox\.cn/].some(function(regex) {
-      return regex.test(homePref);
+      return homePref.split('|').some(function(home) {
+        return regex.test(home);
+      });
     }).toString();
   } catch(e) {}
   return "&cehome=" + usingCEHome;
