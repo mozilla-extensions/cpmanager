@@ -4,10 +4,10 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const prefKey = "extensions.cpmanager@mozillaonline.com.qvod_hao123_ts";
-const trackingURL = "http://addons.g-fox.cn/qvod-hao123.gif?r=";
+const trackingURL = "http://addons.g-fox.cn/qvod-hao123.gif?c=%CLI%&r=%RANDOM%";
 
-function logAndTrack(aMessage) {
-  Services.console.logStringMessage("Dropping " + aMessage);
+function logAndTrack(aCli) {
+  Services.console.logStringMessage("Found " + aCli);
 
   var ts = Date.now() / 86400e3;
   var reference = ts;
@@ -20,7 +20,8 @@ function logAndTrack(aMessage) {
 
   var xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
               .createInstance(Ci.nsIXMLHttpRequest);
-  var url = trackingURL + Math.random();
+  var url = trackingURL.replace("%CLI%", encodeURIComponent(aCli))
+                       .replace("%RANDOM%", Math.random());
   xhr.open("GET", url, true);
   xhr.send();
   xhr.onload = function() {
@@ -45,17 +46,38 @@ CPCommandLineValidator.prototype = {
     "-url"
   ],
 
-  _urlsToDrop: [
-    "http://www.hao123.com/?tn=29065018_59_hao_pg"
+  _hostsToMatch: [
+    "www.hao123.com"
   ],
 
-  _shouldDrop: function(aCmdLine, aArgument) {
-    try {
-      aArgument = aCmdLine.resolveURI(aArgument).spec;
-    } catch(e) {};
+  _querysToDrop: {
+    "www.hao123.com": ["tn=29065018_59_hao_pg"]
+  },
 
-    return this._urlsToDrop.some(function(aUrlToDrop) {
-      return aArgument.indexOf(aUrlToDrop) > -1;
+  _shouldDrop: function(aCmdLine, aArgument, aFlag) {
+    try {
+      aArgument = aCmdLine.resolveURI(aArgument).QueryInterface(Ci.nsIURL);
+    } catch(e) {
+      return false;
+    }
+    var dropIfHostMatched = !aFlag;
+
+    var hostMatched = this._hostsToMatch.some(function(aHostToMatch) {
+      return (aArgument.asciiHost == aHostToMatch) && aArgument.query;
+    });
+
+    if (!hostMatched) {
+      return false;
+    }
+
+    logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
+
+    if (dropIfHostMatched) {
+      return true;
+    }
+
+    return this._querysToDrop[aArgument.asciiHost].some(function(aQueryToDrop) {
+      return aArgument.query == aQueryToDrop;
     });
   },
 
@@ -72,9 +94,9 @@ CPCommandLineValidator.prototype = {
        * and removed using argument related methods.
        */
       if (this._flagsToValidate.indexOf(argument) > -1) {
+        var flag = argument;
         var paramAsArg = cmdLine.getArgument(current + 1);
-        if (this._shouldDrop(cmdLine, paramAsArg)) {
-          logAndTrack(argument + " " + paramAsArg);
+        if (this._shouldDrop(cmdLine, paramAsArg, flag)) {
           cmdLine.removeArguments(current, current + 1);
           total -= 2;
         } else {
@@ -82,7 +104,6 @@ CPCommandLineValidator.prototype = {
         }
       } else {
         if (this._shouldDrop(cmdLine, argument)) {
-          logAndTrack(argument);
           cmdLine.removeArguments(current, current);
           total -= 1;
         } else {
