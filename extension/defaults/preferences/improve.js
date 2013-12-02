@@ -30,3 +30,6 @@ pref("extensions.cmimprove.gesture.enabled", true);
 // -4  =  querterly
 // -6  =  yearly
 pref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", -4);
+
+// whether to show url2qr icon in urlbar
+pref("extensions.cmimprove.url2qr.enabled", true);
