@@ -4,7 +4,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const prefKey = "extensions.cpmanager@mozillaonline.com.qvod_hao123_ts";
-const trackingURL = "http://addons.g-fox.cn/qvod-hao123.gif?c=%CLI%&r=%RANDOM%";
+const trackingURL = "http://addons.g-fox.cn/qvod-hao123.gif?r=%RANDOM%";
 
 function logAndTrack(aCli) {
   Services.console.logStringMessage("Found " + aCli);
