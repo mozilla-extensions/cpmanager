@@ -388,6 +388,7 @@
             var plugin = navigator.plugins[_reminders_plugin_update[i].plugin_name];
             if (!plugin) {
                 delete _reminders_plugin_update[i];
+                continue;
             }
             /* if (Ci.nsIBlocklistService.STATE_NOT_BLOCKED < blocklistService.getPluginBlocklistState({
                 name: plugin.name,
