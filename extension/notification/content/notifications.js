@@ -94,49 +94,100 @@
                         windowPrivate = PrivateBrowsingUtils.isWindowPrivate(window);
                     }
 
-                    var source = Services.io.newURI(reminder.plugin_url, null, null);
-                    var target = Services.dirsvc.get("TmpD", Ci.nsIFile);
-                    target.append("PluginInstaller-" + Date.now() + ".exe")
-                    target = Services.io.newFileURI(target).QueryInterface(Ci.nsIFileURL);
+                    var jsm = {};
+                    try {
+                        Cu.import('resource://gre/modules/Downloads.jsm', jsm);
+                    } catch(e) {}
 
-                    var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-                                    createInstance(Ci.nsIWebBrowserPersist);
-                    persist.persistFlags = Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES
-                                         | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+                    if (jsm.Downloads && jsm.Downloads.getList) {
+                        jsm.Downloads.getList(jsm.Downloads.ALL).then(function(aDownloadList) {
+                            jsm.Downloads.createDownload({
+                                source: {
+                                    url: reminder.plugin_url,
+                                    isPrivate: windowPrivate
+                                },
+                                target: OS.Path.join(OS.Constants.Path.tmpDir, "PluginInstaller-" + Date.now() + ".exe"),
+                                launchWhenSucceeded: true
+                            }).then(function(aDownload) {
+                                aDownloadList.add(aDownload);
+                                aDownload.start().then(function() {
+                                    if (aDownload.succeeded) {
+                                        return Ci.nsIDownloadManager.DOWNLOAD_FINISHED;
+                                    }
+                                }, function() {
+                                    if (aDownload.error) {
+                                        if (aDownload.error.becauseBlockedByParentalControls) {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_PARENTAL;
+                                        } else if (aDownload.error.becauseBlockedByReputationCheck) {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_DIRTY;
+                                        } else if (aDownload.error.becauseBlocked) {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_POLICY;
+                                        } else {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_FAILED;
+                                        }
+                                    } else if (aDownload.canceled) {
+                                        if (aDownload.hasPartialData) {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_PAUSED;
+                                        } else {
+                                            return Ci.nsIDownloadManager.DOWNLOAD_CANCELED;
+                                        }
+                                    }
+                                }).then(function(aState) {
+                                    MOA.AN.Tracker.track({
+                                        rid: MOA.AN.RuleCenter.getRID(reminder),
+                                        type: reminder.type,
+                                        extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
+                                        action: ('download_' + aState)
+                                    });
+                                    aDownloadList.remove(aDownload);
+                                }).then(null, Cu.reportError);
+                            }).then(null, Cu.reportError);
+                        }).then(null, Cu.reportError);
+                    } else {
+                        var source = Services.io.newURI(reminder.plugin_url, null, null);
+                        var target = Services.dirsvc.get("TmpD", Ci.nsIFile);
+                        target.append("PluginInstaller-" + Date.now() + ".exe")
+                        target = Services.io.newFileURI(target).QueryInterface(Ci.nsIFileURL);
 
-                    var downloadManager = Cc['@mozilla.org/download-manager;1'].getService(Ci.nsIDownloadManager);
-                    var download = downloadManager.addDownload(Ci.nsIDownload.DOWNLOAD_TYPE_DOWNLOAD,
-                        source, target, '', null, null, null, persist, windowPrivate);
-                    var downloadProgressListener = {
-                        completed: [
-                            Ci.nsIDownloadManager.DOWNLOAD_FINISHED,
-                            Ci.nsIDownloadManager.DOWNLOAD_FAILED,
-                            Ci.nsIDownloadManager.DOWNLOAD_CANCELED,
-                            Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_PARENTAL,
-                            Ci.nsIDownloadManager.DOWNLOAD_DIRTY,
-                            Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_POLICY
-                        ],
-                        onDownloadStateChange: function(a, aDownload) {
-                            if (aDownload.source.spec == source.spec && aDownload.targetFile.path == target.file.path &&
-                                downloadProgressListener.completed.indexOf(aDownload.state) > -1) {
-                                downloadManager.removeListener(downloadProgressListener);
-                                if (aDownload.state == Ci.nsIDownloadManager.DOWNLOAD_FINISHED) {
-                                    target.file.launch();
+                        var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
+                                        createInstance(Ci.nsIWebBrowserPersist);
+                        persist.persistFlags = Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES
+                                             | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+
+                        var downloadManager = Cc['@mozilla.org/download-manager;1'].getService(Ci.nsIDownloadManager);
+                        var download = downloadManager.addDownload(Ci.nsIDownload.DOWNLOAD_TYPE_DOWNLOAD,
+                            source, target, '', null, null, null, persist, windowPrivate);
+                        var downloadProgressListener = {
+                            completed: [
+                                Ci.nsIDownloadManager.DOWNLOAD_FINISHED,
+                                Ci.nsIDownloadManager.DOWNLOAD_FAILED,
+                                Ci.nsIDownloadManager.DOWNLOAD_CANCELED,
+                                Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_PARENTAL,
+                                Ci.nsIDownloadManager.DOWNLOAD_DIRTY,
+                                Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_POLICY
+                            ],
+                            onDownloadStateChange: function(a, aDownload) {
+                                if (aDownload.source.spec == source.spec && aDownload.targetFile.path == target.file.path &&
+                                    downloadProgressListener.completed.indexOf(aDownload.state) > -1) {
+                                    downloadManager.removeListener(downloadProgressListener);
+                                    if (aDownload.state == Ci.nsIDownloadManager.DOWNLOAD_FINISHED) {
+                                        target.file.launch();
+                                    }
+                                    MOA.AN.Tracker.track({
+                                        rid: MOA.AN.RuleCenter.getRID(reminder),
+                                        type: reminder.type,
+                                        extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
+                                        action: ('download_' + aDownload.state)
+                                    });
+                                    aDownload.remove();
                                 }
-                                MOA.AN.Tracker.track({
-                                    rid: MOA.AN.RuleCenter.getRID(reminder),
-                                    type: reminder.type,
-                                    extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
-                                    action: ('download_' + aDownload.state)
-                                });
-                                aDownload.remove();
                             }
-                        }
-                    };
-                    downloadManager.addListener(downloadProgressListener);
-                    persist.progressListener = download;
+                        };
+                        downloadManager.addListener(downloadProgressListener);
+                        persist.progressListener = download;
 
-                    persist.saveURI(source, null, null, null, null, target, privacyContext);
+                        persist.saveURI(source, null, null, null, null, target, privacyContext);
+                    }
                 }
                 _closeInstallNoti(tabId);
                 MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
