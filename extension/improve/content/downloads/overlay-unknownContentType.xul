@@ -17,4 +17,9 @@
       </hbox>
     </hbox>
   </radiogroup>
+  <groupbox id="mode">
+    <hbox class="indent" insertafter="save-box">
+      <checkbox id="save-to-huawei" label="&cp.saveToHuawei.label;"/>
+    </hbox>
+  </groupbox>
 </overlay>

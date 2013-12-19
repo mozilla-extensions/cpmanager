@@ -179,5 +179,50 @@ SDI = {
     return aFolder ? aFolder.path : "";
   },
 }
+const HUAWEI_APPID = "firefox";
+var HUAWEI = {
+  handleEvent: function HW__handleEvent(aEvent) {
+    switch (aEvent.type) {
+      case "load":
+        this.init();
+        break;
+    }
+  },
+
+  init: function HW__init() {
+    var mode = document.getElementById("mode");
+    var save = document.getElementById("save");
+    var hw = document.getElementById("save-to-huawei");
+
+    var url = "http://www.dbank.com/app/web/offline_plugin.php?downurl=%URL%&filename=%FILENAME%&filesize=%SIZE%&pluginid=%APPID%"
+    url = url.replace('%URL%', encodeURIComponent(window.dialog.mLauncher.source.spec))
+             .replace('%FILENAME%', encodeURIComponent(window.dialog.mLauncher.suggestedFileName))
+             .replace('%SIZE%', window.dialog.mLauncher.contentLength)
+             .replace('%APPID%', HUAWEI_APPID);
+    var onOK = window.dialog.onOK.bind(window.dialog);
+    window.dialog.onOK = (function() {
+      onOK();
+      if (!hw.disabled && hw.checked) {
+        window.opener.open(url)
+        HUAWEI.tracking();
+      }
+    }).bind(window.dialog);
+
+    mode.onselect = function() {
+      hw.disabled = !save.selected;
+    };
+    mode.onselect();
+  },
+
+  tracking: function HW__tracking() {
+    try {
+      var ceTracking = Cc["@mozilla.com.cn/tracking;1"].
+                         getService().wrappedJSObject;
+      ceTracking.track("huawei-add");
+    } catch(e) {}
+  },
+}
+
 window.addEventListener('load' , SDI, false);
+window.addEventListener('load' , HUAWEI, false);
 })();
