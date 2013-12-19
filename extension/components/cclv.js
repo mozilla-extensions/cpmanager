@@ -47,11 +47,13 @@ CPCommandLineValidator.prototype = {
   ],
 
   _hostsToMatch: [
-    "www.hao123.com"
+    "www.hao123.com",
+    "www.hao601.com"
   ],
 
   _querysToDrop: {
-    "www.hao123.com": ["tn=29065018_59_hao_pg"]
+    "www.hao123.com": ["tn=29065018_59_hao_pg"],
+    "www.hao601.com": []
   },
 
   _shouldDrop: function(aCmdLine, aArgument, aFlag) {
