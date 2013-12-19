@@ -53,7 +53,7 @@ CPCommandLineValidator.prototype = {
 
   _querysToDrop: {
     "www.hao123.com": ["tn=29065018_59_hao_pg"],
-    "www.hao601.com": []
+    "www.hao601.com": ["tn=3130716_10"]
   },
 
   _shouldDrop: function(aCmdLine, aArgument, aFlag) {
