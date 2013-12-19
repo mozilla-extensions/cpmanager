@@ -2,6 +2,7 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://cpmanager-clv/CCLVData.jsm");
 
 const prefKey = "extensions.cpmanager@mozillaonline.com.qvod_hao123_ts";
 const trackingURL = "http://addons.g-fox.cn/qvod-hao123.gif?r=%RANDOM%";
@@ -46,14 +47,14 @@ CPCommandLineValidator.prototype = {
     "-url"
   ],
 
-  _hostsToMatch: [
-    "www.hao123.com",
-    "www.hao601.com"
-  ],
+  get _hostsToMatch() {
+    delete this._hostsToMatch;
+    return this._hostsToMatch = Object.keys(this._querysToDrop);
+  },
 
-  _querysToDrop: {
-    "www.hao123.com": ["tn=29065018_59_hao_pg"],
-    "www.hao601.com": ["tn=3130716_10"]
+  get _querysToDrop() {
+    delete this._querysToDrop;
+    return this._querysToDrop = CCLVData.read();
   },
 
   _shouldDrop: function(aCmdLine, aArgument, aFlag) {
@@ -113,7 +114,7 @@ CPCommandLineValidator.prototype = {
         }
       }
     }
-  },
+  }
 };
 
 var components = [CPCommandLineValidator];

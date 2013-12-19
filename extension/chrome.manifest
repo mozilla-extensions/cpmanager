@@ -3,6 +3,8 @@ content   cmtracking         tracking/content/  contentaccessible=yes
 resource  cmtracking         tracking/modules/
 resource  tracking-components        components/binary/
 
+resource  cpmanager-clv         cpmanager-clv/modules/
+
 resource  cmsafeflag               safeflag/modules/
 
 content   cmsafeflag               safeflag/content/  contentaccessible=yes
@@ -72,6 +74,6 @@ contract @mozilla.com.cn/clearHistory;1 {44FA5595-2842-6F60-1385-B6C7AC6F118B}
 category profile-after-change chFactoryClass @mozilla.com.cn/clearHistory;1
 
 # z-cpmanager means very low priority
-component {eada4c5c-6b7a-486b-8492-5297ba7a189e} components/cclv.js
+component {eada4c5c-6b7a-486b-8492-5297ba7a189e} cpmanager-clv/components/cclv.js
 contract @mozillaonline.com/browser/cclv;1 {eada4c5c-6b7a-486b-8492-5297ba7a189e}
 category command-line-validator z-cpmanager @mozillaonline.com/browser/cclv;1
