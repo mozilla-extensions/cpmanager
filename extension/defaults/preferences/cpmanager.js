@@ -16,3 +16,8 @@ pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 pref("plugins.update.flash.WINNT.url","http://r.g-fox.cn/plugin/flash_WINNT");
 pref("plugins.update.flash.Darwin.url","http://r.g-fox.cn/plugin/flash_Darwin");
 //pref("plugins.update.flash.Linux.url","http://r.g-fox.cn/plugin/flash_Linux");
+
+//data choices of tracking
+pref("extensions.cpmanager.tracking.notification.show", true);
+pref("extensions.cpmanager.tracking.enabled", true);
+pref("extensions.cpmanager.tracking.infoURL","http://www.firefox.com.cn/about/participate/#user-privacy");

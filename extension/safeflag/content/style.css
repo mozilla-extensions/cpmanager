@@ -11,5 +11,5 @@ image.arrow { padding: 2px 0px; cursor: pointer; }
 image.arrow[disabled="true"] { opacity: 0.5; cursor: default; }
 
 #button-close{
-	margin-left: 240px;
+  margin-left: 240px;
 }

@@ -18,9 +18,9 @@ SDI = {
     } catch(e) {}
   },
 
-  init: function SDI__init(){
+  init: function SDI__init() {
     // show basic choice
-    if(document.getElementById("normalBox").collapsed == true){
+    if (document.getElementById("normalBox").collapsed == true) {
       document.getElementById("basicBox").collapsed = true;
       document.getElementById("normalBox").collapsed = false;
       document.getElementById("open").disabled = true;
@@ -33,7 +33,7 @@ SDI = {
 
       window.sizeToContent()
     }
-    this.folderListPref = Application.prefs.getValue("browser.download.folderList",1);
+    this.folderListPref = Application.prefs.getValue("browser.download.folderList", 1);
     this.currentDir = this._indexToFolder(this.folderListPref); // file
     this.displayDownloadDirPref();
     var _onOK = dialog.onOK.bind(dialog);
@@ -46,12 +46,12 @@ SDI = {
   folderListPref: 0,
   currentDir: null,
 
-  savePrefs: function (){
-    Application.prefs.setValue("browser.download.folderList",this.folderListPref);
-    Application.prefs.setValue("browser.download.dir",this.currentDir.path);
+  savePrefs: function () {
+    Application.prefs.setValue("browser.download.folderList", this.folderListPref);
+    Application.prefs.setValue("browser.download.dir", this.currentDir.path);
   },
 
-  chooseFolder: function (){
+  chooseFolder: function () {
     const nsIFilePicker = Components.interfaces.nsIFilePicker;
     const nsILocalFile = Components.interfaces.nsILocalFile;
 
@@ -105,7 +105,7 @@ SDI = {
 
     var file = Cc['@mozilla.org/file/local;1']
                .createInstance(Ci.nsILocalFile);
-    try{
+    try {
       var cdPref = Application.prefs.getValue("browser.download.dir","");
       file.initWithPath(cdPref);
     } catch(e) {
@@ -161,7 +161,7 @@ SDI = {
       // folder. See nsDownloadManager for details.
       downloadFolder.label = bundlePreferences.getString("downloadsFolderName");
       iconUrlSpec = fph.getURLSpecFromFile(this._indexToFolder(1));
-    } else if (this.folderListPref == 0){
+    } else if (this.folderListPref == 0) {
       // 'Desktop'
       downloadFolder.label = bundlePreferences.getString("desktopFolderName");
       iconUrlSpec = fph.getURLSpecFromFile(this._indexToFolder(0));

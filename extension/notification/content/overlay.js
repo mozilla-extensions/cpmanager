@@ -1,10 +1,10 @@
 (function() {
 	var init = function() {
 		try {
-			if(!!MOA.AN && MOA.AN.Lib.sinceFx4()) {
+			if (!!MOA.AN && MOA.AN.Lib.sinceFx4()) {
 				Components.utils.import("resource://gre/modules/AddonManager.jsm");
 				AddonManager.getAddonByID("addon-notification@mozillaonline.com", function(addon) {
-					if(!addon)
+					if (!addon)
 						return;
 					addon.uninstall();
 				});

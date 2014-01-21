@@ -1,11 +1,11 @@
 //cert error
 (function() {
 Components.utils.import("resource://gre/modules/Services.jsm");
-function $(id){return document.getElementById(id);}
+function $(id) {return document.getElementById(id);}
 var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
         getService(Ci.nsIStringBundleService).
         createBundle("chrome://cmimprove/locale/browser.properties");
-function getString(key){
+function getString(key) {
   return _bundles.GetStringFromName(key);
 }
 
@@ -47,15 +47,11 @@ var cmImprove_CE = {
       }
     }
   },
-  init : function(){
-    if (Services.vc.compare(Application.version, '11.0') >= 0) {
-      $('appcontent').addEventListener('DOMContentLoaded', cmImprove_CE.iFrameCertFix, false);
-    }
+  init: function() {
+    $('appcontent').addEventListener('DOMContentLoaded', cmImprove_CE.iFrameCertFix, false);
   },
-  uninit : function(){
-    if (Services.vc.compare(Application.version, '11.0') >= 0) {
-      $('appcontent').removeEventListener('DOMContentLoaded', cmImprove_CE.iFrameCertFix, false);
-    }
+  uninit: function() {
+    $('appcontent').removeEventListener('DOMContentLoaded', cmImprove_CE.iFrameCertFix, false);
   },
 }
 

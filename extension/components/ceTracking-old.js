@@ -6,9 +6,8 @@ const Cu = Components.utils;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-const _CID = Components.ID('{C40350A8-F734-4CFF-99D9-95274D408143}');
-const _CONTRACTID = "@mozilla.com.cn/tracking;1";
-const USAGE_URI = 'http://addons.g-fox.cn/tk.gif';
+const _CID = Components.ID('{6E12E09F-1942-46F0-8D85-9C6B1D0E6448}');
+const _CONTRACTID = "@mozilla.com.cn/tracking-old;1";
 
 const ACTIVE_TIME_PREF = "extensions.cpmanager@mozillaonline.com.active_time";
 const PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
@@ -16,9 +15,23 @@ const LOCALE_PREF = "general.useragent.locale";
 const CHANNEL_PREF = "app.chinaedition.channel"
 const DISTRIBUTION_PREF = "distribution.version"
 
-const ONEDAY = 24 * 60 * 60 * 1000;
-const ADU_INTERVAL = 24 * 60 * 60 * 1000;
-Cu.import("resource://gre/modules/Services.jsm");
+//Cu.import("resource://gre/modules/Services.jsm");
+let Services = {};
+
+XPCOMUtils.defineLazyGetter(Services, "prefs", function () {
+  return Cc["@mozilla.org/preferences-service;1"]
+           .getService(Ci.nsIPrefService)
+           .QueryInterface(Ci.nsIPrefBranch2);
+});
+XPCOMUtils.defineLazyGetter(Services, "dirsvc", function () {
+  return Cc["@mozilla.org/file/directory_service;1"]
+           .getService(Ci.nsIDirectoryService)
+           .QueryInterface(Ci.nsIProperties);
+});
+XPCOMUtils.defineLazyServiceGetter(Services, "obs",
+                                   "@mozilla.org/observer-service;1",
+                                   "nsIObserverService");
+
 
 function LOG(txt) {
   var consoleService = Cc["@mozilla.org/consoleservice;1"]
@@ -28,51 +41,26 @@ function LOG(txt) {
 
 function hasPref(name) {
   try {
-    Services.prefs.getCharPref(name);
+  	Services.prefs.getCharPref(name);
     return true;
   } catch (e) {
-    return false;
+  	return false;
   }
 }
 
 function getPrefStr(name, defValue) {
   try {
-    return Services.prefs.getCharPref(name);
+  	return Services.prefs.getCharPref(name);
   } catch (e) {
-    return defValue;
+  	return defValue;
   }
 }
 
 function setPrefStr(name, value) {
   try {
-    Services.prefs.setCharPref(name, value);
+  	Services.prefs.setCharPref(name, value);
   } catch (e) {
-    Components.utils.reportError(e);
-  }
-}
-
-function getPrefInt(name, defValue) {
-  try {
-    return Services.prefs.getIntPref(name);
-  } catch (e) {
-    return defValue;
-  }
-}
-
-function setPrefInt(name, value) {
-  try {
-    Services.prefs.setIntPref(name, value);
-  } catch (e) {
-    Components.utils.reportError(e);
-  }
-}
-
-function usageDataEnabled() {
-  try {
-    return !Services.prefs.getBoolPref("extensions.cpmanager.tracking.notification.show") &&
-            Services.prefs.getBoolPref("extensions.cpmanager.tracking.enabled");
-  } catch (e) {
-    return false;
+  	Components.utils.reportError(e);
   }
 }
 
@@ -172,9 +160,9 @@ function getPK() {
     }
   } catch (e) {
     uuid = generateUUID();
-    Services.prefs.setCharPref(PK_PREF, uuid);
+  	Services.prefs.setCharPref(PK_PREF, uuid);
   }
-  return encodeURIComponent(uuid);
+	return encodeURIComponent(uuid);
 }
 
 function cpmanager_paramCEHome() {
@@ -187,8 +175,10 @@ function cpmanager_paramCEHome() {
       });
     }).toString();
   } catch(e) {}
-  return usingCEHome;
+  return "&cehome=" + usingCEHome;
 }
+
+const ONEDAY = 24*60*60*1000;
 
 var prefileAge = -1;
 function getAge() {
@@ -233,10 +223,13 @@ function getActive() {
   try {
     var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
   } catch (e) {
+    var now = (new Date()).getTime();
+    Services.prefs.setCharPref(ACTIVE_TIME_PREF, now);//activate,pref no find
     return "&activate=true";
   }
-  return "";
+	return "";
 }
+var activeStr = getActive();
 
 var MOExtensions = "";
 function getMOExts() {
@@ -260,10 +253,10 @@ function getMOExts() {
         bootstrapped = {};
       }
       for (var id in bootstrapped) {
-        extensions.push(id + ":" + bootstrapped[id]["version"]);
+        extensions.push(id);
       }
       MOExtensions = extensions.filter(function(ext) /(@mozillaonline\.com|@mozilla\.com\.cn|muter@yxl\.name|personas@christopher\.beard)/.test(ext));
-      MOExtensions = MOExtensions.map(function(ext) {return ext.substring(0, ext.indexOf("@")) + ext.substring(ext.indexOf(":"))});
+      MOExtensions = MOExtensions.map(function(ext) ext.substring(0, ext.indexOf("@")));
       MOExtensions = MOExtensions.join(",");
     }
     return MOExtensions ? "&moexts=" + MOExtensions : "";
@@ -273,30 +266,28 @@ function getMOExts() {
 }
 
 function getADUData() {
+  let channelidstr = "?channelid=";
   let channelid = getPrefStr(CHANNEL_PREF,"www.firefox.com.cn");
+  channelidstr += channelid;
+
   let pk = getPK();
   let uk = getUK();
   let ver = getPrefStr("extensions.lastAppVersion","");
   let cev = getPrefStr(DISTRIBUTION_PREF,"");
-
-  let adudata = ADU_URL + "?ver=2_0"
-              + "&now=" + Date.now()
-              + "&channelid=" + channelid
-              + "&fxversion=" + ver                       //cpmanager_paramCEVersion
-              + "&ceversion=" + cev                       //cpmanager_paramCEVersion
-//            + getActive();                              //cpmanager_paramActive() remove for test version
-              + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
-              + "&age=" + prefileAge
-  if (usageDataEnabled()) {
-    adudata = adudata
-            + "&ude=true"
-            + "&pk=" + pk + "&uk=" + uk                 //uuid
-            + "&default=" + isDefaultBrowser()
-            + "&cehome=" + cpmanager_paramCEHome()
-            + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
-            + getMOExts()
-  }
-  return adudata;
+	return channelidstr
+    // + cpmanager_paramFUOD(fuodPref)
+       + "&fxversion=" + ver                       //cpmanager_paramCEVersion
+       + "&ceversion=" + cev                       //cpmanager_paramCEVersion
+       + "&ver=1_0&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode()
+    // + cpmanager_paramSyncStatus()
+       + cpmanager_paramCEHome()
+    // + cpmanager_paramPrevSessionLen()
+       + activeStr                                 //cpmanager_paramActive()
+       + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
+       + getMOExts()    //cpmanager_paramMOExts()
+       + "&age=" + prefileAge
+       + "&default=" + isDefaultBrowser()
+       + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
 }
 
 function httpGet (url) {
@@ -315,72 +306,49 @@ function httpGet (url) {
     LOG(e);
   }
 };
-
-const RETRY_DELAY = 20 * 1000;
-const ADU_URL = 'http://adu.g-fox.cn/adu-new.gif';
-const ADU_PREF = "extensions.cpmanager@mozillaonline.com.adu.lasttime";
+const RETRY_DELAY = 20*1000;
+let ADU_Task = [
+  {
+    task: "5s",
+    delay: 5*1000,
+    url: 'http://adu.g-fox.cn/adu.gif',
+  },
+  {
+    task: "5m",
+    delay: 5*60*1000,
+    url: 'http://adu.g-fox.cn/adu-1.gif',
+  },
+];
+let ADUIndex = 0;
 let ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
-function sendNextADU() {
-  let lastTime = getPrefInt(ADU_PREF, 0) * 1000;
-  let now = Date.now();
-  let delay = ADU_INTERVAL;
-  if (!lastTime || (now - lastTime >= ADU_INTERVAL) || now < lastTime) {
-    delay = 0;
-  } else {
-    delay -= (now - lastTime);
+function sendADU(index) {
+  if (index >= ADU_Task.length) {
+    return;
   }
-  sendADU(null, delay);
+  _ADU(ADU_Task[index].delay);
 }
 
-function sendADU(url, delay) {
-  url = url || getADUData();
+function _ADU(delay) {
   ADUTimer.initWithCallback({
     notify: function() {
+      let str =  ADU_Task[ADUIndex].url + getADUData() + '&now=' + (new Date()).getTime();
       let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
                   .createInstance(Ci.nsIXMLHttpRequest);
       xhr.QueryInterface(Ci.nsIJSXMLHttpRequest);
-      xhr.open('GET', url, true);
-      xhr.onload = function() {
-        if (xhr.status != 200) {
-          sendADU(url, RETRY_DELAY)
-        } else {
-          let now = Date.now();
-          setPrefInt(ADU_PREF, now / 1000);
-//          remove for test version
-//          try {
-//            var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
-//          } catch (e) {
-//            setCharPref(ACTIVE_TIME_PREF, now);
-//          }
-          sendNextADU();
-        }
-      };
-      xhr.onerror = function() {
-        sendADU(url, RETRY_DELAY)
-      };
+      xhr.open('GET', str, true);
+      xhr.addEventListener("error", function(event) { _ADU(RETRY_DELAY);}, false);
+      xhr.addEventListener("load", function(event) { sendADU(++ADUIndex);}, false);
       xhr.send(null);
     }
   }, delay, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
-function sendUsageData(data) {
-  let str = '';
-  for (let i in data) {
-    str += '&' + i + '=' + data[i];
-  }
-  if (str == '') {
-    return;
-  }
-  let tracking_random = Math.random();
-  str = USAGE_URI + '?when=quit&r=' + tracking_random + str;
-  httpGet(str);
-}
-let trackingFactoryClass = function() {
+let trackingFactoryClassOld = function() {
   this.wrappedJSObject = this;
 }
 
-trackingFactoryClass.prototype = {
+trackingFactoryClassOld.prototype = {
   classDescription: "Tracking for Imporve Firefox",
   contractID: _CONTRACTID,
   classID: _CID,
@@ -388,59 +356,26 @@ trackingFactoryClass.prototype = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
                                          Ci.nsISupportsWeakReference]),
 
-  //tracking key:count
-  data: {},
-
-  trackPrefs: function(key, value) {
-    this.data[key] = value;
-  },
-
-  track: function(key) {
-    if (typeof this.data[key] == 'number') {
-      this.data[key] ++;
-    } else {
-      this.data[key] = 1;
-    }
-  },
-
-  get ude() {
-    return usageDataEnabled();
-  },
-
-  send: function(url) {
-    if (this.ude) {
-      httpGet(url);
-    }
-    return this.ude;
-  },
-
   observe: function(aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
         getAge();
         Services.obs.addObserver(this, "quit-application", true);
         Services.obs.addObserver(this, "final-ui-startup", true);
-        if (this.ude) {
-          let tracking_random = Math.random();
-          let str = USAGE_URI + '?when=run&r=' + tracking_random;
-          httpGet(str);
-        }
         break;
+
       case "final-ui-startup":
-        ADUTimer.initWithCallback({
-          notify: function() {
-            sendNextADU();
-          }
-        }, 5000, Ci.nsITimer.TYPE_ONE_SHOT);
-        break;
-      case "quit-application":
-        if (this.ude) {
-          sendUsageData(this.data);
-        }
+        sendADU(0);
         break;
     };
   },
 
 }
 
-const NSGetFactory = XPCOMUtils.generateNSGetFactory([trackingFactoryClass]);
+if (XPCOMUtils.generateNSGetFactory) {
+  const NSGetFactory = XPCOMUtils.generateNSGetFactory([trackingFactoryClassOld]);
+} else {
+  const NSGetModule = function (aCompMgr, aFileSpec) {
+    return XPCOMUtils.generateModule([trackingFactoryClassOld]);
+  }
+}

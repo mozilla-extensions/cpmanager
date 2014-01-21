@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<overlay id='cpmanagerOverlay'
-	xmlns='http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'>
-	<script type='application/x-javascript' src='chrome://cmtracking/content/moa.js'></script>
-	<script type='application/x-javascript' src='chrome://cmtracking/content/cpmanager.js'></script>
-</overlay>

@@ -1,4 +1,4 @@
-nsPluginInstallerWizard.prototype.showPluginList = function (){
+nsPluginInstallerWizard.prototype.showPluginList = function () {
   var myPluginList = document.getElementById("pluginList");
   var hasPluginWithInstallerUI = false;
 
@@ -8,7 +8,7 @@ nsPluginInstallerWizard.prototype.showPluginList = function (){
 
   this.pluginsToInstallNum = 0;
 
-  for (var pluginInfoItem in this.mPluginInfoArray){
+  for (var pluginInfoItem in this.mPluginInfoArray) {
     // [plugin image] [Plugin_Name Plugin_Version]
 
     var pluginInfo = this.mPluginInfoArray[pluginInfoItem];
@@ -26,7 +26,7 @@ nsPluginInstallerWizard.prototype.showPluginList = function (){
     myCheckbox.setAttribute("style", "font-size:larger;");
 
     myPluginList.appendChild(myCheckbox);
-    if(description){
+    if (description) {
       var myLabel = document.createElement("label");
       myLabel.setAttribute("value", description);
       myLabel.setAttribute("style", "margin-left: 30px;");

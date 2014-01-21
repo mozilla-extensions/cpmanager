@@ -18,11 +18,11 @@
     },
 
     init: function() {
-      if(Application.prefs.getValue("extensions.cmimprove.clearhistory.notification.shown",false)) {
+      if (Application.prefs.getValue("extensions.cmimprove.clearhistory.notification.shown", false)) {
         return;
       }
       this._displayInfoBar();
-      Application.prefs.setValue("extensions.cmimprove.clearhistory.notification.shown",true);
+      Application.prefs.setValue("extensions.cmimprove.clearhistory.notification.shown", true);
     },
 
     _getNotification: function (name) {
@@ -34,7 +34,7 @@
       var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
               getService(Ci.nsIStringBundleService).
               createBundle("chrome://cmimprove/locale/browser.properties");
-      function getString(key){
+      function getString(key) {
         return _bundles.GetStringFromName(key);
       }
 
@@ -89,45 +89,45 @@ var ce_sanitizeHistory = {
     }
   },
 
-  init: function ce_sanitizeHistory__init(){
+  init: function ce_sanitizeHistory__init() {
     this.installButton("ce_sanitizeHistory");
     this.initUI();
     var toolbox = document.getElementById("navigator-toolbox");
-    toolbox.addEventListener("aftercustomization",this,false)
+    toolbox.addEventListener("aftercustomization", this, false)
   },
 
-  initUI: function ice_sanitizeHistory__initUI(){
+  initUI: function ice_sanitizeHistory__initUI() {
     this.bindPopup("ce_sanitizeHistory","ce_sanitizeHistory_popup")
   },
 
-  bindPopup: function ce_sanitizeHistory__bindPopup(buttonId,menuId){
+  bindPopup: function ce_sanitizeHistory__bindPopup(buttonId, menuId) {
     var button = document.getElementById(buttonId)
-    if(!button)
+    if (!button)
       return;
     var menu = document.getElementById(menuId)
-    button.addEventListener("mousedown",function(aEvent){
+    button.addEventListener("mousedown", function(aEvent) {
       if (aEvent.button != 0 )
         return;
       menu.openPopup(button, "before_start", 0, 0, false, false, aEvent);
-    },false);
+    }, false);
   },
 
-  installButton: function ce_sanitizeHistory__installButton(buttonId,toolbarId) {
+  installButton: function ce_sanitizeHistory__installButton(buttonId, toolbarId) {
     toolbarId = toolbarId || "addon-bar";
     var key = "extensions.toolbarbutton.installed."+buttonId;
-    if(Application.prefs.getValue(key, false))
+    if (Application.prefs.getValue(key, false))
       return;
 
     var toolbar = window.document.getElementById(toolbarId);
     let curSet = toolbar.currentSet;
-    if (-1 == curSet.indexOf(buttonId)){
+    if (-1 == curSet.indexOf(buttonId)) {
       let newSet = curSet + "," + buttonId;
       toolbar.currentSet = newSet;
       toolbar.setAttribute("currentset", newSet);
       document.persist(toolbar.id, "currentset");
-      try{
+      try {
         BrowserToolboxCustomizeDone(true);
-      }catch(e){}
+      } catch(e) {}
     }
     if (toolbar.getAttribute("collapsed") == "true") {
       toolbar.setAttribute("collapsed", "false");

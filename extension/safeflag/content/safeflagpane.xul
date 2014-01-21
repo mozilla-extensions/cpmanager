@@ -8,7 +8,7 @@
   <script type="application/javascript">
     (function() {
       function toggleSF() {
-        if(document.getElementById("c-enable").checked) {
+        if (document.getElementById("c-enable").checked) {
           document.getElementById("b-safe").disabled = false;
           document.getElementById("b-unsafe").disabled = false
         }else {

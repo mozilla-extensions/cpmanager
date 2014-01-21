@@ -7,13 +7,13 @@ var DL = {
         break;
     }
   },
-  init: function DL__init(){
+  init: function DL__init() {
     DownloadsViewItem.prototype.onProgressChange = function() {
       this._updateProgress();
       this._updateStatusLine();
 
       if (this.dataItem.state == Ci.nsIDownloadManager.DOWNLOAD_DOWNLOADING) {
-        var status,newEstimatedSecondsLeft;
+        var status, newEstimatedSecondsLeft;
         [status, newEstimatedSecondsLeft] =
           DownloadUtils.getDownloadStatus(this.dataItem.currBytes,
                                           this.dataItem.maxBytes,

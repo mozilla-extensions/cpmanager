@@ -449,19 +449,13 @@
     window.removeEventListener("load", dnd_onload, false);
 
     window.setTimeout(function() {
-      // FF4.0+
-      if(typeof Application.getExtensions != "undefined") {
-        Cu.import("resource://gre/modules/AddonManager.jsm");
-        AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
-          if(addon && !addon.userDisabled && !addon.appDisabled) {
-            appcenterEnabled = true;
-          }
-          registerDndHandler();
-        });
-      } else {
-        // Appcenter only supports FF5+
+      Cu.import("resource://gre/modules/AddonManager.jsm");
+      AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
+        if(addon && !addon.userDisabled && !addon.appDisabled) {
+          appcenterEnabled = true;
+        }
         registerDndHandler();
-      }
+      });
     }, 1000);
   }, false);
 })();

@@ -3,11 +3,11 @@
 						.getService(Components.interfaces.nsIWindowMediator);
 	var mrw = wm.getMostRecentWindow("navigator:browser");
 
-	var init = function(){
+	var init = function() {
 		var ruleCount = mrw.MOA.AN.RuleCenter.getRulesAvailCount();
 		var addonTreeView = {
-			rowCount : ruleCount,
-			getCellText : function(row,column){
+			rowCount: ruleCount,
+			getCellText: function(row, column) {
 				var rule = mrw.MOA.AN.RuleCenter.getRuleAvailByIndex(row);
 				var reminder = mrw.MOA.AN.RuleCenter.getReminderAvailById(rule.reminder_id);
 				switch (column.id) {
@@ -24,15 +24,15 @@
 						return 'Unknown'
 				}
 			},
-			setTree: function(treebox){ this.treebox = treebox; },
-			isContainer: function(row){ return false; },
-			isSeparator: function(row){ return false; },
-			isSorted: function(){ return false; },
-			getLevel: function(row){ return 0; },
-			getImageSrc: function(row,col){ return null; },
-			getRowProperties: function(row,props){},
-			getCellProperties: function(row,col,props){},
-			getColumnProperties: function(colid,col,props){}
+			setTree: function(treebox) { this.treebox = treebox; },
+			isContainer: function(row) { return false; },
+			isSeparator: function(row) { return false; },
+			isSorted: function() { return false; },
+			getLevel: function(row) { return 0; },
+			getImageSrc: function(row, col) { return null; },
+			getRowProperties: function(row, props) {},
+			getCellProperties: function(row, col, props) {},
+			getColumnProperties: function(colid, col, props) {}
 		};
 		document.getElementById('addon').view = addonTreeView;
 	}

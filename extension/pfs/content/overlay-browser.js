@@ -78,7 +78,7 @@ window.addEventListener("load", function() {
         });
       }
       //show panel later
-      notification.options.eventCallback = function(event){
+      notification.options.eventCallback = function(event) {
         gPluginHandler._clickToPlayNotificationEventCallback.bind(this)(event);
         if (event == "showing") {
           var cas = this.options.centerActions || [];

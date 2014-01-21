@@ -2,7 +2,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 
 
 // View for the undo menu.
-function log(e){
+function log(e) {
   Services.console.logStringMessage(e);
 }
 function ceUndoCloseTabMenu(element) {
@@ -17,7 +17,7 @@ function ceUndoCloseTabMenu(element) {
 }
 
 ceUndoCloseTabMenu.prototype = {
-  enableClearMenu: function UCTM_enableClearMenu(){
+  enableClearMenu: function UCTM_enableClearMenu() {
     this._enableClearMenu = true;
   },
   clearRecentlyClosedTabs: function UCTM_clearRecentlyClosedTabs() {
@@ -116,11 +116,11 @@ ceUndoCloseTabMenu.prototype = {
     undoPopup.appendChild(document.createElement("menuseparator"));
     m = undoPopup.appendChild(document.createElement("menuitem"));
     m.id = "ce_menu_clearAllTabs";
-    if(!this._enableClearMenu)
+    if (!this._enableClearMenu)
       m.setAttribute("disabled","true");
     m.setAttribute("label", bundles.GetStringFromName("ce.menuClearAllTabs.label"));
     var self = this;
-    m.addEventListener("command", function(){self.clearRecentlyClosedTabs()}, false);
+    m.addEventListener("command", function() {self.clearRecentlyClosedTabs()}, false);
 
     // "Restore All Tabs"
     var strings = gNavigatorBundle;
@@ -136,7 +136,7 @@ ceUndoCloseTabMenu.prototype = {
 // tabs context menu
 (function() {
 
-function $(id){
+function $(id) {
   if (typeof id == 'string') {
     return document.getElementById(id);
   } else {
@@ -150,10 +150,10 @@ function $M(id, props, eventhandlers) {
     for (var key in props) {
       if (key == "value") {
         el.value = props[key];
-      } else if(key == "class" && Services.appinfo.OS != "WINNT") {
+      } else if (key == "class" && Services.appinfo.OS != "WINNT") {
         continue;
       } else {
-        if(props[key]) {
+        if (props[key]) {
           el.setAttribute(key, props[key]);
         } else {
           el.removeAttribute(key)
@@ -177,44 +177,44 @@ function $E(tag, props, eventhandlers) {
 var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
         getService(Ci.nsIStringBundleService).
         createBundle("chrome://cmimprove/locale/browser.properties");
-function getString(key){
+function getString(key) {
   return _bundles.GetStringFromName(key);
 }
-function cmd_cloneTab(){
+function cmd_cloneTab() {
   tab = TabContextMenu.contextTab;
-  if(!tab) {
+  if (!tab) {
     return;
   }
   openUILinkIn(tab.linkedBrowser.currentURI.spec, "tab");
 }
-function cmd_closeRight(){
+function cmd_closeRight() {
   tab = TabContextMenu.contextTab;
-  if(!tab) {
+  if (!tab) {
     return;
   }
   var right = tab.nextElementSibling;
-  while(right){
+  while (right) {
     tab = right;
     right = tab.nextElementSibling;
-    if(tab.tagName == "tab") {
+    if (tab.tagName == "tab") {
       gBrowser.removeTab(tab);
     }
   }
 }
-function cmd_bookmark(){
+function cmd_bookmark() {
   tab = TabContextMenu.contextTab;
-  if(!tab) {
+  if (!tab) {
     return;
   }
   var tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-  if(tfID == -1){
+  if (tfID == -1) {
     tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
   }
-  PlacesCommandHook.bookmarkPage(tab.linkedBrowser,tfID,true);
+  PlacesCommandHook.bookmarkPage(tab.linkedBrowser, tfID, true);
 }
-function cmd_reloadSkipCache(){
+function cmd_reloadSkipCache() {
   tab = TabContextMenu.contextTab;
-  if(!tab) {
+  if (!tab) {
     return;
   }
   const reloadFlags = Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_PROXY | Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE;
@@ -239,27 +239,27 @@ var undoclose = {
         break;
     }
   },
-  enableClearMenu: function UC_enableClearMenu(){
+  enableClearMenu: function UC_enableClearMenu() {
     var button = $("ce-undo-close-toolbar-button");
-    if(button){
-      if(!button._placesView)
+    if (button) {
+      if (!button._placesView)
         new ceUndoCloseTabMenu(button);
       button._placesView.enableClearMenu();
     }
     var menu = $("ce-undo-close-tab-contextmenu");
-    if(menu){
-      if(!menu._placesView)
+    if (menu) {
+      if (!menu._placesView)
         new ceUndoCloseTabMenu(menu);
       menu._placesView.enableClearMenu();
     }
   },
   installButton: function() {
-    try{
-      if(Application.prefs.getValue("extensions.cmimprove.undoclose.installButton", false))
+    try {
+      if (Application.prefs.getValue("extensions.cmimprove.undoclose.installButton", false))
         return;
       var navbar = document.getElementById("nav-bar");
       var str = navbar.currentSet + "";
-      if(str.indexOf("ce-undo-close-toolbar-button") != -1)
+      if (str.indexOf("ce-undo-close-toolbar-button") != -1)
         return;
       str = str + ",ce-undo-close-toolbar-button";
       navbar.setAttribute("currentset", str);
@@ -270,30 +270,30 @@ var undoclose = {
     } catch(e) {}
   },
 
-  init: function UC_init(){
+  init: function UC_init() {
     gBrowser.tabContainer.addEventListener("TabOpen", this, false);
     gBrowser.tabContainer.addEventListener("TabClose", this, false);
     var toolbox = $("navigator-toolbox");
-    toolbox.addEventListener("aftercustomization",this,false)
+    toolbox.addEventListener("aftercustomization", this, false)
     this.installButton();
-    setTimeout(this.toggleRecentlyClosedTabs,200);
+    setTimeout(this.toggleRecentlyClosedTabs, 200);
   },
-  uninit: function UC_uninit(){
+  uninit: function UC_uninit() {
     gBrowser.tabContainer.removeEventListener("TabClose", this, false);
     gBrowser.tabContainer.removeEventListener("TabOpen", this, false);
     var toolbox = $("navigator-toolbox");
-    toolbox.removeEventListener("aftercustomization",this,false)
+    toolbox.removeEventListener("aftercustomization", this, false)
   },
-  toggleRecentlyClosedTabs: function UC_toggleRecentlyClosedTabs(){
+  toggleRecentlyClosedTabs: function UC_toggleRecentlyClosedTabs() {
     var button = $("ce-undo-close-toolbar-button");
-    if(button){
-      if(!button._placesView)
+    if (button) {
+      if (!button._placesView)
         new ceUndoCloseTabMenu(button);
       button._placesView.toggleRecentlyClosedTabs();
     }
     var menu = $("ce-undo-close-tab-contextmenu");
-    if(menu){
-      if(!menu._placesView)
+    if (menu) {
+      if (!menu._placesView)
         new ceUndoCloseTabMenu(menu);
       menu._placesView.toggleRecentlyClosedTabs();
     }
@@ -475,16 +475,16 @@ var undoclose = {
     };
   },
   animateCount: 0,
-  animate: function UC_animate(aTab){
-    try{
+  animate: function UC_animate(aTab) {
+    try {
       if (!Services.prefs.getBoolPref("extensions.cmimprove.features.undocloseanimation.enable", true)) {
         return;
       }
     } catch(e) {}
     var button = $("ce-undo-close-toolbar-button");
-    if(!button)
+    if (!button)
       return;
-    if(aTab != window.gBrowser.selectedTab)
+    if (aTab != window.gBrowser.selectedTab)
       return;
     var panel = $("browser-panel");
 
@@ -499,9 +499,9 @@ var undoclose = {
     var width2 = 0;
     var height2 = 0;
 
-    if(left2 == 0) //no animation when close about:addons
+    if (left2 == 0) //no animation when close about:addons
       return;
-    if(this.animateCount++ > 0)
+    if (this.animateCount++ > 0)
       return;
     var win = linkedBrowser.contentWindow.content;
     var canvas = $("ce-animation-canvas");
@@ -533,20 +533,20 @@ var undoclose = {
   },
 };
 var tcm = {
-  init : function(){
-    try{
+  init: function() {
+    try {
       if (!Services.prefs.getBoolPref("extensions.cmimprove.features.tabcontextmenu.enable", true)) {
         return;
       }
     } catch(e) {}
     var parent = $("tabContextMenu")
-    if(!parent) {
+    if (!parent) {
       return;
     }
     //remove all menuseparator
     var arr = parent.getElementsByTagName("menuseparator");
     try {
-      for(var i = arr.length; i > 0;) {
+      for (var i = arr.length; i > 0;) {
         parent.removeChild(arr[--i]);
       }
     } catch(e) {}
@@ -606,11 +606,11 @@ var tcm = {
                    ,{ command:cmd_reloadSkipCache })//reload
               ,$("context_reloadAllTabs")//reloadAll
     ]
-    var anchor = $E("menuseparator",{ hidden: "true" });
-    parent.insertBefore(anchor,parent.firstChild);
-    arr.forEach(function(m){
-      if(m) {
-        parent.insertBefore(m,anchor);
+    var anchor = $E("menuseparator", { hidden: "true" });
+    parent.insertBefore(anchor, parent.firstChild);
+    arr.forEach(function(m) {
+      if (m) {
+        parent.insertBefore(m, anchor);
       }
     });
     //hide all menuseparator after anchor

@@ -48,7 +48,7 @@
           break;
       }
     },
-    init: function SocialAPIHack__init(){
+    init: function SocialAPIHack__init() {
       this._prefs = gPrefService.getBranch('extensions.cmimprove.socialapi.');
 
       if (!(window.Social && Social.activateFromOrigin)) {
@@ -62,7 +62,7 @@
         gBrowser.addEventListener("ActivateSocialFeature-Weibo", SocialAPIHack, true, true);
       }, 1000);
     },
-    activateWeibo: function SocialAPIHack__activateWeibo(e){
+    activateWeibo: function SocialAPIHack__activateWeibo(e) {
       // from browser/base/content/browser-social.js
       let targetDoc = e.target;
       if (!(targetDoc instanceof HTMLDocument)) {

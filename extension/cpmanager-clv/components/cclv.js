@@ -18,16 +18,18 @@ function logAndTrack(aCli) {
   if (ts < reference) {
     return;
   }
-
-  var xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
-              .createInstance(Ci.nsIXMLHttpRequest);
-  var url = trackingURL.replace("%CLI%", encodeURIComponent(aCli))
-                       .replace("%RANDOM%", Math.random());
-  xhr.open("GET", url, true);
-  xhr.send();
-  xhr.onload = function() {
-    Services.prefs.setIntPref(prefKey, Math.floor(ts) + 1);
-  };
+  var tracker = Components.classes["@mozilla.com.cn/tracking;1"];
+  if (tracker && tracker.getService().wrappedJSObject.ude) {
+    var xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                .createInstance(Ci.nsIXMLHttpRequest);
+    var url = trackingURL.replace("%CLI%", encodeURIComponent(aCli))
+                         .replace("%RANDOM%", Math.random());
+    xhr.open("GET", url, true);
+    xhr.send();
+    xhr.onload = function() {
+      Services.prefs.setIntPref(prefKey, Math.floor(ts) + 1);
+    };
+  }
 }
 
 function CPCommandLineValidator() {

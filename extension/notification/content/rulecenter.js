@@ -228,7 +228,7 @@
     };
 
     ns.getDayTipReminders = function(force) {
-        return (force ? _daytips_avail : _daytips).filter(function(reminder){
+        return (force ? _daytips_avail : _daytips).filter(function(reminder) {
                     var btn = MOA.AN.Lib.get(reminder.btn_id);
                     return btn && btn.hidden == false && btn.clientWidth > 0
                 })
@@ -323,7 +323,7 @@
 
             if (reminder.type == 'tip') {
                 _daytips_avail.push(reminder);
-                if(!!MOA.AN.Lib.getFilePref(reminder_id + '__nomore', false))
+                if (!!MOA.AN.Lib.getFilePref(reminder_id + '__nomore', false))
                     continue;
 
                 _daytips.push(reminder)

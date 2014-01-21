@@ -1,53 +1,53 @@
 @namespace html url(http://www.w3.org/1999/xhtml);
 
 #addon-notification-popup .popup-notification-description {
-	max-width: 24em;
-	height: 3em;
+  max-width: 24em;
+  height: 3em;
 }
 
 #lms-notification-icon {
-	list-style-image: url("chrome://livemargins/skin/appcenter-16.png");
+  list-style-image: url("chrome://livemargins/skin/appcenter-16.png");
 }
 #plugin_updates-notification-icon {
-	list-style-image: url("chrome://browser/skin/pluginInstall-16.png");
+  list-style-image: url("chrome://browser/skin/pluginInstall-16.png");
 }
 #texts-notification-icon {
-	list-style-image: url("chrome://global/skin/icons/information-16.png");
+  list-style-image: url("chrome://global/skin/icons/information-16.png");
 }
 #socialapis-notification-icon {
-	list-style-image: url("chrome://cmnotification/skin/socialapi.png");
+  list-style-image: url("chrome://cmnotification/skin/socialapi.png");
 }
 #notification-popup-box[anchorid="lms-notification-icon"] > #lms-notification-icon,
 #notification-popup-box[anchorid="plugin_updates-notification-icon"] > #lms-notification-icon,
 #notification-popup-box[anchorid="texts-notification-icon"] > #texts-notification-icon,
 #notification-popup-box[anchorid="socialapis-notification-icon"] > #socialapis-notification-icon {
-	display: -moz-box;
+  display: -moz-box;
 }
 
 .popup-notification-icon[popupid="addon-notification-daytip"] {
-	list-style-image: url("chrome://cmnotification/skin/info64.png");
+  list-style-image: url("chrome://cmnotification/skin/info64.png");
 }
 
 .popup-notification-icon[popupid="addon-notification-addon"] {
-	list-style-image: url("chrome://cmnotification/skin/discover64.png");
+  list-style-image: url("chrome://cmnotification/skin/discover64.png");
 }
 
 .popup-notification-icon[popupid="addon-notification-lm"] {
-	list-style-image: url("chrome://livemargins/skin/appcenter-32.png");
-	width: 32px;
-	height: 32px;
+  list-style-image: url("chrome://livemargins/skin/appcenter-32.png");
+  width: 32px;
+  height: 32px;
 }
 
 .popup-notification-icon[popupid="addon-notification-plugin_update"] {
-	list-style-image: url("chrome://browser/skin/pluginInstall-64.png");
+  list-style-image: url("chrome://browser/skin/pluginInstall-64.png");
 }
 
 .popup-notification-icon[popupid="addon-notification-text"] {
-	list-style-image: url("chrome://global/skin/icons/information-64.png");
+  list-style-image: url("chrome://global/skin/icons/information-64.png");
 }
 
 .popup-notification-icon[popupid="addon-notification-socialapi"] {
-	list-style-image: url("chrome://cmnotification/skin/socialapi64.png");
+  list-style-image: url("chrome://cmnotification/skin/socialapi64.png");
 }
 
 #addon-notification-addon-notification,
@@ -56,7 +56,7 @@
 #addon-notification-text-notification,
 #addon-notification-socialapi-notification,
 #addon-notification-popup > popupnotification {
-	-moz-binding: url("chrome://cmnotification/content/bindings.xml#addon-notification-popup");
+  -moz-binding: url("chrome://cmnotification/content/bindings.xml#addon-notification-popup");
 }
 
 #addon-notification-addon-notification .popup-notification-label,
@@ -65,8 +65,8 @@
 #addon-notification-text-notification .popup-notification-label,
 #addon-notification-socialapi-notification .popup-notification-label,
 #addon-notification-popup .popup-notification-label {
-	font-size: 110%;
-	font-weight: bold;
+  font-size: 110%;
+  font-weight: bold;
 }
 
 #addon-notification-addon-notification a,
@@ -75,9 +75,9 @@
 #addon-notification-text-notification a,
 #addon-notification-socialapi-notification a,
 #addon-notification-popup a {
-	color: -moz-nativehyperlinktext;
-	margin-left: 0.5em;
-	text-decoration: underline;
+  color: -moz-nativehyperlinktext;
+  margin-left: 0.5em;
+  text-decoration: underline;
 }
 
 #addon-notification-addon-notification .text-link-gray,
@@ -86,7 +86,7 @@
 #addon-notification-text-notification .text-link-gray,
 #addon-notification-socialapi-notification .text-link-gray,
 #addon-notification-popup .text-link-gray {
-	color: gray;
+  color: gray;
 }
 
 #addon-notification-addon-notification .text-link-gray:hover,
@@ -95,7 +95,7 @@
 #addon-notification-text-notification .text-link-gray:hover,
 #addon-notification-socialapi-notification .text-link-gray:hover,
 #addon-notification-popup .text-link-gray:hover {
-	color: -moz-nativehyperlinktext;
+  color: -moz-nativehyperlinktext;
 }
 
 #addon-notification-addon-notification .popup-notification-button-container,
@@ -104,6 +104,6 @@
 #addon-notification-text-notification .popup-notification-button-container,
 #addon-notification-socialapi-notification .popup-notification-button-container,
 #addon-notification-popup .popup-notification-button-container {
-	border-top: 1px solid #c9c9c9;
-	padding-top: 10px;
+  border-top: 1px solid #c9c9c9;
+  padding-top: 10px;
 }

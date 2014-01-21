@@ -17,22 +17,22 @@ let cePrivateBrowsingUI = {
   uninit: function PBUI_unint() {
   },
 
-  installButton: function PBUI__installButton(buttonId,toolbarId) {
+  installButton: function PBUI__installButton(buttonId, toolbarId) {
     toolbarId = toolbarId || "addon-bar";
     var key = "extensions.toolbarbutton.installed."+buttonId;
-    if(Application.prefs.getValue(key, false))
+    if (Application.prefs.getValue(key, false))
       return;
 
     var toolbar = window.document.getElementById(toolbarId);
     let curSet = toolbar.currentSet;
-    if (-1 == curSet.indexOf(buttonId)){
+    if (-1 == curSet.indexOf(buttonId)) {
       let newSet = curSet + "," + buttonId;
       toolbar.currentSet = newSet;
       toolbar.setAttribute("currentset", newSet);
       document.persist(toolbar.id, "currentset");
-      try{
+      try {
         BrowserToolboxCustomizeDone(true);
-      }catch(e){}
+      } catch(e) {}
     }
     if (toolbar.getAttribute("collapsed") == "true") {
       toolbar.setAttribute("collapsed", "false");

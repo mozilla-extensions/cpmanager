@@ -13,7 +13,7 @@ const _CONTRACTID = "@mozilla.com.cn/clearHistory;1";
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/PlacesUtils.jsm");
 
-function LOG(txt){
+function LOG(txt) {
   var consoleService = Cc["@mozilla.org/consoleservice;1"]
                        .getService(Ci.nsIConsoleService);
                        consoleService.logStringMessage("clear history : " + txt);
@@ -37,10 +37,10 @@ function getIntPref(name, defValue) {
 
 function clearHistory()
 {
-  var isAuto = getBoolPref("privacy.sanitize.sanitizeOnShutdown",false);
-  if(isAuto)
+  var isAuto = getBoolPref("privacy.sanitize.sanitizeOnShutdown", false);
+  if (isAuto)
     return;
-  var timeout = getIntPref("extensions.cpmanager@mozillaonline.com.sanitize.timeout",0);
+  var timeout = getIntPref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", 0);
   var days = 0;
   switch (timeout) {
     case -1: //"daily":
@@ -62,7 +62,7 @@ function clearHistory()
       days = timeout;
       break;
   }
-  if(days == 0)
+  if (days == 0)
     return;
   var range = getClearRange(days)
   var globalHistory = PlacesUtils.history.QueryInterface(Ci.nsIBrowserHistory);
@@ -83,7 +83,7 @@ function clearHistory()
 //  catch (e) { }
 }
 
-function getClearRange (days){
+function getClearRange (days) {
   var startDate = 0;
   var endDate = Date.now() * 1000;
   endDate -= days * 24 * 3600000000; // 1*60*60*1000000

@@ -406,7 +406,7 @@
                                                 PopupNotifications.getNotification('addon-install-failed', curBrowser) ||
                                                 PopupNotifications.getNotification('addon-install-complete', curBrowser) ||
                                                 PopupNotifications.getNotification('click-to-play-plugins', curBrowser);
-                    if(!_current_notification) {
+                    if (!_current_notification) {
                         _system_popup_countdown.option.onFinish()
                     }
                 }
