@@ -1,5 +1,6 @@
 var EXPORTED_SYMBOLS = ['safeflag'];
 
+Components.utils.import("resource://gre/modules/Services.jsm");
 var _listManager = Components.classes["@mozilla.org/url-classifier/listmanager;1"].getService(Components.interfaces.nsIUrlListManager);
 var _ucdbSvc = Components.classes["@mozilla.org/url-classifier/dbservice;1"].getService(Components.interfaces.nsIUrlClassifierDBService);
 
