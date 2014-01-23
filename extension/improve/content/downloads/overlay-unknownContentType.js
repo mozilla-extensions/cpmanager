@@ -194,7 +194,7 @@ var HUAWEI = {
     var save = document.getElementById("save");
     var hw = document.getElementById("save-to-huawei");
 
-    var url = "http://www.dbank.com/app/web/offline_plugin.php?downurl=%URL%&filename=%FILENAME%&filesize=%SIZE%&pluginid=%APPID%"
+    var url = "http://www.dbank.com/app/web/offline_plugin.php?downurl=%URL%&filename=%FILENAME%&filesize=%SIZE%&uid=%APPID%"
     url = url.replace('%URL%', encodeURIComponent(window.dialog.mLauncher.source.spec))
              .replace('%FILENAME%', encodeURIComponent(window.dialog.mLauncher.suggestedFileName))
              .replace('%SIZE%', window.dialog.mLauncher.contentLength)
