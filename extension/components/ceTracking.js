@@ -279,7 +279,7 @@ function getADUData() {
   let ver = getPrefStr("extensions.lastAppVersion","");
   let cev = getPrefStr(DISTRIBUTION_PREF,"");
 
-  let adudata = ADU_URL + "?ver=2_0"
+  let adudata = ADU_URL + "?ver=2_1"
               + "&now=" + Date.now()
               + "&channelid=" + channelid
               + "&fxversion=" + ver                       //cpmanager_paramCEVersion
@@ -287,10 +287,10 @@ function getADUData() {
 //            + getActive();                              //cpmanager_paramActive() remove for test version
               + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
               + "&age=" + prefileAge
+              + "&pk=" + pk + "&uk=" + uk                 //uuid
   if (usageDataEnabled()) {
     adudata = adudata
             + "&ude=true"
-            + "&pk=" + pk + "&uk=" + uk                 //uuid
             + "&default=" + isDefaultBrowser()
             + "&cehome=" + cpmanager_paramCEHome()
             + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
@@ -345,15 +345,13 @@ function sendADU(url, delay) {
         if (xhr.status != 200) {
           sendADU(url, RETRY_DELAY)
         } else {
-          let now = Date.now();
-          setPrefInt(ADU_PREF, now / 1000);
-//          remove for test version
-//          try {
-//            var act = parseInt(Services.prefs.getCharPref(ACTIVE_TIME_PREF));
-//          } catch (e) {
-//            setCharPref(ACTIVE_TIME_PREF, now);
-//          }
-          sendNextADU();
+          let now = Date.now() / 1000;
+          setPrefInt(ADU_PREF, now);
+          var checknow = getPrefInt(ADU_PREF, 0);
+          // for setPref error
+          if (now == checknow) {
+            sendNextADU();
+          }
         }
       };
       xhr.onerror = function() {

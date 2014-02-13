@@ -278,7 +278,7 @@ function getADUData() {
     // + cpmanager_paramFUOD(fuodPref)
        + "&fxversion=" + ver                       //cpmanager_paramCEVersion
        + "&ceversion=" + cev                       //cpmanager_paramCEVersion
-       + "&ver=1_0&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode()
+       + "&ver=2_1&pk=" + pk + "&uk=" + uk         //cpmanager_paramActCode()
     // + cpmanager_paramSyncStatus()
        + cpmanager_paramCEHome()
     // + cpmanager_paramPrevSessionLen()
