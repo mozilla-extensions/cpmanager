@@ -91,6 +91,13 @@ var ce_sanitizeHistory = {
 
   init: function ce_sanitizeHistory__init() {
     this.installButton("ce_sanitizeHistory");
+
+    try {
+      Cu.import("resource://cmtracking/ExtensionUsage.jsm", this);
+      this.ExtensionUsage.register("ce_sanitizeHistory", "window:button",
+        "cpmanager@mozillaonline.com");
+    } catch(e) {};
+
     this.initUI();
     var toolbox = document.getElementById("navigator-toolbox");
     toolbox.addEventListener("aftercustomization", this, false)

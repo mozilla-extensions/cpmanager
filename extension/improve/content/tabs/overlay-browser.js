@@ -276,6 +276,13 @@ var undoclose = {
     var toolbox = $("navigator-toolbox");
     toolbox.addEventListener("aftercustomization", this, false)
     this.installButton();
+
+    try {
+      Cu.import("resource://cmtracking/ExtensionUsage.jsm", this);
+      this.ExtensionUsage.register("ce-undo-close-toolbar-button", "window:button",
+        "cpmanager@mozillaonline.com");
+    } catch(e) {};
+
     setTimeout(this.toggleRecentlyClosedTabs, 200);
   },
   uninit: function UC_uninit() {

@@ -19,6 +19,7 @@ const DISTRIBUTION_PREF = "distribution.version"
 const ONEDAY = 24 * 60 * 60 * 1000;
 const ADU_INTERVAL = 24 * 60 * 60 * 1000;
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://cmtracking/ExtensionUsage.jsm");
 
 function LOG(txt) {
   var consoleService = Cc["@mozilla.org/consoleservice;1"]

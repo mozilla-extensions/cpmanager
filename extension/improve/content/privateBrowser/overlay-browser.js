@@ -12,6 +12,12 @@ let cePrivateBrowsingUI = {
   },
   init: function PBUI_init() {
     this.installButton("ce_privateBrowser");
+
+    try {
+      Cu.import("resource://cmtracking/ExtensionUsage.jsm", this);
+      this.ExtensionUsage.register("ce_privateBrowser", "window:button",
+        "cpmanager@mozillaonline.com");
+    } catch(e) {};
   },
 
   uninit: function PBUI_unint() {
