@@ -23,7 +23,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 function LOG(txt) {
   var consoleService = Cc["@mozilla.org/consoleservice;1"]
                        .getService(Ci.nsIConsoleService);
-                       consoleService.logStringMessage("tracking" + txt);
+                       consoleService.logStringMessage("tracking: " + txt);
 }
 
 function hasPref(name) {
@@ -279,7 +279,7 @@ function getADUData() {
   let ver = getPrefStr("extensions.lastAppVersion","");
   let cev = getPrefStr(DISTRIBUTION_PREF,"");
 
-  let adudata = ADU_URL + "?ver=2_1"
+  let adudata = ADU_URL + "?ver=2_2"
               + "&now=" + Date.now()
               + "&channelid=" + channelid
               + "&fxversion=" + ver                       //cpmanager_paramCEVersion
@@ -318,46 +318,58 @@ function httpGet (url) {
 
 const RETRY_DELAY = 20 * 1000;
 const ADU_URL = 'http://adu.g-fox.cn/adu-new.gif';
-const ADU_PREF = "extensions.cpmanager@mozillaonline.com.adu.lasttime";
+const ADU_LAST = "extensions.cpmanager@mozillaonline.com.adu.last";
 let ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
+function untilTomorrow(now) {
+  var t = new Date(now);
+  t.setDate(t.getDate() + 1);
+  t.setHours(0);
+  t.setMinutes(parseInt(Math.random() * 10));// random 0 to 9
+  return t - now;
+}
 function sendNextADU() {
-  let lastTime = getPrefInt(ADU_PREF, 0) * 1000;
-  let now = Date.now();
-  let delay = ADU_INTERVAL;
-  if (!lastTime || (now - lastTime >= ADU_INTERVAL) || now < lastTime) {
-    delay = 0;
-  } else {
-    delay -= (now - lastTime);
+  let last = getPrefStr(ADU_LAST, ""); // "" : first time
+  let now = new Date();
+  let today = now.toDateString();
+  let delay = 5000; //delay 5s on first time or error
+  if (last == today) {
+    delay = untilTomorrow(now);
   }
   sendADU(null, delay);
 }
 
 function sendADU(url, delay) {
-  url = url || getADUData();
   ADUTimer.initWithCallback({
     notify: function() {
-      let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
-                  .createInstance(Ci.nsIXMLHttpRequest);
-      xhr.QueryInterface(Ci.nsIJSXMLHttpRequest);
-      xhr.open('GET', url, true);
-      xhr.onload = function() {
-        if (xhr.status != 200) {
-          sendADU(url, RETRY_DELAY)
-        } else {
-          let now = Date.now() / 1000;
-          setPrefInt(ADU_PREF, now);
-          var checknow = getPrefInt(ADU_PREF, 0);
-          // for setPref error
-          if (now == checknow) {
-            sendNextADU();
+      try {
+        url = url || getADUData();
+        let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                    .createInstance(Ci.nsIXMLHttpRequest);
+        xhr.QueryInterface(Ci.nsIJSXMLHttpRequest);
+        xhr.open('GET', url, true);
+        xhr.onload = function() {
+          if (xhr.status != 200) { //net error
+            sendADU(url, RETRY_DELAY)
+          } else {
+            let today = new Date().toDateString();
+            setPrefStr(ADU_LAST, today);
+            var check = getPrefStr(ADU_LAST, "");
+            // Make sure pref is successfully set
+            // before preparing to send next ADB tomorrow.
+            // If failed to set the pref, do nothing.
+            if (today == check) {
+              sendNextADU();
+            }
           }
-        }
-      };
-      xhr.onerror = function() {
-        sendADU(url, RETRY_DELAY)
-      };
-      xhr.send(null);
+        };
+        xhr.onerror = function() {
+          sendADU(url, RETRY_DELAY)
+        };
+        xhr.send(null);
+      } catch (e) {
+        sendADU(null, RETRY_DELAY)
+      }
     }
   }, delay, Ci.nsITimer.TYPE_ONE_SHOT);
 }
@@ -425,11 +437,7 @@ trackingFactoryClass.prototype = {
         }
         break;
       case "final-ui-startup":
-        ADUTimer.initWithCallback({
-          notify: function() {
-            sendNextADU();
-          }
-        }, 5000, Ci.nsITimer.TYPE_ONE_SHOT);
+        sendNextADU();
         break;
       case "quit-application":
         if (this.ude) {
