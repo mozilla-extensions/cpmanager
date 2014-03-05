@@ -2,3 +2,5 @@
 <!ENTITY cp.selectDir.label "Browse…">
 <!ENTITY cp.saveToHuawei.label "Also save to my DBank Cloud Storage">
 
+<!ENTITY cp.options.download.pane.label "DBank Entry">
+<!ENTITY cp.options.dbank.label "Enable 'Also save to my DBank Cloud Storage' in the download dialog.">

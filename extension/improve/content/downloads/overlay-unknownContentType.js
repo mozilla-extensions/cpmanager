@@ -184,7 +184,9 @@ var HUAWEI = {
   handleEvent: function HW__handleEvent(aEvent) {
     switch (aEvent.type) {
       case "load":
-        this.init();
+        if (Application.prefs.getValue("extensions.cmimprove.downloads.dbank.enable", false)) {
+          this.init();
+        }
         break;
     }
   },
@@ -193,6 +195,8 @@ var HUAWEI = {
     var mode = document.getElementById("mode");
     var save = document.getElementById("save");
     var hw = document.getElementById("save-to-huawei");
+    var box = document.getElementById("save-to-huawei-box");
+    box.removeAttribute("hidden");
 
     var url = "http://www.dbank.com/app/web/offline_plugin.php?downurl=%URL%&filename=%FILENAME%&filesize=%SIZE%&uid=%APPID%"
     url = url.replace('%URL%', encodeURIComponent(window.dialog.mLauncher.source.spec))

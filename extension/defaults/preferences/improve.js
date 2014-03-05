@@ -33,3 +33,6 @@ pref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", -4);
 
 // whether to show url2qr icon in urlbar
 pref("extensions.cmimprove.url2qr.enabled", true);
+
+// whether to show 'save to dbank' in download ui
+pref("extensions.cmimprove.downloads.dbank.enable", true);

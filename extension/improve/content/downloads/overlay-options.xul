@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE window [
+<!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/downloads.dtd">
+%improveDTD;
+]>
+<overlay id="downloads-options-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <prefwindow id="cpmanagerOptions">
+    <prefpane id="downloadspane"
+              label="&cp.options.download.pane.label;"
+              image="chrome://cmimprove/skin/download-options.png"
+              src="chrome://cmimprove/content/downloads/options-pane.xul"
+              flex="1"/>
+  </prefwindow>
+</overlay>

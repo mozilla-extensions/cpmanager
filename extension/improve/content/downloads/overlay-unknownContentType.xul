@@ -18,8 +18,8 @@
     </hbox>
   </radiogroup>
   <groupbox id="mode">
-    <hbox class="indent" insertafter="save-box">
-      <checkbox id="save-to-huawei" label="&cp.saveToHuawei.label;"/>
+    <hbox id="save-to-huawei-box" hidden="true" class="indent" insertafter="save-box">
+      <checkbox id="save-to-huawei" label="&cp.saveToHuawei.label;" src="chrome://cmimprove/skin/hw-logo.png"/>
     </hbox>
   </groupbox>
 </overlay>

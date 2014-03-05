@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE window [
+<!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/downloads.dtd">
+%improveDTD;
+]>
+<overlay id="downloads-options-prefpane" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <prefpane id="downloadspane">
+    <preferences>
+      <preference id="b-enabledbank" name="extensions.cmimprove.downloads.dbank.enable" type="bool"/>
+    </preferences>
+    <vbox>
+      <checkbox id="c-enabledbank" preference="b-enabledbank" label="&cp.options.dbank.label;"/>
+    </vbox>
+  </prefpane>
+</overlay>
