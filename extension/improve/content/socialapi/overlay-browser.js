@@ -51,6 +51,24 @@
     init: function SocialAPIHack__init() {
       this._prefs = gPrefService.getBranch('extensions.cmimprove.socialapi.');
 
+      if (SocialToolbar && SocialToolbar.updateButton) {
+        var _updateButton = SocialToolbar.updateButton.bind(SocialToolbar);
+        SocialToolbar.updateButton = (function() {
+          _updateButton();
+          var login = document.getElementById("social-notification-icon-message");
+          if (login) {
+            login.addEventListener("mousedown", function(aEvent) {
+              aEvent.stopImmediatePropagation();
+              try {
+                var ceTracking = Cc["@mozilla.com.cn/tracking;1"]
+                                   .getService().wrappedJSObject;
+                ceTracking.track("smclick");
+              } catch(e) {}
+            }, false);
+          }
+          Application.prefs.setValue("social.haslogin", !!login);
+        }).bind(SocialToolbar);
+      }
       if (!(window.Social && Social.activateFromOrigin)) {
         return
       }

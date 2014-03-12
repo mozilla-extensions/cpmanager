@@ -68,6 +68,14 @@ function setPrefInt(name, value) {
   }
 }
 
+function getPrefBool(name, defValue) {
+  try {
+    return Services.prefs.getBoolPref(name);
+  } catch (e) {
+    return defValue;
+  }
+}
+
 function usageDataEnabled() {
   try {
     return !Services.prefs.getBoolPref("extensions.cpmanager.tracking.notification.show") &&
@@ -379,6 +387,14 @@ function sendUsageData(data) {
   let str = '';
   for (let i in data) {
     str += '&' + i + '=' + data[i];
+  }
+  try {
+    var providers = JSON.parse(getPrefStr("social.activeProviders", "{}"));
+    if (Object.keys(providers).length) {
+      str += "&sociallogin=" + getPrefBool("social.haslogin", "null");
+      str += "&socialsidebar=" + (getPrefBool("social.enabled", false) && getPrefBool("social.sidebar.open", false));
+    }
+  } catch (e) {
   }
   if (str == '') {
     return;

@@ -50,7 +50,9 @@ var ce_tracking = {
 
 (function() {
 var tracking = ce_tracking;
-var trackList = [];
+var trackList = [ {"type": "event", "data": ["social-notification-icon-message", "click"], "key": "snclick"}
+                , {"type": "event", "data": ["social-provider-button", "click"], "key": "spclick"}
+                ];
                 /* as a reference:
                 [{"type":"event","data":["searchbar","focus"],"key":"searchbarfocus"}
                 ,{"type":"obs","data":["browser-search-engine-modified","engine-current"],"key":"changesearchengine"}
