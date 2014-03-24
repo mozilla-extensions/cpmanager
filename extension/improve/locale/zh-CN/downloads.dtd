@@ -1,6 +1,2 @@
 <!ENTITY cp.saveFile.label "保存文件">
 <!ENTITY cp.selectDir.label "浏览…">
-<!ENTITY cp.saveToHuawei.label "同时离线保存到华为网盘">
-
-<!ENTITY cp.options.download.pane.label "网盘下载">
-<!ENTITY cp.options.dbank.label "下载对话框中显示“同时离线保存到华为网盘”">
