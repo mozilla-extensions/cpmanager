@@ -226,11 +226,12 @@ let ExtensionUsage = {
       this.DBConnection.execute(SELECT_TRACK, null, function(aRow) {
         let sum = aRow.getResultByName("sum");
         let related = aRow.getResultByName("related");
-        if (sum || related) {
+        let fxusage = aRow.getResultByName("fxusage");
+        if (sum || related || fxusage) {
           let item = [];
           item.push(sum || 0);
           item.push(related);
-          item.push(aRow.getResultByName("fxusage"));
+          item.push(fxusage);
           ret[aRow.getResultByName("usage")] = item.join(",");
         }
       }).then(function() {
