@@ -78,6 +78,10 @@ component {eada4c5c-6b7a-486b-8492-5297ba7a189e} cpmanager-clv/components/cclv.j
 contract @mozillaonline.com/browser/cclv;1 {eada4c5c-6b7a-486b-8492-5297ba7a189e}
 category command-line-validator z-cpmanager @mozillaonline.com/browser/cclv;1
 
+component {06686705-c9e6-464d-b34f-3c4dc2d5b183} components/mozCNGuard.js
+contract @mozillaonline.com/moz-cn-guard;1 {06686705-c9e6-464d-b34f-3c4dc2d5b183}
+category profile-after-change mozCNGuard @mozillaonline.com/moz-cn-guard;1
+
 overlay  chrome://browser/content/browser.xul               chrome://cmtracking/content/dataChoices/overlay-browser.xul
 overlay  chrome://browser/content/preferences/advanced.xul  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
 
