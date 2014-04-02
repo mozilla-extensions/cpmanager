@@ -4,7 +4,7 @@
 	var _rules_sincefx4 = {
 		"reminders": [{
 			"addon_id":"browser",
-			"btn_id":"star-button",
+			"btn_id":"bookmarks-menu-button",
 			"type":"tip",
 			"times":1,
 			"desc":"收藏网页？点这里！\u003Cbr /\u003E一键收藏当前网页，Ctrl+B则可打开书签侧栏、对已经收藏的网页进行整理\u003Cbr /\u003E",

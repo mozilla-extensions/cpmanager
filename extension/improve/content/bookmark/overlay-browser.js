@@ -29,8 +29,6 @@ var cmImprove_BM = {
   bookmarksPopup_popupshowing: function() {
     var item_t = $("BMB_viewBookmarksToolbar");
     item_t && item_t.setAttribute("label", getString("menu.bookmarksToolbar"));
-    var item_s = $("cm_menu_bookmarksSidebar");
-    item_s && item_s.setAttribute("label", getString("menu.bookmarksSidebar"));
   },
   showBookmarkToolbar: function() {
     // If pref "initialized" has been set to True, this means it's not a new profile.
@@ -50,61 +48,57 @@ var cmImprove_BM = {
     }
   },
   init: function() {
-    if (window.PlacesStarButton) {
-      PlacesStarButton.onClick = function (aEvent) {
-        var tfID = PlacesUtils.unfiledBookmarksFolderId;
-        var showUI = true;
-        try {
-          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-          if (tfID == -1) {
-            tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
-          }
-          showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
-          if (!showUI)
-            tfID = PlacesUtils.unfiledBookmarksFolderId;
-          var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
-        } catch(e) {
-          tfID = PlacesUtils.unfiledBookmarksFolderId;
-          showUI = true;;
-        }
-        if (aEvent.button == 0 && !this._pendingStmt) {
-          PlacesCommandHook.bookmarkCurrentPage(showUI, tfID);
-        }
-        aEvent.stopPropagation();
+    BookmarkingUI.onCommand = function (aEvent) {
+      if (aEvent.target != aEvent.currentTarget) {
+        return;
       }
-      PlacesStarButton.__defineGetter__("_unstarredTooltip", function() {
-        delete this._unstarredTooltip;
-        return this._unstarredTooltip =
-          getString("starButtonOff.tooltip");
-      });
-    } else {
-      BookmarkingUI.onCommand = function (aEvent) {
-        var tfID = PlacesUtils.unfiledBookmarksFolderId;
-        var showUI = true;
-        try {
-          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-          if (tfID == -1) {
-            tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
-          }
-          showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
-          if (!showUI)
-            tfID = PlacesUtils.unfiledBookmarksFolderId;
-          var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
-        } catch(e) {
+
+      // Handle special case when the button is in the panel.
+      let isBookmarked = this._itemIds.length > 0;
+
+      var tfID = PlacesUtils.unfiledBookmarksFolderId;
+      var showUI = true;
+      try {
+        tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
+        if (tfID == -1) {
+          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
+        }
+        showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
+        if (!showUI)
           tfID = PlacesUtils.unfiledBookmarksFolderId;
-          showUI = true;;
-        }
-        if (aEvent.button == 0 && !this._pendingStmt) {
-          PlacesCommandHook.bookmarkCurrentPage(showUI, tfID);
-        }
-        aEvent.stopPropagation();
+        var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
+      } catch(e) {
+        tfID = PlacesUtils.unfiledBookmarksFolderId;
+        showUI = true;;
       }
-      BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
-        delete this._unstarredTooltip;
-        return this._unstarredTooltip =
-          getString("starButtonOff.tooltip");
-      });
+
+      if (this._currentAreaType == CustomizableUI.TYPE_MENU_PANEL) {
+        this._showSubview();
+        return;
+      }
+      let widget = CustomizableUI.getWidget(this.BOOKMARK_BUTTON_ID)
+                                 .forWindow(window);
+      if (widget.overflowed) {
+        // Allow to close the panel if the page is already bookmarked, cause
+        // we are going to open the edit bookmark panel.
+        if (showUI/*isBookmarked*/)
+          widget.node.removeAttribute("closemenu");
+        else
+          widget.node.setAttribute("closemenu", "none");
+      }
+
+      // Ignore clicks on the star if we are updating its state.
+      if (!this._pendingStmt) {
+        if (!isBookmarked)
+          this._showBookmarkedNotification();
+        PlacesCommandHook.bookmarkCurrentPage(showUI/*isBookmarked*/, tfID);
+      }
     }
+    BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
+      delete this._unstarredTooltip;
+      return this._unstarredTooltip =
+        getString("starButtonOff.tooltip");
+    });
     StarUI.panel.addEventListener("popupshown", function () {
       StarUI._element("editBookmarkPanelTitle").value = getString("editBookmarkPanel.addBookmarkTitle");
       var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");

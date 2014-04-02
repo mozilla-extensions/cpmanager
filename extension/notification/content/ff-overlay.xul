@@ -28,8 +28,4 @@
            role="alert"
            noautohide="true"/>
  </popupset>
- <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="addon-notifier-button" class="toolbarbutton-1 chromeclass-toolbar-additional" image="chrome://cmnotification/skin/redo.png" label="&addonnotification.clearAllData;" tooltiptext="&addonnotification.tooltip.clearAllData;" oncommand="try {MOA.AN.RuleCenter.reload(true);} catch(e){alert(e);}"/>
-    <toolbarbutton id="addon-notifier-tips-button" class="toolbarbutton-1 chromeclass-toolbar-additional" image="chrome://cmnotification/skin/lightbulb.png" label="&addonnotification.showFunctionTips;" tooltiptext="&addonnotification.tooltip.showFunctionTips;" oncommand="try {MOA.AN.Notification.showDayTip(true);} catch(e){alert(e);}"/>
- </toolbarpalette>
 </overlay>

@@ -30,8 +30,8 @@
   </stringbundleset>
 
   <hbox id="urlbar-icons">
-    <image id="safeflag-icon" class="urlbar-icon" hidden="true" insertbefore="star-button"
-           src="chrome://cmsafeflag/content/icons/special/default.png" context="safeflag-contextpopup"/>
+    <image id="safeflag-icon" class="urlbar-icon" hidden="true" insertafter="page-report-button"
+           src="chrome://cmsafeflag/content/icons/special/safe.png" context="safeflag-contextpopup"/>
   </hbox>
 
   <popupset id="mainPopupSet">

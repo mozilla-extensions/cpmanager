@@ -11,6 +11,3 @@
 <!ENTITY cp.clearRecentHistory.yearly.label    "一年以前">
 
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "关闭时清除历史记录">
-
-<!ENTITY cp.newPrivateWindow.label                 "新建隐私浏览窗口">
-<!ENTITY cp.newPrivateWindow.accesskey             "P">

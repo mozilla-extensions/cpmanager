@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <?xml-stylesheet href="chrome://cmimprove-os/skin/cm_menu_maintenance.css" type="text/css" ?>
-<?xml-stylesheet href="chrome://cmimprove-os/skin/undo_closetab.css" type="text/css" ?>
+<?xml-stylesheet href="chrome://cmimprove/skin/undo_closetab.css" type="text/css" ?>
 <!DOCTYPE window [
 <!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
 %improveDTD;
@@ -11,10 +11,7 @@
 ]>
 <overlay id="improve" xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/javascript" src="chrome://cmimprove/content/overlay-browser.js" />
   <script type="application/javascript" src="chrome://cmimprove/content/bookmark/overlay-browser.js" />
-
-  <script type="application/javascript" src="chrome://cmimprove/content/certerror/overlay-browser.js" />
 
   <script type="application/javascript" src="chrome://cmimprove/content/placeholder/overlay-browser.js" />
 
@@ -34,64 +31,39 @@
   </commandset>
 
   <menupopup id="BMB_bookmarksPopup">
-    <menuitem id="cm_menu_bookmarksSidebar"
-              insertafter="BMB_viewBookmarksToolbar"
-              key="viewBookmarksSidebarKb"
-              observes="viewBookmarksSidebar"/>
-    <menu accesskey="&maintenance.accesskey;"
-          class="menu-iconic"
+    <menu class="menu-iconic subviewbutton"
           id="cm-menu-maintenance"
-          insertafter="BMB_bookmarksShowAll"
           label="&maintenance.label;"
           tooltiptext="&maintenance.tooltip;">
       <menupopup id="maintenanceButtonPopup">
         <menuitem id="browserImport"
                   command="OrganizerCommand_browserImport"
-                  label="&importOtherBrowser.label;"
-                  accesskey="&importOtherBrowser.accesskey;"/>
+                  label="&importOtherBrowser.label;"/>
         <menuitem id="fileImport"
                   command="OrganizerCommand_import"
-                  label="&importBookmarksFromHTML.label;"
-                  accesskey="&importBookmarksFromHTML.accesskey;"/>
+                  label="&importBookmarksFromHTML.label;"/>
         <menuseparator/>
         <menuitem id="fileExport"
                   command="OrganizerCommand_export"
-                  label="&exportBookmarksToHTML.label;"
-                  accesskey="&exportBookmarksToHTML.accesskey;"/>
+                  label="&exportBookmarksToHTML.label;"/>
       </menupopup>
     </menu>
-    <menu id="BMB_subscribeToPageMenuitem" insertafter="BMB_bookmarksShowAll" />
   </menupopup>
 
-  <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="ce-undo-close-toolbar-button"
-                   type="menu-button"
-                   class="toolbarbutton-1"
-                   label="&undoCloseTab.label;"
-                   tooltiptext="&undoCloseTab.label;"
-                   accesskey="&undoCloseTab.accesskey;"
-                   observes="History:UndoCloseTab">
-          <menupopup id="ce-undo-close-tb-menu"
-                     placespopup="true"
-                     oncommand="event.stopPropagation();"
-                     onpopupshowing="if (!this.parentNode._placesView)
-                                       new ceUndoCloseTabMenu(this.parentNode);
-                                     this.parentNode._placesView.populateUndoSubmenu();"
-                     tooltip="bhTooltip"
-                     popupsinherittooltip="true" >
-        </menupopup>
-    </toolbarbutton>
-  </toolbarpalette>
+  <panelmultiview id="PanelUI-multiView" mainViewId="PanelUI-mainView">
+    <panelview id="PanelUI-MOA-undoCloseView" flex="1" class="PanelUI-subView"
+               tooltip="bhTooltip" popupsinherittooltip="true"/>
+  </panelmultiview>
 
   <menupopup id="tabContextMenu">
     <menu id="ce-undo-close-tab-contextmenu"
           label="&historyUndoMenu.label;"
           accesskey="&historyMenu.accesskey;">
+      <observes element="History:UndoCloseTab"
+                attribute="disabled" />
       <menupopup id="ce-undo-close-tab-menu"
                  placespopup="true"
-                 onpopupshowing="if (!this.parentNode._placesView)
-                                   new ceUndoCloseTabMenu(this.parentNode);
-                                 this.parentNode._placesView.populateUndoSubmenu();"
+                 onpopupshowing="MOA.Improve.Tabs.populateUndo(event);"
                  tooltip="bhTooltip"
                  popupsinherittooltip="true" />
     </menu>
@@ -99,14 +71,6 @@
   <vbox id="browser-panel" >
     <html:canvas id="ce-animation-canvas" class="animation-content" />
   </vbox>
-  <!--toolbar id="addon-bar" defaultset="addonbar-closebutton,spring,status-bar,mn-mailnotifier-status-bar,muter-toolbar-palette-button,tcfontsetter,quickluanch-addonbar-item,ce_sanitizeHistory,ce_privateBrowser,downloads-button,ntabimprove,personas-toolbar-button,tczoompanel"/-->
-  <!--toolbar id="nav-bar" defaultset="unified-back-forward-button,urlbar-container,reload-button,stop-button,urlbar-search-splitter,search-container,lm-snapshot-button,share-all-cn-button-box-new,home-button,bookmarks-menu-button-container,window-controls,ce-undo-close-toolbar-button,appcenter-button"/-->
   <textbox id="urlbar"    keyLabelNonMac=" &lt;Ctrl+L&gt;" keyLabelMac=" &lt;&#x2318;L&gt;"/>
   <searchbar id="searchbar" keyLabelNonMac=" &lt;Ctrl+K&gt;" keyLabelMac=" &lt;&#x2318;K&gt;"/>
-  <statusbar id="status-bar">
-    <!-- Add the following hidden node to fix bug of addonbar's auto hidden,
-         look AddonsMgrListener.getAddonBarItemCount in browser.js -->
-    <toolbarseparator hidden="true"/>
-  </statusbar>
-  <toolbarbutton id="addonbar-closebutton" hidden="true"/>
 </overlay>

@@ -3,6 +3,8 @@ var EXPORTED_SYMBOLS = ["ExtensionUsage"];
 const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
+  "resource:///modules/CustomizableUI.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Sqlite",
@@ -110,8 +112,18 @@ let ExtensionUsage = {
       }
     };
 
-    let toolbars = ["nav-bar", "addon-bar"].map(function(aId) {
-      return aWindow.document.getElementById(aId);
+    let toolbars = [];
+    [
+      CustomizableUI.AREA_NAVBAR,
+      CustomizableUI.AREA_PANEL
+    ].forEach(function(aId) {
+      let toolbar = aWindow.document.getElementById(aId);
+      toolbars.push(toolbar);
+
+      let overflowTarget = toolbar.getAttribute("overflowtarget");
+      if (overflowTarget) {
+        toolbars.push(aWindow.document.getElementById(overflowTarget));
+      }
     });
 
     toolbars.forEach(function(aToolbar) {

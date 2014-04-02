@@ -33,7 +33,7 @@
     }
     urlbar.className = default_className;
     var icon = document.getElementById("safeflag-icon");
-    icon.src = _getIconPath('special/default');
+    icon.hidden = true;
     icon.tooltipText = MOA.SafeFlag.Utils.getString('tooltipSafeFlag');
 
     if (!_isActivated())
@@ -60,6 +60,7 @@
         urlbar.className = [default_className, 'sfbg_safe'].join(' ').trim();
       }
     }
+    icon.hidden = false;
   }
 
   ns.updateIcon = function() {

@@ -1,12 +1,10 @@
 (function() {
-  var jsm = {};
+  let jsm = {};
   try {
     Cu.import("resource://gre/modules/SocialService.jsm", jsm);
   } catch(e) {}
 
-  var SocialAPIHack = {
-    lastEventReceived: 0,
-    _prefs: null,
+  let SocialAPIHack = {
     _weibo: {
       author: 'SINA Corporation',
       description: '用一句话随意记录生活，用火狐随时随地发微博，迅速获取最热最火最快最酷最新的资讯',
@@ -17,121 +15,54 @@
       name: '新浪微博',
       origin: 'http://m.weibo.cn',
       sidebarURL: 'http://m.weibo.cn/sidebar/',
-      version: '0.1',
+      statusURL: 'http://m.weibo.cn/msg',
+      version: '0.2',
       workerURL: 'http://m.weibo.cn/js/social/worker.js'
     },
-    _ensureWeibo: function SocialAPIHack___ensureWeibo(weibo) {
-      jsm.SocialService.getProvider(weibo.origin, function(existedProvider) {
-        let prefBranch = gPrefService.getBranch('social.manifest.');
-        if (!existedProvider) {
-          let string = Cc["@mozilla.org/supports-string;1"]
-                         .createInstance(Ci.nsISupportsString);
-          string.data = JSON.stringify(weibo);
-          prefBranch.setComplexValue('weibo', Ci.nsISupportsString, string);
 
-          if (!jsm.SocialService.canActivateOrigin &&
-              !jsm.SocialService.getOriginActivationType) {
-            jsm.SocialService.addProvider(weibo, function() {});
+    _ensureLatestWeibo: function SocialAPIHack___ensureLatestWeibo(weibo) {
+      let latestAddon = jsm.SocialService.createWrapper(weibo);
+      let prefBranch = gPrefService.getBranch('social.');
+      prefBranch.clearUserPref('manifest.facebook');
+      let socialEnabled = false;
+      try {
+        socialEnabled = prefBranch.getBoolPref('enabled');
+      } catch(e) {}
+
+      AddonManager.getAddonByID(latestAddon.id, function(aAddon) {
+        if (aAddon) {
+          if (!socialEnabled || aAddon.userDisabled) {
+            // uninstall for those not currently enabled ?
+            aAddon.uninstall();
+          } else if (aAddon.version < latestAddon.version) {
+            jsm.SocialService.updateProvider(weibo.origin, weibo);
           }
-        } else {
-          prefBranch.clearUserPref('facebook');
         }
       });
     },
+
     handleEvent: function SocialAPIHack__handleEvent(aEvent) {
       switch (aEvent.type) {
         case "load":
           this.init();
           break;
-        case "ActivateSocialFeature-Weibo":
-          this.activateWeibo(aEvent);
-          break;
       }
     },
+
     init: function SocialAPIHack__init() {
-      this._prefs = gPrefService.getBranch('extensions.cmimprove.socialapi.');
+      let self = this;
+      let onBrowserDelayedStartup = function onBrowserDelayedStartup() {
+        Services.obs.removeObserver(onBrowserDelayedStartup,
+          "browser-delayed-startup-finished");
 
-      if (SocialToolbar && SocialToolbar.updateButton) {
-        var _updateButton = SocialToolbar.updateButton.bind(SocialToolbar);
-        SocialToolbar.updateButton = (function() {
-          _updateButton();
-          var login = document.getElementById("social-notification-icon-message");
-          if (login) {
-            login.addEventListener("mousedown", function(aEvent) {
-              aEvent.stopImmediatePropagation();
-              try {
-                var ceTracking = Cc["@mozilla.com.cn/tracking;1"]
-                                   .getService().wrappedJSObject;
-                ceTracking.track("smclick");
-              } catch(e) {}
-            }, false);
-          }
-          Application.prefs.setValue("social.haslogin", !!login);
-        }).bind(SocialToolbar);
-      }
-      if (!(window.Social && Social.activateFromOrigin)) {
-        return
-      }
+        self._ensureLatestWeibo(self._weibo);
+      };
 
-      var self = this;
-      // Social.provider may not be inited quickly enough
-      setTimeout(function() {
-        self._ensureWeibo(self._weibo);
-        gBrowser.addEventListener("ActivateSocialFeature-Weibo", SocialAPIHack, true, true);
-      }, 1000);
-    },
-    activateWeibo: function SocialAPIHack__activateWeibo(e) {
-      // from browser/base/content/browser-social.js
-      let targetDoc = e.target;
-      if (!(targetDoc instanceof HTMLDocument)) {
-        return;
-      }
-      if (targetDoc.defaultView.top != content) {
-        return;
-      }
-      let activateOrigin = targetDoc.nodePrincipal.origin;
-      let whitelist = this._prefs.getCharPref('whitelist');
-      if (whitelist.split(',').indexOf(activateOrigin) == -1) {
-        return;
-      }
-
-      if (window.PrivateBrowsingUtils && PrivateBrowsingUtils.isWindowPrivate &&
-          PrivateBrowsingUtils.isWindowPrivate(window)) {
-        return;
-      }
-
-      let now = Date.now();
-      if (now - SocialAPIHack.lastEventReceived < 1000) {
-        return;
-      }
-      SocialAPIHack.lastEventReceived = now;
-
-      let oldOrigin = Social.provider ? Social.provider.origin : "";
-
-      let provider = Social.activateFromOrigin(this._weibo.origin, this.activeNotification(oldOrigin));
-
-      this.activeNotification(oldOrigin)(provider);
-    },
-    activeNotification: function SocialAPIHack__activeNotification(oldOrigin) {
-      return function(provider) {
-        if (!provider) {
-          return;
-        }
-
-        let description = document.getElementById("social-activation-message");
-        let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
-        let message = gNavigatorBundle.getFormattedString("social.activated.description",
-                                                          [provider.name, brandShortName]);
-        description.value = message;
-
-        let notificationPanel = SocialUI.notificationPanel;
-        notificationPanel.setAttribute("origin", provider.origin);
-        notificationPanel.setAttribute("oldorigin", oldOrigin);
-
-        notificationPanel.hidden = false;
-        setTimeout(function () {
-          notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
-        }, 0);
+      if (gBrowserInit.delayedStartupFinished) {
+        this._ensureLatestWeibo(this._weibo);
+      } else {
+        Services.obs.addObserver(onBrowserDelayedStartup,
+          "browser-delayed-startup-finished", false);
       }
     },
   }

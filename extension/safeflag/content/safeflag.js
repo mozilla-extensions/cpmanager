@@ -87,7 +87,7 @@
   }
 
   ns.getCurrentTabSafeflag = function() {
-    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag)
+    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag || _tab_url_safeflag_[_current_tab_id_].url == BROWSER_NEW_TAB_URL)
       return null;
 
     return _tab_url_safeflag_[_current_tab_id_].safe_flag;

@@ -1,16 +1,21 @@
-#mo-url2qr-popup > vbox {
-  padding: 0 20px 10px;
+#mo-url2qr-popup > image,
+#mo-url2qr-popup > hbox {
+  margin: 0 20px;
 }
 
-#mo-url2qr-popup > vbox > hbox {
+#mo-url2qr-popup > hbox {
   height: 28px;
 }
 
-#mo-url2qr-popup > vbox > hbox:first-of-type {
+#mo-url2qr-popup > hbox:first-of-type {
   height: 42px;
 }
 
-#mo-url2qr-popup > vbox > hbox > label {
+#mo-url2qr-popup > hbox:last-of-type {
+  margin-bottom: 10px;
+}
+
+#mo-url2qr-popup > hbox > label {
   color: #333;
   font-family: sans-serif;
   font-size: 13px;
@@ -19,10 +24,10 @@
   -moz-margin-end: 2px;
 }
 
-#mo-url2qr-popup > vbox > hbox:first-of-type > label {
+#mo-url2qr-popup > hbox:first-of-type > label {
   font-size: 18px;
 }
 
-#mo-url2qr-popup > vbox > hbox > label.text-link {
+#mo-url2qr-popup > hbox > label.text-link {
   color: #06c;
 }

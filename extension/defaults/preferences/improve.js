@@ -11,14 +11,9 @@ pref("extensions.cmimprove.bookmarks.add.defaultFolder", 5);
 // whether or not to show the edit-bookmark UI when adds a bookmark to the page
 pref("extensions.cmimprove.bookmarks.add.showEditUI", true);
 
-// Add Cert Exception
-pref("extensions.cmimprove.iframe_cert_fix.whitelist", "dynamic.12306.cn");
-
 // features enable
 pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
 pref("extensions.cmimprove.features.undocloseanimation.enable", true);
-
-pref("extensions.cmimprove.socialapi.whitelist", "http://firefox.com.cn,http://www.firefox.com.cn");
 
 pref("extensions.cmimprove.gesture.enabled", true);
 

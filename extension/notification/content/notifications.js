@@ -544,6 +544,10 @@
         };
         panel.appendChild(popupnotification);
         panel.hidden = false;
+
+        target = CustomizableUI.getWidget(target.id).forWindow(window).anchor;
+        target = document.getAnonymousElementByAttribute(target, "anonid", "button") || target;
+        target = document.getAnonymousElementByAttribute(target, "class", "toolbarbutton-icon") || target;
         panel.openPopup(target, "bottomcenter topleft");
     }
 
