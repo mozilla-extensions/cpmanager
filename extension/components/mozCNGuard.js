@@ -42,8 +42,7 @@ mozCNGuard.prototype = {
       "huohu123.com": "",
       "i.firefoxchina.cn": "",
       "i.g-fox.cn": "",
-      "www.huohu123.com": "",
-      "www.mozilla.org": ""
+      "www.huohu123.com": ""
     };
 
     if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
