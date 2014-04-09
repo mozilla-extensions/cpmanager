@@ -38,6 +38,10 @@ mozCNGuard.prototype = {
     let channel = aSubject;
     channel.QueryInterface(Ci.nsIHttpChannel);
 
+    if (!(channel.loadFlags & Ci.nsIChannel.LOAD_DOCUMENT_URI)) {
+      return;
+    }
+
     let restrictedHosts = {
       "huohu123.com": "h.17huohu.com",
       "i.firefoxchina.cn": "i.17huohu.com",
