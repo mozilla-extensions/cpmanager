@@ -65,17 +65,22 @@ CPCommandLineValidator.prototype = {
     } catch(e) {
       return false;
     }
+
+    if (!/^https?$/.test(aArgument.scheme)) {
+      return false;
+    }
+
     var dropIfHostMatched = !aFlag;
 
     var hostMatched = this._hostsToMatch.some(function(aHostToMatch) {
       return (aArgument.asciiHost == aHostToMatch) && aArgument.query;
     });
 
+    logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
+
     if (!hostMatched) {
       return false;
     }
-
-    logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
 
     if (dropIfHostMatched) {
       return true;
