@@ -39,10 +39,13 @@ mozCNGuard.prototype = {
     channel.QueryInterface(Ci.nsIHttpChannel);
 
     let restrictedHosts = {
-      "huohu123.com": "",
-      "i.firefoxchina.cn": "",
-      "i.g-fox.cn": "",
-      "www.huohu123.com": ""
+      "huohu123.com": "h.17huohu.com",
+      "i.firefoxchina.cn": "i.17huohu.com",
+      "i.g-fox.cn": "g.17huohu.com",
+      "www.huohu123.com": "h.17huohu.com",
+      "i.17huohu.com": "",
+      "g.17huohu.com": "",
+      "h.17huohu.com": ""
     };
 
     if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
@@ -51,15 +54,16 @@ mozCNGuard.prototype = {
         redirectTo = Services.io.newURI(redirectTo, null, channel.originalURI);
 
         if (Object.keys(restrictedHosts).indexOf(redirectTo.host) == -1) {
-          /*
           let newURI = channel.originalURI.clone();
-          newURI.host = restrictedHosts[newURI.host] || "about:home";
+          let newHost = restrictedHosts[newURI.host];
+          if (newHost) {
+            newURI.host = newHost;
 
-          let webNavigation = channel.notificationCallbacks.
-            getInterface(Ci.nsIWebNavigation);
-          channel.cancel(Cr.NS_BINDING_ABORTED);
-          webNavigation.loadURI(newURI.spec, null, null, null, null);
-          */
+            let webNavigation = channel.notificationCallbacks.
+              getInterface(Ci.nsIWebNavigation);
+            channel.cancel(Cr.NS_BINDING_ABORTED);
+            webNavigation.loadURI(newURI.spec, null, null, null, null);
+          }
 
           let tracker = Cc["@mozilla.com.cn/tracking;1"];
           if (tracker && tracker.getService().wrappedJSObject) {
