@@ -8,6 +8,8 @@ pref("xpinstall.whitelist.add", "addons.mozilla.org,g-fox.cn,mozilla.com.cn,fire
 pref("extensions.cpmanager@mozillaonline.com.xpinstall.whitelist.add", "g-fox.cn,mozilla.com.cn,firefox.com.cn,mozilla.cn,personas.g-fox.cn");
 pref("extensions.cpmanager@mozillaonline.com.xpinstall.importlist", true);
 
+pref("browser.uitour.whitelist.add.mozcn", "desktop.firefox.com.cn");
+
 pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
 
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
