@@ -30,8 +30,7 @@
 	};
 
 	window.addEventListener('load', function(evt) {
-		var prefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefBranch).QueryInterface(Ci.nsIPrefService);
-		if (prefs.getCharPref('general.useragent.locale') != 'zh-CN') {
+		if ((Services.prefs.getCharPref('general.useragent.locale') != 'zh-CN') || (Services.appinfo.OS == 'Linux')) {
 			MOA.debug('general.useragent.locale is not zh-CN, no daily tip or addon recommendation should be displayed');
 			return;
 		}
