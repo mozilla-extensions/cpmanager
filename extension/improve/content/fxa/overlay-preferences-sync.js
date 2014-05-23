@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+(function() {
+  const Cu = Components.utils;
+  const Cr = Components.results;
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+
+  Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+  XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
+    "chrome://cmimprove/content/fxa/serviceSwitcher.jsm");
+
+  XPCOMUtils.defineLazyModuleGetter(this, "Services",
+    "resource://gre/modules/Services.jsm");
+
+  let _bundles = null;
+  function _(key) {
+    if (!_bundles) {
+      _bundles = Services.strings.createBundle("chrome://cmimprove/locale/fxa.properties");
+    }
+
+    return _bundles.GetStringFromName(key);
+  }
+
+  function toggle() {
+    if (FxaSwitcher.localServiceEnabled) {
+      FxaSwitcher.resetFxaServices();
+    } else {
+      FxaSwitcher.switchToLocalService();
+    }
+  }
+
+  function updateUI() {
+    let toggler = document.getElementById('cn-fxa-switcher');
+    toggler.value =
+      FxaSwitcher.localServiceEnabled ? _('fxa.preferences.label.switchToGlobal') :
+        _('fxa.preferences.label.switchToLocal');
+  }
+
+  window.addEventListener('load', function() {
+    let toggler = document.getElementById('cn-fxa-switcher');
+    toggler.onclick = toggle;
+    updateUI();
+  });
+})();
+

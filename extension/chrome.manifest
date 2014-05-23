@@ -18,7 +18,6 @@ content  cmnotification                 notification/content/
 skin     cmnotification   classic/1.0   notification/skin/
 locale   cmnotification   en-US         notification/locale/en-US/
 locale   cmnotification   zh-CN         notification/locale/zh-CN/
-
 overlay   chrome://browser/content/browser.xul          chrome://cmsafeflag/content/overlay.xul
 override  chrome://safeflag/content/overlay.xul         chrome://cmsafeflag/content/safeflag_blank.xul
 style     chrome://global/content/customizeToolbar.xul  chrome://cmsafeflag/skin/overlay.css
@@ -37,6 +36,7 @@ overlay  chrome://browser/content/browser.xul                        chrome://cm
 overlay  chrome://mozapps/content/plugins/pluginInstallerWizard.xul  chrome://cmpfs/content/overlay.xul
 
 content  cmimprove                   improve/content/
+resource cmimprove-fxa               improve/content/fxa/
 locale   cmimprove     en-US         improve/locale/en-US/
 locale   cmimprove     zh-CN         improve/locale/zh-CN/
 skin     cmimprove     classic/1.0   improve/skin/
@@ -76,7 +76,9 @@ category profile-after-change mozCNGuard @mozillaonline.com/moz-cn-guard;1
 
 overlay  chrome://browser/content/browser.xul               chrome://cmtracking/content/dataChoices/overlay-browser.xul
 overlay  chrome://browser/content/preferences/advanced.xul  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
+overlay  chrome://browser/content/preferences/sync.xul      chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
 component {6E12E09F-1942-46F0-8D85-9C6B1D0E6448} components/ceTracking-old.js
 contract @mozilla.com.cn/tracking-old;1 {6E12E09F-1942-46F0-8D85-9C6B1D0E6448}
 category profile-after-change trackingFactoryClassOld @mozilla.com.cn/tracking-old;1
+
