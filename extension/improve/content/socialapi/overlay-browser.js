@@ -24,14 +24,14 @@
       let latestAddon = jsm.SocialService.createWrapper(weibo);
       let prefBranch = gPrefService.getBranch('social.');
       prefBranch.clearUserPref('manifest.facebook');
-      let socialEnabled = false;
+      let socialEnabled = undefined;
       try {
         socialEnabled = prefBranch.getBoolPref('enabled');
       } catch(e) {}
 
       AddonManager.getAddonByID(latestAddon.id, function(aAddon) {
         if (aAddon) {
-          if (!socialEnabled || aAddon.userDisabled) {
+          if (socialEnabled === false || aAddon.userDisabled) {
             // uninstall for those not currently enabled ?
             aAddon.uninstall();
           } else if (aAddon.version < latestAddon.version) {
