@@ -1,3 +1,14 @@
+#mo-url2qr-icon {
+  list-style-image: url("chrome://cmimprove/skin/url2qr-icon.png");
+}
+
+@media (-moz-mac-lion-theme) and (min-resolution: 2dppx) {
+  #mo-url2qr-icon {
+    height: 16px;
+    list-style-image: url("chrome://cmimprove/skin/url2qr-icon@2x.png");
+  }
+}
+
 #mo-url2qr-popup > image,
 #mo-url2qr-popup > hbox {
   margin: 0 20px;
