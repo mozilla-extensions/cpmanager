@@ -11,8 +11,12 @@
   <script type="application/javascript;version=1.8" src="chrome://cmimprove/content/url2qr/url2qr.js"></script>
 
   <hbox id="urlbar-icons">
-    <image id="mo-url2qr-icon" class="urlbar-icon" hidden="true" insertafter="safeflag-icon"
-           tooltiptext="&mo-url2qr.generateQR;" src="chrome://cmimprove/skin/url2qr-icon.png" popup="mo-url2qr-popup"/>
+    <image id="mo-url2qr-icon"
+      class="urlbar-icon"
+      hidden="true"
+      insertafter="safeflag-icon"
+      tooltiptext="&mo-url2qr.generateQR;"
+      popup="mo-url2qr-popup"/>
   </hbox>
 
   <popupset id="mainPopupSet">

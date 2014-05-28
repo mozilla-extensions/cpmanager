@@ -48,13 +48,13 @@
     var isUnsafeBackground = MOA.SafeFlag.Utils.getPrefs().getBoolPref("background.unsafe");
 
     if (current_tab_safeflag.isMalware || current_tab_safeflag.isPhishing) {
-      icon.src = _getIconPath('special/unsafe');
+      icon.classList.add('safeflag-unsafe');
       if (isUnsafeBackground) {
         MOA.debug('Set background color for unsafe sites.');
         urlbar.className = [default_className, 'sfbg_unsafe'].join(' ').trim();
       }
     } else {
-      icon.src = _getIconPath('special/safe');
+      icon.classList.remove('safeflag-unsafe');
       if (isSafeBackground) {
         MOA.debug('Set background color for safe sites.');
         urlbar.className = [default_className, 'sfbg_safe'].join(' ').trim();

@@ -10,6 +10,25 @@
   background-color: red;
 }
 
+#safeflag-icon {
+  list-style-image: url("chrome://cmsafeflag/content/icons/special/safe.png");
+}
+
+#safeflag-icon.safeflag-unsafe {
+  list-style-image: url("chrome://cmsafeflag/content/icons/special/unsafe.png");
+}
+
+@media (-moz-mac-lion-theme) and (min-resolution: 2dppx) {
+  #safeflag-icon {
+    height: 16px;
+    list-style-image: url("chrome://cmsafeflag/content/icons/special/safe@2x.png");
+  }
+
+  #safeflag-icon.safeflag-unsafe {
+    list-style-image: url("chrome://cmsafeflag/content/icons/special/unsafe@2x.png");
+  }
+}
+
 #safeflag-contextpopup{
   -moz-appearance: tooltip;
 }
