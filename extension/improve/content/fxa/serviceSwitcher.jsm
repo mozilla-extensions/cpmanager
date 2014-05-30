@@ -13,7 +13,10 @@ let AUTH_SERVER      = 'https://api-accounts.firefox.com.cn';
 let ACCOUNTS_SERVER  = 'https://accounts.firefox.com.cn';
 
 const DEBUG = 0;
-if (0) {
+
+/* Only for test */
+const useTestDomain = 0;
+if (useTestDomain) {
   TOKEN_SERVER       = 'https://sync.testfirefox.com.cn';
   AUTH_SERVER        = 'https://api-accounts.testfirefox.com.cn';
   ACCOUNTS_SERVER    = 'https://accounts.testfirefox.com.cn';
@@ -108,18 +111,18 @@ PrefWatchDog = {
 };
 
 /**
- * services.sync.tokenServerURI is reset after user disconnected, we need to
+ * PREF_SYNC_TOKENSERVER is reset after user disconnected, we need to
  * change it back.
  */
 function startPrefWatchDog() {
   debug('Add pref watch dog');
-  Services.prefs.addObserver('services.sync.tokenServerURI',
+  Services.prefs.addObserver(PREF_SYNC_TOKENSERVER,
     PrefWatchDog, false);
 }
 
 function stopPrefWatchDog() {
   debug('Remove pref watch dog');
-  Services.prefs.removeObserver('services.sync.tokenServerURI',
+  Services.prefs.removeObserver(PREF_SYNC_TOKENSERVER,
     PrefWatchDog, false);
 }
 
@@ -188,6 +191,19 @@ function resetFxaServices() {
   startPrefWatchDog();
 }
 
+
+function onlySyncBookmark() {
+  [
+    'services.sync.engine.addons',
+    'services.sync.engine.history',
+    'services.sync.engine.passwords',
+    'services.sync.engine.prefs',
+    'services.sync.engine.tabs',
+  ].forEach(key => {
+    Services.prefs.setBoolPref(key, false);
+  });
+}
+
 function switchToLocalService() {
   if (localServiceEnabled()) {
     return;
@@ -217,8 +233,6 @@ function markChecked() {
 }
 
 function init() {
-  initPageMod();
-
   if (alreadyChecked()) {
     startPrefWatchDog();
     done();
@@ -231,6 +245,7 @@ function init() {
       case UT_NO_SYNC_USED:
       case UT_WEAVE_USED:
         switchToLocalService();
+        onlySyncBookmark();
         break;
       default:
         debug('Ignore for ' + aType);
@@ -310,67 +325,6 @@ let FxaSwitcher = {
     }
   }
 };
-
-let { PageMod }= Cu.import("resource://gre/modules/devtools/Loader.jsm").
-                   devtools.require("sdk/page-mod");
-
-let l10nKeys = [
-  'fxa.confirm.title.switchToLocal',
-  'fxa.confirm.body.switchToLocal',
-  'fxa.confirm.title.switchToGlobal',
-  'fxa.confirm.body.switchToGlobal',
-  'fxa.page.tooltip.localServices',
-  'fxa.page.toggler.switchToLocal',
-  'fxa.page.toggler.switchToGlobal',
-  'fxa.page.flag.global',
-  'fxa.page.flag.local'
-];
-
-function initPageMod() {
-  let l10nValues = {};
-  l10nKeys.forEach(function(key) {
-    l10nValues[key] = _(key);
-  });
-
-  let l10nScript = 'var l10n = ' + JSON.stringify(l10nValues) + ';';
-
-  PageMod({
-    include: /about:accounts([#?].*)?$/,
-    contentScriptFile: 'resource://cmimprove-fxa/injectScript.js',
-    contentScript: l10nScript,
-    contentStyleFile: 'resource://cmimprove-fxa/injectStyle.css',
-    contentScriptWhen: 'start',
-    onAttach: function(worker) {
-      debug('Attach pageMod!!');
-      function handleMessage(data) {
-        switch (data.message) {
-          case 'localServiceEnabled':
-            worker.port.emit('message', {
-              enabled: FxaSwitcher.localServiceEnabled,
-              _rid_: data._rid_
-            });
-            break;
-          case 'resetFxaServices':
-            FxaSwitcher.resetFxaServices();
-            worker.port.emit('message', {
-              _rid_: data._rid_
-            });
-            break;
-          case 'switchToLocalService':
-            FxaSwitcher.switchToLocalService();
-            worker.port.emit('message', {
-              _rid_: data._rid_
-            });
-            break;
-        }
-      }
-
-      worker.port.on('message', handleMessage);
-    }
-  });
-
-  debug('Init cpmanager fxa improve');
-}
 
 init();
 

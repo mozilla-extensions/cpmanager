@@ -9,6 +9,7 @@
   const Cc = Components.classes;
 
   Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
   XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
     "chrome://cmimprove/content/fxa/serviceSwitcher.jsm");
 
@@ -39,7 +40,7 @@
         _('fxa.preferences.label.switchToLocal');
   }
 
-  window.addEventListener('load', function() {
+  document.getElementById('paneSync').addEventListener('paneload', function() {
     let toggler = document.getElementById('cn-fxa-switcher');
     toggler.onclick = toggle;
     updateUI();
