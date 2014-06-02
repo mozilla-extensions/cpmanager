@@ -34,6 +34,8 @@ const TERMS_URL        = ACCOUNTS_SERVER + '/legal/terms';
 
 const PREF_SYNC_TOKENSERVER = 'services.sync.tokenServerURI';
 
+const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
+
 const SERVICE_PREFS = {
   'services.sync.tokenServerURI': TOKEN_SERVER_URI,
   'identity.fxaccounts.auth.uri': AUTH_URI,
@@ -233,6 +235,9 @@ function markChecked() {
 }
 
 function init() {
+  // Complete unfinished jobs before FF restarted.
+  doUnfinishedJobs();
+
   if (alreadyChecked()) {
     startPrefWatchDog();
     done();
@@ -274,6 +279,42 @@ function done() {
   });
 }
 
+function doUnfinishedJobs() {
+  try {
+    if (!Services.prefs.getBoolPref(PREF_RESTART_FLAG, false)) {
+      return;
+    }
+  } catch (e) {
+    return;
+  }
+
+  Services.prefs.clearUserPref(PREF_RESTART_FLAG);
+  doSendTrack();
+}
+
+function sendTrackIfAllowed() {
+  // Only mark pref, do tracking after FF restarted.
+  Services.prefs.setBoolPref(PREF_RESTART_FLAG, true);
+}
+
+function doSendTrack() {
+  var tracker = Cc["@mozilla.com.cn/tracking;1"];
+  if (!tracker || !tracker.getService().wrappedJSObject.ude) {
+    return;
+  }
+
+  let url = 'http://addons.g-fox.cn/fxa-switch.gif?fxa=' + localServiceEnabled();
+  let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
+              createInstance(Ci.nsIXMLHttpRequest);
+
+  xhr.onload = function() {
+    debug("Stats sent: " + url);
+  };
+
+  xhr.open("GET", url, true);
+  xhr.send();
+}
+
 let FxaSwitcher = {
   /**
    * This along with addStatusListener/removeStatusListener are used by passport addon,
@@ -308,6 +349,7 @@ let FxaSwitcher = {
     let body = _('fxa.confirm.body.switchToGlobal');
     if (Services.prompt.confirm(null, title, body)) {
       resetFxaServices();
+      sendTrackIfAllowed();
       Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup)
         .quit(Ci.nsIAppStartup.eForceQuit | Ci.nsIAppStartup.eRestart);
     }
@@ -318,7 +360,7 @@ let FxaSwitcher = {
     let body = _('fxa.confirm.body.switchToLocal');
     if (Services.prompt.confirm(null, title, body)) {
       switchToLocalService();
-
+      sendTrackIfAllowed();
       // Restart anyway.
       Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup)
         .quit(Ci.nsIAppStartup.eForceQuit | Ci.nsIAppStartup.eRestart);

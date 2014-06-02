@@ -18,8 +18,15 @@ const DISTRIBUTION_PREF = "distribution.version"
 
 const ONEDAY = 24 * 60 * 60 * 1000;
 const ADU_INTERVAL = 24 * 60 * 60 * 1000;
-Cu.import("resource://gre/modules/Services.jsm");
+
+// Don't use lazy getter here, we need it be initialized.
 Cu.import("resource://cmtracking/ExtensionUsage.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "Services",
+  "resource://gre/modules/Services.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
+  "chrome://cmimprove/content/fxa/serviceSwitcher.jsm");
 
 function LOG(txt) {
   var consoleService = Cc["@mozilla.org/consoleservice;1"]
@@ -304,7 +311,9 @@ function getADUData() {
             + "&cehome=" + cpmanager_paramCEHome()
             + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
             + getMOExts()
+            + "&fxa=" + FxaSwitcher.localServiceEnabled  // Indicates if switched Fxa services' entries.
   }
+
   return adudata;
 }
 
