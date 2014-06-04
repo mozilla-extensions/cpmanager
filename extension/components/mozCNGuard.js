@@ -10,6 +10,8 @@ let Cc = Components.classes;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
+  "resource://cmsafeflag/SkipSBData.jsm");
 
 function mozCNGuard() {}
 
@@ -22,15 +24,37 @@ mozCNGuard.prototype = {
   observe: function MCG_observe(aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
+        Services.obs.addObserver(this, "http-on-modify-request", false);
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
         break;
+      case "http-on-modify-request":
+        this.skipFalsePositiveSB(aSubject);
       case "http-on-examine-response":
       case "http-on-examine-cached-response":
       case "http-on-examine-merged-response":
         this.dropRogueRedirect(aSubject);
         break;
+    }
+  },
+
+  _skipSBData: null,
+
+  skipFalsePositiveSB: function MCG_skipFalsePositiveSB(aSubject) {
+    if (!this._skipSBData) {
+      this._skipSBData = SkipSBData.read();
+    }
+
+    let channel = aSubject;
+    channel.QueryInterface(Ci.nsIHttpChannel);
+    let uri = channel.originalURI;
+
+    if ((this._skipSBData.urls &&
+         this._skipSBData.urls[uri.asciiSpec]) ||
+        (this._skipSBData.baseDomains &&
+         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(uri)])) {
+      channel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
     }
   },
 
