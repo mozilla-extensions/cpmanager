@@ -1,4 +1,4 @@
-let EXPORTED_SYMBOLS = ["CCLVData"];
+let EXPORTED_SYMBOLS = ["SkipSBData"];
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
@@ -20,7 +20,7 @@ XPCOMUtils.defineLazyGetter(this, "gUnicodeConverter", function() {
 
 let LOG = function(m) Services.console.logStringMessage(m);
 
-let CCLVData = {
+let SkipSBData = {
   get verifier() {
     delete this.verifier;
     return this.verifier = Cc["@mozilla.org/security/datasignatureverifier;1"].
@@ -37,10 +37,10 @@ let CCLVData = {
     return this.key = key;
   },
 
-  updateUrl: "http://cclv.firefoxchina.cn/cclv/v1/hosts.json",
+  updateUrl: "http://i.firefoxchina.cn/skipsb/v1/urls.json",
 
   get _bundleData() {
-    let uri = Services.io.newURI("resource://cpmanager-clv/cclvhosts.json",
+    let uri = Services.io.newURI("resource://cmsafeflag/skipsburls.json",
       null, null);
     delete this._bundleData;
     return this._bundleData = uri.QueryInterface(Ci.nsIFileURL).file;
@@ -49,7 +49,7 @@ let CCLVData = {
   get _latestData() {
     delete this._latestData;
     return this._latestData = FileUtils.
-      getFile("ProfLD", ["cclv", "hosts.json"], false);
+      getFile("ProfLD", ["mozcn-skipsb", "urls.json"], false);
   },
 
   _fetch: function(aUrl, aCallback) {
@@ -137,4 +137,4 @@ let CCLVData = {
   }
 };
 
-CCLVData.init();
+SkipSBData.init();
