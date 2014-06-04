@@ -10,6 +10,8 @@ pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
 
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
+pref("plugin.default.state", 2);
+
 //plugin checker for flash
 pref("plugins.update.flash.WINNT.url","http://r.g-fox.cn/plugin/flash_WINNT");
 pref("plugins.update.flash.Darwin.url","http://r.g-fox.cn/plugin/flash_Darwin");
