@@ -31,6 +31,7 @@ const REMOTE_URI       = ACCOUNTS_SERVER + '/?service=sync&context=fx_desktop_v1
 const SETTINGS_URI     = ACCOUNTS_SERVER + '/settings';
 const PRIVACY_URL      = ACCOUNTS_SERVER + '/legal/privacy';
 const TERMS_URL        = ACCOUNTS_SERVER + '/legal/terms';
+const STATUS_URL       = ACCOUNTS_SERVER + '/status/';
 
 const PREF_SYNC_TOKENSERVER = 'services.sync.tokenServerURI';
 
@@ -44,6 +45,7 @@ const SERVICE_PREFS = {
   'identity.fxaccounts.remote.signup.uri': SIGHUP_URI,
   'identity.fxaccounts.remote.uri': REMOTE_URI,
   'identity.fxaccounts.settings.uri': SETTINGS_URI,
+  'services.sync.statusURL': STATUS_URL,
   'services.sync.fxa.privacyURL': PRIVACY_URL,
   'services.sync.fxa.termsURL': TERMS_URL,
   'services.sync.fxaccounts.enabled': true
