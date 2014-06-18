@@ -193,19 +193,6 @@ function resetFxaServices() {
   startPrefWatchDog();
 }
 
-
-function onlySyncBookmark() {
-  [
-    'services.sync.engine.addons',
-    'services.sync.engine.history',
-    'services.sync.engine.passwords',
-    'services.sync.engine.prefs',
-    'services.sync.engine.tabs',
-  ].forEach(key => {
-    Services.prefs.setBoolPref(key, false);
-  });
-}
-
 function switchToLocalService() {
   if (localServiceEnabled()) {
     return;
@@ -250,7 +237,6 @@ function init() {
       case UT_NO_SYNC_USED:
       case UT_WEAVE_USED:
         switchToLocalService();
-        onlySyncBookmark();
         break;
       default:
         debug('Ignore for ' + aType);
