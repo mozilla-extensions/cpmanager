@@ -38,6 +38,11 @@
     toggler.value =
       FxaSwitcher.localServiceEnabled ? _('fxa.preferences.label.switchToGlobal') :
         _('fxa.preferences.label.switchToLocal');
+
+    if (FxaSwitcher.localServiceEnabled) {
+      let caption = document.querySelector('#fxaGroup > caption:first-child');
+      caption.label = _('fxa.preferences.caption.label');
+    }
   }
 
   document.getElementById('paneSync').addEventListener('paneload', function() {
