@@ -8,8 +8,12 @@ let Ci = Components.interfaces;
 let Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
+  "resource://gre/modules/Timer.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
+  "resource://gre/modules/SafeBrowsing.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 
@@ -30,7 +34,15 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
         break;
       case "http-on-modify-request":
-        this.skipFalsePositiveSB(aSubject);
+        let channel = aSubject;
+        channel.QueryInterface(Ci.nsIHttpChannel);
+        let uri = channel.originalURI;
+
+        if (uri.asciiSpec == SafeBrowsing.gethashURL) {
+          this.cancelGetHashOnTimeout(channel);
+        } else {
+          this.skipFalsePositiveSB(channel, uri);
+        }
       case "http-on-examine-response":
       case "http-on-examine-cached-response":
       case "http-on-examine-merged-response":
@@ -39,22 +51,26 @@ mozCNGuard.prototype = {
     }
   },
 
+  cancelGetHashOnTimeout: function MCG_cancelGetHashOnTimeout(aChannel) {
+    setTimeout(function() {
+      if (aChannel && aChannel.isPending()) {
+        aChannel.cancel(Cr.NS_ERROR_ABORT);
+      }
+    }, 10e3);
+  },
+
   _skipSBData: null,
 
-  skipFalsePositiveSB: function MCG_skipFalsePositiveSB(aSubject) {
+  skipFalsePositiveSB: function MCG_skipFalsePositiveSB(aChannel, aURI) {
     if (!this._skipSBData) {
       this._skipSBData = SkipSBData.read();
     }
 
-    let channel = aSubject;
-    channel.QueryInterface(Ci.nsIHttpChannel);
-    let uri = channel.originalURI;
-
     if ((this._skipSBData.urls &&
-         this._skipSBData.urls[uri.asciiSpec]) ||
+         this._skipSBData.urls[aURI.asciiSpec]) ||
         (this._skipSBData.baseDomains &&
-         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(uri)])) {
-      channel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
+         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(aURI)])) {
+      aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
     }
   },
 
@@ -77,7 +93,7 @@ mozCNGuard.prototype = {
     };
 
     if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
-      if ([301, 302].indexOf(channel.responseStatus) > -1) {
+      if ([301, 302].indexOf(channel.responseStatus || 0) > -1) {
         let redirectTo = channel.getResponseHeader("Location");
         redirectTo = Services.io.newURI(redirectTo, null, channel.originalURI);
 
