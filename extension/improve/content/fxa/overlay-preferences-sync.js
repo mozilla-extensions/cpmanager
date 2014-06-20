@@ -43,6 +43,14 @@
       let caption = document.querySelector('#fxaGroup > caption:first-child');
       caption.label = _('fxa.preferences.caption.label');
     }
+
+    // We only change the color of the label that open old sync support page. However, there is
+    // no id in this label, let's use an ugly hack to indentify it here ...
+    [].forEach.call(document.querySelectorAll('#noFxaAccount label.text-link'), aLabel => {
+      if (aLabel.getAttribute('onclick').contains('openOldSyncSupportPage()')) {
+        aLabel.style.color = '#999';
+      }
+    })
   }
 
   document.getElementById('paneSync').addEventListener('paneload', function() {
