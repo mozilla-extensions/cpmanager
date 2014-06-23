@@ -198,13 +198,19 @@ function resetFxaServices() {
 
 function onlySyncBookmark() {
   [
-    'services.sync.engine.addons',
-    'services.sync.engine.history',
-    'services.sync.engine.passwords',
-    'services.sync.engine.prefs',
-    'services.sync.engine.tabs',
-  ].forEach(key => {
-    Services.prefs.setBoolPref(key, false);
+    { key: 'services.sync.engine.addons', value: false},
+    { key: 'services.sync.engineStatusChanged.addons', value: true },
+    { key: 'services.sync.engine.history', value: false},
+    { key: 'services.sync.engineStatusChanged.history', value: true },
+    { key: 'services.sync.engine.passwords', value: false},
+    { key: 'services.sync.engineStatusChanged.passwords', value: true },
+    { key: 'services.sync.engine.prefs', value: false},
+    { key: 'services.sync.engineStatusChanged.prefs', value: true },
+    { key: 'services.sync.engine.tabs', value: false},
+    { key: 'services.sync.engineStatusChanged.tabs', value: true },
+    { key: 'services.sync.engineStatusChanged.prefs.modified', value: true }
+  ].forEach(aKeyValue => {
+    Services.prefs.setBoolPref(aKeyValue.key, aKeyValue.value);
   });
 }
 
