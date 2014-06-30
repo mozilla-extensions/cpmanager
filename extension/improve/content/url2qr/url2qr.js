@@ -57,6 +57,34 @@
     }
   };
 
+  ns.generateGIFwithFx = function(message) {
+    try {
+      let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+      let { require } = devtools;
+      let QR = require("devtools/toolkit/qrcode/index");
+      let Encoder = require("devtools/toolkit/qrcode/encoder/index").Encoder;
+
+      quality = "L";
+      version = QR.findMinimumVersion(message, quality);
+      let encoder = new Encoder(version, quality);
+      encoder.addData(message);
+      encoder.make();
+
+      /**
+       * cellSize is size of each modules in pixels. 4 * 2 means a margin of
+       * 4 cells on both sides of the output.
+       *
+       * The goal here is to make sure the output image is at least about
+       * 240 x 240px and the cellSize is no less than 2px, its default value.
+       */
+      let altCellSize = Math.floor(240 / (encoder.getModuleCount() + 4 * 2));
+      let cellSize = Math.max(2, altCellSize);
+      return encoder.createImgData(cellSize);
+    } catch(e) {
+      return {};
+    }
+  };
+
   ns.popupShown = function() {
     let uri = gBrowser.selectedBrowser.currentURI;
     if (!uri) {
@@ -67,7 +95,7 @@
     text = {
       "about:cehome": "http://i.firefoxchina.cn/?from=url2qr"
     }[text] || text;
-    let datauri = MOA.URL2QR.QRCode.generatePNG(text);
+    let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text);
     ns.popupImage.src = datauri;
     ce_tracking.track("url2qr-qrshown");
   };
