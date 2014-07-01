@@ -17,6 +17,10 @@ XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
 XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 
+XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
+  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+});
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -55,13 +59,19 @@ mozCNGuard.prototype = {
     setTimeout(function() {
       if (aChannel && aChannel.isPending()) {
         aChannel.cancel(Cr.NS_ERROR_ABORT);
+        CETracking.track("sb-gethash-abort");
       }
     }, 10e3);
+    CETracking.track("sb-gethash-found");
   },
 
   _skipSBData: null,
 
   skipFalsePositiveSB: function MCG_skipFalsePositiveSB(aChannel, aURI) {
+    if (!(aChannel.loadFlags & Ci.nsIChannel.LOAD_CLASSIFY_URI)) {
+      return;
+    }
+
     if (!this._skipSBData) {
       this._skipSBData = SkipSBData.read();
     }
@@ -71,6 +81,9 @@ mozCNGuard.prototype = {
         (this._skipSBData.baseDomains &&
          this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(aURI)])) {
       aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
+      CETracking.track("sb-skip-classify");
+    } else {
+      CETracking.track("sb-will-classify");
     }
   },
 
