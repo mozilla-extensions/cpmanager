@@ -11,3 +11,5 @@
 <!ENTITY cp.clearRecentHistory.yearly.label    "Over 1 year">
 
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "Always clear history when Firefox closes">
+
+<!ENTITY cp.mozillaComCn.label "Community Website">

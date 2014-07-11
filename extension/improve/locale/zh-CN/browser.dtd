@@ -11,3 +11,5 @@
 <!ENTITY cp.clearRecentHistory.yearly.label    "一年以前">
 
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "关闭时清除历史记录">
+
+<!ENTITY cp.mozillaComCn.label "社区论坛">

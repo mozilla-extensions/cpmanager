@@ -31,6 +31,14 @@
              oncommand="PlacesOrganizer.exportBookmarks();"/>
   </commandset>
 
+  <menupopup id="menu_HelpPopup">
+    <menuitem id="cm-menu-mozilla-com-cn"
+              oncommand="openUILinkIn('http://mozilla.com.cn/?src=ffhelp', 'tab');"
+              label="&cp.mozillaComCn.label;"
+              tooltiptext="&cp.mozillaComCn.label;"
+              insertbefore="menu_openHelp"/>
+  </menupopup>
+
   <menupopup id="BMB_bookmarksPopup">
     <menu class="menu-iconic subviewbutton"
           id="cm-menu-maintenance"
