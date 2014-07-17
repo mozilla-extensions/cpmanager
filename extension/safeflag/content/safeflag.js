@@ -36,7 +36,13 @@
       if (!tabId)
         return;
 
+      let isTopLevel = webProgress.isTopLevel || win == win.top;
+      if (!isTopLevel) {
+          return;
+      }
+
       MOA.debug(tabId + ', uri: ' + uri);
+
       _current_tab_id_ = tabId;
       if (!uri) {
         // When a new tab is opened, uri is null.
@@ -87,8 +93,9 @@
   }
 
   ns.getCurrentTabSafeflag = function() {
-    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag || _tab_url_safeflag_[_current_tab_id_].url == BROWSER_NEW_TAB_URL)
+    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag || gInitialPages.indexOf(_tab_url_safeflag_[_current_tab_id_].url)) {
       return null;
+    }
 
     return _tab_url_safeflag_[_current_tab_id_].safe_flag;
   };

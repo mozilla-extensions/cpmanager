@@ -51,13 +51,15 @@
       icon.classList.add('safeflag-unsafe');
       if (isUnsafeBackground) {
         MOA.debug('Set background color for unsafe sites.');
-        urlbar.className = [default_className, 'sfbg_unsafe'].join(' ').trim();
+        urlbar.classList.remove('sfbg_safe');
+        urlbar.classList.add('sfbg_unsafe');
       }
     } else {
       icon.classList.remove('safeflag-unsafe');
       if (isSafeBackground) {
         MOA.debug('Set background color for safe sites.');
-        urlbar.className = [default_className, 'sfbg_safe'].join(' ').trim();
+        urlbar.classList.remove('sfbg_unsafe');
+        urlbar.classList.add('sfbg_safe');
       }
     }
     icon.hidden = false;
