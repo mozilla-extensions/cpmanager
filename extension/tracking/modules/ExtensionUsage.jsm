@@ -364,6 +364,12 @@ let ExtensionUsage = {
           self.initCriteria();
         }).then(null, reportError);
       }).then(null, reportError);
+
+      if (Sqlite.shutdown) {
+        Sqlite.shutdown.addBlocker("ExtensionUsage: close db connection",
+          self.DBConnection.close()
+        );
+      }
     }).then(null, reportError);
 
     this.initMonitors();
