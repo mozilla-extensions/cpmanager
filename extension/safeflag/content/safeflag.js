@@ -93,7 +93,7 @@
   }
 
   ns.getCurrentTabSafeflag = function() {
-    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag || gInitialPages.indexOf(_tab_url_safeflag_[_current_tab_id_].url)) {
+    if (!_tab_url_safeflag_[_current_tab_id_] || !_tab_url_safeflag_[_current_tab_id_].safe_flag || (gInitialPages.indexOf(_tab_url_safeflag_[_current_tab_id_].url) > -1)) {
       return null;
     }
 
