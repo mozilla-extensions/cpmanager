@@ -367,7 +367,7 @@ let ExtensionUsage = {
 
       if (Sqlite.shutdown) {
         Sqlite.shutdown.addBlocker("ExtensionUsage: close db connection",
-          self.DBConnection.close()
+          () => self.DBConnection.close()
         );
       }
     }).then(null, reportError);
