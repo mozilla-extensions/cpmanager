@@ -100,16 +100,7 @@ PrefWatchDog = {
       // Check if PREF_SYNC_TOKENSERVER is reset and other prefs
       // stay as local entries, if yes, it should be reset by FF when
       // user signed out, let's change it back.
-      if (!Services.prefs.prefHasUserValue(PREF_SYNC_TOKENSERVER) &&
-          isAuthURILocal()) {
-        debug('change it back.');
-
-        if (localServiceEnabled()) {
-          resetFxaServices();
-        } else {
-          switchToLocalService();
-        }
-      }
+      repairPrefs();
     }
   }
 };
@@ -242,9 +233,28 @@ function markChecked() {
   Services.prefs.setBoolPref(ONE_CHECK_PREF, true);
 }
 
+function repairPrefs() {
+  // In such a case, the prefs will be messy:
+  //   - User upgraded passport addon but without the latest cpmanager.
+  //   - User finished the migration process, then the passport addon
+  //     uninstalled itself.
+  //   - User logged out fxa account.
+  //   - User tried to login again, it failed, because the tokenServerURI
+  //     pref is reset without pref-watchdog protection.
+  //
+  // we try to clean the mess here.
+  if (!Services.prefs.prefHasUserValue(PREF_SYNC_TOKENSERVER) &&
+      isAuthURILocal()) {
+    debug('change it back.');
+    switchToLocalService();
+  }
+}
+
 function init() {
   // Complete unfinished jobs before FF restarted.
   doUnfinishedJobs();
+
+  repairPrefs();
 
   if (alreadyChecked()) {
     startPrefWatchDog();
