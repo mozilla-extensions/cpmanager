@@ -71,9 +71,23 @@ CPCommandLineValidator.prototype = {
     }
 
     var dropIfHostMatched = !aFlag;
+    var queryMatched = false;
 
+    var self = this;
     var hostMatched = this._hostsToMatch.some(function(aHostToMatch) {
-      return (aArgument.asciiHost == aHostToMatch) && aArgument.query;
+      if (aArgument.asciiHost != aHostToMatch) {
+        return false;
+      }
+
+      /**
+       * include "" in querysToDrop explicitly to allow match w/o query string,
+       * it will be conveniently ignored by outdated versions of cpmanager.
+       */
+      var querysToDrop = self._querysToDrop[aHostToMatch];
+      queryMatched = querysToDrop.some(function(aQueryToDrop) {
+        return aArgument.query == aQueryToDrop;
+      })
+      return aArgument.query || queryMatched;
     });
 
     logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
@@ -86,9 +100,7 @@ CPCommandLineValidator.prototype = {
       return true;
     }
 
-    return this._querysToDrop[aArgument.asciiHost].some(function(aQueryToDrop) {
-      return aArgument.query == aQueryToDrop;
-    });
+    return aArgument.query && queryMatched;
   },
 
   /* nsICommandLineValidator */
