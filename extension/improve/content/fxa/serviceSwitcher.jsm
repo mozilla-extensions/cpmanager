@@ -38,7 +38,6 @@ const PREF_SYNC_TOKENSERVER = 'services.sync.tokenServerURI';
 const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
 
 const SERVICE_PREFS = {
-  'services.sync.tokenServerURI': TOKEN_SERVER_URI,
   'identity.fxaccounts.auth.uri': AUTH_URI,
   'identity.fxaccounts.remote.force_auth.uri': FORCE_AUTH_URI,
   'identity.fxaccounts.remote.signin.uri': SIGHIN_URI,
@@ -49,7 +48,12 @@ const SERVICE_PREFS = {
   'services.sync.fxa.privacyURL': PRIVACY_URL,
   'services.sync.fxa.termsURL': TERMS_URL,
   'services.sync.fxaccounts.enabled': true
+
 };
+
+SERVICE_PREFS[PREF_SYNC_TOKENSERVER] = TOKEN_SERVER_URI;
+
+const WEAVE_STARTOVER_FINISH = 'weave:service:start-over:finish';
 
 const UT_NO_SYNC_USED    = 'ut_no_sync_used';
 const UT_FXA_USED        = 'ut_fxaccount_used';
@@ -85,40 +89,22 @@ function localServiceEnabled() {
            TOKEN_SERVER_URI;
 }
 
-function isAuthURILocal() {
-  return Services.prefs.getCharPref('identity.fxaccounts.auth.uri') ==
-           AUTH_URI;
-}
-
 PrefWatchDog = {
   observe: function(aSubject, aTopic, aData) {
-    if (aTopic != "nsPref:changed") {
-      return;
-    }
-
-    if (aData == PREF_SYNC_TOKENSERVER) {
-      // Check if PREF_SYNC_TOKENSERVER is reset and other prefs
-      // stay as local entries, if yes, it should be reset by FF when
-      // user signed out, let's change it back.
-      repairPrefs();
+    switch (aTopic) {
+      case WEAVE_STARTOVER_FINISH:
+        repairPrefs();
+        break;
     }
   }
 };
 
 /**
- * PREF_SYNC_TOKENSERVER is reset after user disconnected, we need to
- * change it back.
+ * services.sync.* prefs are reset after user disconnected, we need to
+ * observe WEAVE_STARTOVER_FINISH topic and change some of them back.
  */
 function startPrefWatchDog() {
-  debug('Add pref watch dog');
-  Services.prefs.addObserver(PREF_SYNC_TOKENSERVER,
-    PrefWatchDog, false);
-}
-
-function stopPrefWatchDog() {
-  debug('Remove pref watch dog');
-  Services.prefs.removeObserver(PREF_SYNC_TOKENSERVER,
-    PrefWatchDog, false);
+  Services.obs.addObserver(PrefWatchDog, WEAVE_STARTOVER_FINISH, false);
 }
 
 function debug(msg) {
@@ -179,11 +165,9 @@ function resetFxaServices() {
     return;
   }
 
-  stopPrefWatchDog();
   Object.keys(SERVICE_PREFS).forEach(function(key) {
     Services.prefs.clearUserPref(key);
   });
-  startPrefWatchDog();
 }
 
 
@@ -205,20 +189,18 @@ function onlySyncBookmark() {
   });
 }
 
-function switchToLocalService() {
-  if (localServiceEnabled()) {
-    return;
-  }
-
-  stopPrefWatchDog();
+function switchToLocalService(aOnlyForSyncPrefs) {
   Object.keys(SERVICE_PREFS).forEach(function(key) {
+    if (aOnlyForSyncPrefs && !key.startsWith('services.sync.')) {
+      return;
+    }
+
     if (typeof SERVICE_PREFS[key] == 'string') {
       Services.prefs.setCharPref(key, SERVICE_PREFS[key]);
     } else if (typeof SERVICE_PREFS[key] == 'boolean') {
       Services.prefs.setBoolPref(key, SERVICE_PREFS[key]);
     }
   });
-  startPrefWatchDog();
 }
 
 function alreadyChecked() {
@@ -243,10 +225,25 @@ function repairPrefs() {
   //     pref is reset without pref-watchdog protection.
   //
   // we try to clean the mess here.
-  if (!Services.prefs.prefHasUserValue(PREF_SYNC_TOKENSERVER) &&
-      isAuthURILocal()) {
+  var hasLocalPref = Object.keys(SERVICE_PREFS).some(function(key) {
+    try {
+      if (typeof SERVICE_PREFS[key] == 'string') {
+        return Services.prefs.getCharPref(key) == SERVICE_PREFS[key];
+      } else if (typeof SERVICE_PREFS[key] == 'boolean') {
+        return Services.prefs.getBoolPref(key) == SERVICE_PREFS[key];
+      }
+    } catch (e) {
+      return false;
+    }
+  });
+
+  if (hasLocalPref) {
     debug('change it back.');
-    switchToLocalService();
+    // For some unknown reason, we have hundreds of global users who are using
+    // our sync server, we haven't decide how to deal with it (bug 1645). To
+    // prevent impacting those unexpected users, let's just change prefs with
+    // prefix services.sync.*
+    switchToLocalService(/* aOnlyForSyncPrefs =*/ true);
   }
 }
 
