@@ -32,10 +32,14 @@ mozCNGuard.prototype = {
   observe: function MCG_observe(aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
+        Services.obs.addObserver(this, "browser-delayed-startup-finished", false);
         Services.obs.addObserver(this, "http-on-modify-request", false);
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
+        break;
+      case "browser-delayed-startup-finished":
+        this.initProgressListener(aSubject);
         break;
       case "http-on-modify-request":
         let channel = aSubject;
@@ -53,6 +57,35 @@ mozCNGuard.prototype = {
         this.dropRogueRedirect(aSubject);
         break;
     }
+  },
+
+  _getErrorCode: function MCG__getErrorCode(aDocument) {
+    let url = aDocument.documentURI;
+    let error = url.search(/e\=/);
+    let duffUrl = url.search(/\&u\=/);
+    return decodeURIComponent(url.slice(error + 2, duffUrl));
+  },
+
+  initProgressListener: function MCG_initProgressListener(aSubject) {
+    let w = aSubject;
+    let self = this;
+    let appContent = w.document.getElementById('appcontent');
+    appContent.addEventListener('DOMContentLoaded', function(aEvt) {
+      let contentDocument = aEvt.target;
+      if (contentDocument.documentURI.startsWith("about:neterror")) {
+        let host = contentDocument.location.host;
+        let baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
+        let errorCode = self._getErrorCode(contentDocument);
+        if (baseDomain == "taobao.com" && errorCode == "netReset") {
+          let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
+                            "r=%RANDOM%&spec=%SPEC%";
+          let url = urlTemplate.
+            replace("%SPEC%", contentDocument.location.href).
+            replace("%RANDOM%", Math.random());
+          CETracking.send(url);
+        }
+      }
+    }, false);
   },
 
   cancelGetHashOnTimeout: function MCG_cancelGetHashOnTimeout(aChannel) {
