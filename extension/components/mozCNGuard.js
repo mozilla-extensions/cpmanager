@@ -59,33 +59,24 @@ mozCNGuard.prototype = {
     }
   },
 
-  _getErrorCode: function MCG__getErrorCode(aDocument) {
-    let url = aDocument.documentURI;
-    let error = url.search(/e\=/);
-    let duffUrl = url.search(/\&u\=/);
-    return decodeURIComponent(url.slice(error + 2, duffUrl));
-  },
-
   initProgressListener: function MCG_initProgressListener(aSubject) {
     let w = aSubject;
-    let self = this;
-    let appContent = w.document.getElementById('appcontent');
-    appContent.addEventListener('DOMContentLoaded', function(aEvt) {
-      let contentDocument = aEvt.target;
-      if (contentDocument.documentURI.startsWith("about:neterror")) {
-        let host = contentDocument.location.host;
-        let baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
-        let errorCode = self._getErrorCode(contentDocument);
-        if (baseDomain == "taobao.com" && errorCode == "netReset") {
-          let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
-                            "r=%RANDOM%&spec=%SPEC%";
-          let url = urlTemplate.
-            replace("%SPEC%", contentDocument.location.href).
-            replace("%RANDOM%", Math.random());
-          CETracking.send(url);
+    w.gBrowser.addTabsProgressListener({
+      onLocationChange: function(a, b, aRequest, aLocation, aFlags) {
+        if (aFlags & Ci.nsIWebProgressListener.LOCATION_CHANGE_ERROR_PAGE) {
+          let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);
+          if (baseDomain == "taobao.com" &&
+              aReuqest.status == Cr.NS_ERROR_NET_RESET) {
+            let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
+                              "r=%RANDOM%&spec=%SPEC%";
+            let url = urlTemplate.
+              replace("%SPEC%", encodeURIComponent(aLocation.asciiSpec)).
+              replace("%RANDOM%", Math.random());
+            CETracking.send(url);
+          }
         }
       }
-    }, false);
+    });
   },
 
   cancelGetHashOnTimeout: function MCG_cancelGetHashOnTimeout(aChannel) {
