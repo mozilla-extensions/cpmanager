@@ -33,6 +33,7 @@ mozCNGuard.prototype = {
     switch (aTopic) {
       case "profile-after-change":
         Services.obs.addObserver(this, "browser-delayed-startup-finished", false);
+        Services.obs.addObserver(this, "sessionstore-state-finalized", false);
         Services.obs.addObserver(this, "http-on-modify-request", false);
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
@@ -40,6 +41,10 @@ mozCNGuard.prototype = {
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
+        break;
+      case "sessionstore-state-finalized":
+      case "sessionstore-windows-restored":
+        this.trackRogueStartup(aTopic);
         break;
       case "http-on-modify-request":
         let channel = aSubject;
@@ -56,6 +61,94 @@ mozCNGuard.prototype = {
       case "http-on-examine-merged-response":
         this.dropRogueRedirect(aSubject);
         break;
+    }
+  },
+
+  trackRogueStartup: function MCG_trackRoughStartup(aTopic) {
+    Services.obs.removeObserver(this, aTopic);
+
+    let sessionStartup = Cc["@mozilla.org/browser/sessionstartup;1"].
+      getService(Ci.nsISessionStartup);
+    if (aTopic == "sessionstore-state-finalized" &&
+        sessionStartup.sessionType != sessionStartup.NO_SESSION) {
+      Services.obs.addObserver(this, "sessionstore-windows-restored", false);
+      return;
+    }
+
+    let w = Services.wm.getMostRecentWindow("navigator:browser");
+
+    let choice = "badpref";
+    try {
+      choice = Services.prefs.getIntPref("browser.startup.page");
+    } catch(e) {};
+
+    // restore on startup/restart
+    let doRestore = sessionStartup.doRestore();
+
+    // urls to open when there's no url in arguments
+    let defaultArgs = Cc["@mozilla.org/browser/clh;1"].
+      getService(Ci.nsIBrowserHandler).defaultArgs;
+    let defaultArgZero = defaultArgs.split("|")[0];
+
+    // will open cehome in foreground if no arguments
+    let prefSet = !doRestore && [
+      /^about:cehome$/,
+      /^http:\/\/i\.firefoxchina\.cn\/?$/
+    ].some((aSpec) => {
+      return aSpec.test(defaultArgZero);
+    });
+
+    // no extra arguments
+    let noArgs = w.arguments && w.arguments[0] &&
+      w.arguments[0] == defaultArgs;
+
+    let reportFirstLocation = function(aURI) {
+      let expected = aURI.asciiSpec == defaultArgZero;
+      // normalize defaultArgZero, e.g. add trailing slash.
+      try {
+        let defaultArgZeroURI = Services.io.newURI(defaultArgZero, null, null);
+        expected = aURI.equals(defaultArgZeroURI);
+      } catch(e) {};
+
+      if (prefSet && noArgs) {
+        expected = expected || aURI.asciiSpec;
+      }
+
+      let urlTemplate = "http://addons.g-fox.cn/firstLocation.gif?" +
+                        "p=%PREF_SET%&a=%NO_ARGS%&e=%EXPECTED%" +
+                        "&bsp=%BSP_CHOICE%&r=%RANDOM%";
+      let url = urlTemplate.
+        replace("%PREF_SET%", prefSet).
+        replace("%NO_ARGS%", noArgs).
+        replace("%EXPECTED%", encodeURIComponent(expected)).
+        replace("%BSP_CHOICE%", choice).
+        replace("%RANDOM%", Math.random());
+      CETracking.send(url);
+    };
+
+    let progressListener = {
+      onLocationChange: function(aWebProgress, b, aLocation, d) {
+        if (aWebProgress.isTopLevel && (aLocation instanceof Ci.nsIURI)) {
+          w.gBrowser.removeProgressListener(progressListener);
+
+          reportFirstLocation(aLocation);
+        }
+      }
+    };
+
+    /**
+     * BUSY_FLAGS_BEFORE_PAGE_LOAD seems to work, but not really sure.
+     * could use a better check here.
+     */
+    let docShell = w.gBrowser.selectedBrowser.docShell;
+    if (docShell.busyFlags & Ci.nsIDocShell.BUSY_FLAGS_BEFORE_PAGE_LOAD) {
+      /**
+       * addProgressListener: listener for the selectedBrowser
+       * addTabsProgressListener: listener for every browser in gBrowser
+       */
+      w.gBrowser.addProgressListener(progressListener);
+    } else {
+      reportFirstLocation(w.gBrowser.selectedBrowser.currentURI);
     }
   },
 
@@ -130,7 +223,11 @@ mozCNGuard.prototype = {
     };
 
     if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
-      if ([301, 302].indexOf(channel.responseStatus || 0) > -1) {
+      let responseStatus = 0;
+      try {
+        responseStatus = channel.responseStatus;
+      } catch(e) {};
+      if ([301, 302].indexOf(responseStatus) > -1) {
         let redirectTo = channel.getResponseHeader("Location");
         redirectTo = Services.io.newURI(redirectTo, null, channel.originalURI);
 
@@ -146,25 +243,21 @@ mozCNGuard.prototype = {
             webNavigation.loadURI(newURI.spec, null, null, null, null);
           }
 
-          let tracker = Cc["@mozilla.com.cn/tracking;1"];
-          if (tracker && tracker.getService().wrappedJSObject) {
-            let uuid = "NA";
-            let uuidKey = "extensions.cpmanager@mozillaonline.com.uuid";
-            try {
-              uuid = Services.prefs.getCharPref(uuidKey);
-            } catch(e) {}
+          let uuid = "NA";
+          let uuidKey = "extensions.cpmanager@mozillaonline.com.uuid";
+          try {
+            uuid = Services.prefs.getCharPref(uuidKey);
+          } catch(e) {}
 
-            let urlTemplate = "http://addons.g-fox.cn/302.gif?r=%RANDOM%" +
-                              "&status=%STATUS%&from=%FROM%&to=%TO%&id=%ID%";
-            let url = urlTemplate.
-              replace("%STATUS%", channel.responseStatus).
-              replace("%FROM%", encodeURIComponent(channel.originalURI.spec)).
-              replace("%TO%", encodeURIComponent(redirectTo.spec)).
-              replace("%ID%", encodeURIComponent(uuid)).
-              replace("%RANDOM%", Math.random());
-
-            tracker.getService().wrappedJSObject.send(url);
-          }
+          let urlTemplate = "http://addons.g-fox.cn/302.gif?r=%RANDOM%" +
+                            "&status=%STATUS%&from=%FROM%&to=%TO%&id=%ID%";
+          let url = urlTemplate.
+            replace("%STATUS%", channel.responseStatus).
+            replace("%FROM%", encodeURIComponent(channel.originalURI.spec)).
+            replace("%TO%", encodeURIComponent(redirectTo.spec)).
+            replace("%ID%", encodeURIComponent(uuid)).
+            replace("%RANDOM%", Math.random());
+          CETracking.send(url);
         }
       }
     }
