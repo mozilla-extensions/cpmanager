@@ -109,6 +109,7 @@ CPCommandLineValidator.prototype = {
       return;
     }
 
+    var prevIsOSInt = false;
     for (var current = 0, total = cmdLine.length; current < total;) {
       var argument = cmdLine.getArgument(current);
       /*
@@ -116,11 +117,17 @@ CPCommandLineValidator.prototype = {
        * and removed using argument related methods.
        */
       if (this._flagsToValidate.indexOf(argument) > -1) {
-        var flag = argument;
+        var flag = (prevIsOSInt ? "-osint " : "") + argument;
         var paramAsArg = cmdLine.getArgument(current + 1);
         if (this._shouldDrop(cmdLine, paramAsArg, flag)) {
-          cmdLine.removeArguments(current, current + 1);
-          total -= 2;
+          if (prevIsOSInt) {
+            current -= 1;
+            cmdLine.removeArguments(current, current + 2);
+            total -= 3;
+          } else {
+            cmdLine.removeArguments(current, current + 1);
+            total -= 2;
+          }
         } else {
           current += 2;
         }
@@ -132,6 +139,7 @@ CPCommandLineValidator.prototype = {
           current += 1;
         }
       }
+      prevIsOSInt = (argument == "-osint");
     }
   }
 };

@@ -34,6 +34,7 @@ mozCNGuard.prototype = {
       case "profile-after-change":
         Services.obs.addObserver(this, "browser-delayed-startup-finished", false);
         Services.obs.addObserver(this, "sessionstore-state-finalized", false);
+        Services.obs.addObserver(this, "toplevel-window-ready", false);
         Services.obs.addObserver(this, "http-on-modify-request", false);
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
@@ -64,6 +65,31 @@ mozCNGuard.prototype = {
     }
   },
 
+  get browserHandler() {
+    delete this.browserHandler;
+    return this.browserHandler = Cc["@mozilla.org/browser/clh;1"].
+      getService(Ci.nsIBrowserHandler);
+  },
+
+  get startPageChoice() {
+    let choice = "badpref";
+    try {
+      choice = Services.prefs.getIntPref("browser.startup.page");
+    } catch(e) {};
+
+    delete this.startPageChoice;
+    return this.startPageChoice = choice;
+  },
+
+  isCEHome: function MCG_isCEHome(aSpec) {
+    return [
+      /^about:cehome$/,
+      /^http:\/\/i\.firefoxchina\.cn\/?$/
+    ].some((aExpectedSpec) => {
+      return aExpectedSpec.test(aSpec);
+    });
+  },
+
   trackRogueStartup: function MCG_trackRoughStartup(aTopic) {
     Services.obs.removeObserver(this, aTopic);
 
@@ -77,31 +103,21 @@ mozCNGuard.prototype = {
 
     let w = Services.wm.getMostRecentWindow("navigator:browser");
 
-    let choice = "badpref";
-    try {
-      choice = Services.prefs.getIntPref("browser.startup.page");
-    } catch(e) {};
-
     // restore on startup/restart
     let doRestore = sessionStartup.doRestore();
 
     // urls to open when there's no url in arguments
-    let defaultArgs = Cc["@mozilla.org/browser/clh;1"].
-      getService(Ci.nsIBrowserHandler).defaultArgs;
+    let defaultArgs = this.browserHandler.defaultArgs;
     let defaultArgZero = defaultArgs.split("|")[0];
 
     // will open cehome in foreground if no arguments
-    let prefSet = !doRestore && [
-      /^about:cehome$/,
-      /^http:\/\/i\.firefoxchina\.cn\/?$/
-    ].some((aSpec) => {
-      return aSpec.test(defaultArgZero);
-    });
+    let prefSet = !doRestore && this.isCEHome(defaultArgZero);
 
     // no extra arguments
     let noArgs = w.arguments && w.arguments[0] &&
       w.arguments[0] == defaultArgs;
 
+    let self = this;
     let reportFirstLocation = function(aURI) {
       let expected = aURI.asciiSpec == defaultArgZero;
       // normalize defaultArgZero, e.g. add trailing slash.
@@ -121,7 +137,7 @@ mozCNGuard.prototype = {
         replace("%PREF_SET%", prefSet).
         replace("%NO_ARGS%", noArgs).
         replace("%EXPECTED%", encodeURIComponent(expected)).
-        replace("%BSP_CHOICE%", choice).
+        replace("%BSP_CHOICE%", self.startPageChoice).
         replace("%RANDOM%", Math.random());
       CETracking.send(url);
     };
@@ -149,6 +165,46 @@ mozCNGuard.prototype = {
       w.gBrowser.addProgressListener(progressListener);
     } else {
       reportFirstLocation(w.gBrowser.selectedBrowser.currentURI);
+    }
+
+    this.maybeOpenStartPages(w);
+  },
+
+  maybeOpenStartPages: function MCG_maybeOpenStartPages(aSubject) {
+    if (this.startPageChoice != 1) {
+      return;
+    }
+
+    let argumentsZero = aSubject.arguments && aSubject.arguments[0];
+    if (this.browserHandler.defaultArgs == argumentsZero) {
+      return;
+    }
+
+    let self = this;
+    if (argumentsZero instanceof Ci.nsISupportsArray) {
+      this.browserHandler.startPage.split("|").forEach(function(aPage, aIndex) {
+        let uri = Services.io.newURI(aPage, null, null);
+        let title;
+
+        if (self.isCEHome(aPage)) {
+          aPage = uri.asciiSpec + "?from=extra_start";
+          title = "\u706b\u72d0\u4e3b\u9875";
+        }
+
+        aSubject.PlacesUtils.asyncHistory.getPlacesInfo(uri, {
+          handleError: function() {},
+          handleResult: function(aPlaceInfo) {
+            title = aPlaceInfo.title;
+          },
+          handleCompletion: function() {
+            let tab = aSubject.gBrowser.addTab();
+            aSubject.gBrowser.moveTabTo(tab, aIndex);
+            aSubject.SessionStore.setTabState(tab, JSON.stringify({
+              entries: [{ url: aPage, title: title }]
+            }));
+          }
+        });
+      });
     }
   },
 
