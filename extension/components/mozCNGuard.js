@@ -215,7 +215,7 @@ mozCNGuard.prototype = {
         if (aFlags & Ci.nsIWebProgressListener.LOCATION_CHANGE_ERROR_PAGE) {
           let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);
           if (baseDomain == "taobao.com" &&
-              aReuqest.status == Cr.NS_ERROR_NET_RESET) {
+              aRequest.status == Cr.NS_ERROR_NET_RESET) {
             let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
                               "r=%RANDOM%&spec=%SPEC%";
             let url = urlTemplate.
