@@ -33,7 +33,6 @@ style     chrome://browser/content/browser.xul               chrome://cmnotifica
 
 content  cmpfs                                                       pfs/content/
 overlay  chrome://browser/content/browser.xul                        chrome://cmpfs/content/overlay-browser.xul
-overlay  chrome://mozapps/content/plugins/pluginInstallerWizard.xul  chrome://cmpfs/content/overlay.xul
 
 content  cmimprove                   improve/content/
 locale   cmimprove     en-US         improve/locale/en-US/
