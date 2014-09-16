@@ -31,8 +31,18 @@ overlay   chrome://browser/content/browser.xul               chrome://cmnotifica
 override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotification/content/notification_blank.xul
 style     chrome://browser/content/browser.xul               chrome://cmnotification/skin/overlay-win.css            os=WINNT
 
-content  cmpfs                                                       pfs/content/
-overlay  chrome://browser/content/browser.xul                        chrome://cmpfs/content/overlay-browser.xul
+content  cmpfs                                  pfs/content/
+overlay  chrome://browser/content/browser.xul   chrome://cmpfs/content/overlay-browser.xul
+
+locale   cmpfs  en-US        pfs/locale/en-US/
+locale   cmpfs  zh-CN        pfs/locale/zh-CN/
+
+resource cmpfs  pfs/modules/
+
+skin     cmpfs            classic/1.0   pfs/skin/
+skin     cmpfs-os         classic/1.0   pfs/skin/windows/
+skin     cmpfs-os         classic/1.0   pfs/skin/osx/       os=Darwin
+skin     cmpfs-os         classic/1.0   pfs/skin/linux/     os=Linux
 
 content  cmimprove                   improve/content/
 locale   cmimprove     en-US         improve/locale/en-US/
@@ -40,7 +50,7 @@ locale   cmimprove     zh-CN         improve/locale/zh-CN/
 skin     cmimprove     classic/1.0   improve/skin/
 skin     cmimprove-os  classic/1.0   improve/skin/
 skin     cmimprove-os  classic/1.0   improve/skin/mac/ os=Darwin
-skin     cmimprove-os  classic/1.0	 improve/skin/linux/ os=Linux
+skin     cmimprove-os  classic/1.0   improve/skin/linux/ os=Linux
 
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/gesture/overlay-browser.xul          appversion>=4.0
