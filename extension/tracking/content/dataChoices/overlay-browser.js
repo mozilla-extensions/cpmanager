@@ -41,7 +41,7 @@
       let brandBundle = document.getElementById("bundle_brand");
       let appName = brandBundle.getString("brandShortName");
 
-      let _bundles = document.getElementById("cmtracking_bundle_browser");
+      let _bundles = document.getElementById("cmtracking_bundle");
 
       let message = _bundles.getFormattedString(
         "dataChoicesNotification.message",

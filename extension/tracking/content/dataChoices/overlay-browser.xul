@@ -9,6 +9,6 @@
     <notificationbox id="global-notificationbox" insertafter="developer-toolbar"/>
   </vbox>
   <stringbundleset id="stringbundleset">
-      <stringbundle id="cmtracking_bundle_browser" src="chrome://cmtracking/locale/browser.properties"/>
+    <stringbundle id="cmtracking_bundle" src="chrome://cmtracking/locale/cmtracking.properties"/>
   </stringbundleset>
 </overlay>
