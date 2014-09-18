@@ -20,7 +20,6 @@ const INFINITE = 0xffffffff;
 const INVALID_HANDLE_VALUE = HANDLE(OS.Constants.Win.INVALID_HANDLE_VALUE);
 const MAX_PATH = OS.Constants.Win.MAX_PATH;
 const PROCESS_QUERY_INFORMATION = 0x0400;
-const PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 const STILL_ACTIVE = ctypes.UInt64(259);
 const SYNCHRONIZE = 0x00100000;
 const TH32CS_SNAPPROCESS = 0x00000002;
@@ -51,8 +50,6 @@ const Process32First = kernel32.declare("Process32FirstW",
   WinABI, BOOL, HANDLE, LPPROCESSENTRY32);
 const Process32Next = kernel32.declare("Process32NextW",
   WinABI, BOOL, HANDLE, LPPROCESSENTRY32);
-const QueryFullProcessImageName = kernel32.declare("QueryFullProcessImageNameW",
-  WinABI, BOOL, HANDLE, DWORD, LPTSTR, PDWORD);
 const OpenProcess = kernel32.declare("OpenProcess",
   WinABI, HANDLE, DWORD, BOOL, DWORD);
 const CloseHandle = kernel32.declare("CloseHandle",
@@ -136,9 +133,7 @@ let getExitCodeForFile = function (aExeName) {
     return false;
   }
 
-  let access = PROCESS_QUERY_INFORMATION |
-               PROCESS_QUERY_LIMITED_INFORMATION |
-               SYNCHRONIZE;
+  let access = PROCESS_QUERY_INFORMATION | SYNCHRONIZE;
   let handleProcess = OpenProcess(access, false, pid);
   if (handleProcess.isNull()) {
     reportError("OpenProcess", ctypes.winLastError);
