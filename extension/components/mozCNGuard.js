@@ -21,6 +21,76 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
+let safeBrowsingHack = {
+  _shouldCancel: false,
+  _skipSBData: null,
+
+  get prefs() {
+    let prefix = "urlclassifier.gethash.";
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch(prefix);
+  },
+
+  init: function() {
+    /**
+     * The pref urlclassifier.gethash.timeout_ms was introduced in
+     * https://bugzil.la/1024555, as part of the cancel gethash on timeout
+     * feature in vanilla Fx.
+     */
+    if (this.prefs.getPrefType("timeout_ms") == Services.prefs.PREF_INVALID) {
+      this.shouldCancel = true;
+    } else {
+      this.prefs.setIntPref("timeout_ms", 10e3);
+    }
+  },
+
+  onHttpRequest: function(aSubject) {
+    let channel = aSubject;
+    channel.QueryInterface(Ci.nsIHttpChannel);
+    let uri = channel.originalURI;
+
+    if (uri.asciiSpec == SafeBrowsing.gethashURL) {
+      this.maybeCancelGetHashOnTimeout(channel);
+    } else {
+      this.skipFalsePositiveSB(channel, uri);
+    }
+  },
+
+  maybeCancelGetHashOnTimeout: function (aChannel) {
+    if (!this._shouldCancel) {
+      return;
+    }
+
+    setTimeout(function() {
+      if (aChannel && aChannel.isPending()) {
+        aChannel.cancel(Cr.NS_ERROR_ABORT);
+        CETracking.track("sb-gethash-abort");
+      }
+    }, 10e3);
+    CETracking.track("sb-gethash-found");
+  },
+
+  skipFalsePositiveSB: function (aChannel, aURI) {
+    if (!(aChannel.loadFlags & Ci.nsIChannel.LOAD_CLASSIFY_URI)) {
+      return;
+    }
+
+    if (!this._skipSBData) {
+      this._skipSBData = SkipSBData.read();
+    }
+
+    if ((this._skipSBData.urls &&
+         this._skipSBData.urls[aURI.asciiSpec]) ||
+        (this._skipSBData.baseDomains &&
+         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(aURI)])) {
+      aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
+      CETracking.track("sb-skip-classify");
+    } else {
+      CETracking.track("sb-will-classify");
+    }
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -39,6 +109,7 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
+        safeBrowsingHack.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
@@ -48,15 +119,8 @@ mozCNGuard.prototype = {
         this.trackRogueStartup(aTopic);
         break;
       case "http-on-modify-request":
-        let channel = aSubject;
-        channel.QueryInterface(Ci.nsIHttpChannel);
-        let uri = channel.originalURI;
-
-        if (uri.asciiSpec == SafeBrowsing.gethashURL) {
-          this.cancelGetHashOnTimeout(channel);
-        } else {
-          this.skipFalsePositiveSB(channel, uri);
-        }
+        safeBrowsingHack.onHttpRequest(aSubject);
+        break;
       case "http-on-examine-response":
       case "http-on-examine-cached-response":
       case "http-on-examine-merged-response":
@@ -226,38 +290,6 @@ mozCNGuard.prototype = {
         }
       }
     });
-  },
-
-  cancelGetHashOnTimeout: function MCG_cancelGetHashOnTimeout(aChannel) {
-    setTimeout(function() {
-      if (aChannel && aChannel.isPending()) {
-        aChannel.cancel(Cr.NS_ERROR_ABORT);
-        CETracking.track("sb-gethash-abort");
-      }
-    }, 10e3);
-    CETracking.track("sb-gethash-found");
-  },
-
-  _skipSBData: null,
-
-  skipFalsePositiveSB: function MCG_skipFalsePositiveSB(aChannel, aURI) {
-    if (!(aChannel.loadFlags & Ci.nsIChannel.LOAD_CLASSIFY_URI)) {
-      return;
-    }
-
-    if (!this._skipSBData) {
-      this._skipSBData = SkipSBData.read();
-    }
-
-    if ((this._skipSBData.urls &&
-         this._skipSBData.urls[aURI.asciiSpec]) ||
-        (this._skipSBData.baseDomains &&
-         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(aURI)])) {
-      aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
-      CETracking.track("sb-skip-classify");
-    } else {
-      CETracking.track("sb-will-classify");
-    }
   },
 
   dropRogueRedirect: function MCG_dropRogueRedirect(aSubject) {
