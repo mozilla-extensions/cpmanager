@@ -38,7 +38,7 @@ let safeBrowsingHack = {
      * feature in vanilla Fx.
      */
     if (this.prefs.getPrefType("timeout_ms") == Services.prefs.PREF_INVALID) {
-      this.shouldCancel = true;
+      this._shouldCancel = true;
     } else {
       this.prefs.setIntPref("timeout_ms", 10e3);
     }
