@@ -29,11 +29,10 @@ const workerURL = "resource://cmtracking/getExitCode.js";
 const exeName = "helper.exe";
 const helpURI = Services.io.newURI(
   "http://firefox.com.cn/help/default-browser/", null, null);
+const osVer = Services.sysinfo.getProperty("version");
 const log = function(aMsg) Services.console.logStringMessage(aMsg);
 
-let extra = Services.sysinfo.getProperty("version");
-
-let maybeOpenHelp = function() {
+let maybeOpenHelp = function(aExtra) {
   let p = Services.prompt;
 
   let properties = "chrome://cmtracking/locale/cmtracking.properties";
@@ -49,7 +48,7 @@ let maybeOpenHelp = function() {
       w.switchToTabHavingURI(helpURI, true);
     }
 
-    CETracking.track("sdb-openhelp-" + extra);
+    CETracking.track("sdb-openhelp-" + aExtra);
   }
 };
 
@@ -65,8 +64,7 @@ let modShellSvc = Object.create(origShellSvc, {
           origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
 
           try {
-            extra += "-";
-            extra += aIsVisited ? "a" : "b";
+            let extra = osVer + "-" + (aIsVisited ? "a" : "b");
 
             CETracking.track("sdb-attempt-" + extra);
 
@@ -89,7 +87,7 @@ let modShellSvc = Object.create(origShellSvc, {
                   } else {
                     CETracking.track("sdb-failure-" + extra);
 
-                    maybeOpenHelp();
+                    maybeOpenHelp(extra);
                   }
                   break;
               }
