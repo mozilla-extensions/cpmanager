@@ -27,8 +27,8 @@ try {
 } catch(e) {};
 const workerURL = "resource://cmtracking/getExitCode.js";
 const exeName = "helper.exe";
-const helpSpec = "http://firefox.com.cn/help/default-browser/";
-const helpURI = Services.io.newURI(helpSpec, null, null);
+const helpURI = Services.io.newURI(
+  "http://firefox.com.cn/help/default-browser/", null, null);
 const log = function(aMsg) Services.console.logStringMessage(aMsg);
 
 let extra = Services.sysinfo.getProperty("version");
