@@ -9,6 +9,8 @@ const Cr = Components.results;
 const Cu = Components.utils;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
+  "resource://gre/modules/PlacesUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "RecentWindow",
   "resource:///modules/RecentWindow.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
@@ -25,8 +27,11 @@ try {
 } catch(e) {};
 const workerURL = "resource://cmtracking/getExitCode.js";
 const exeName = "helper.exe";
-const osVer = Services.sysinfo.getProperty("version");
+const helpSpec = "http://firefox.com.cn/help/default-browser/";
+const helpURI = Services.io.newURI(helpSpec, null, null);
 const log = function(aMsg) Services.console.logStringMessage(aMsg);
+
+let extra = Services.sysinfo.getProperty("version");
 
 let maybeOpenHelp = function() {
   let p = Services.prompt;
@@ -41,12 +46,10 @@ let maybeOpenHelp = function() {
         null, {}) === 0) {
     let w = RecentWindow.getMostRecentBrowserWindow();
     if (w && w.switchToTabHavingURI) {
-      let spec = "http://firefox.com.cn/help/default-browser/";
-      let uri = Services.io.newURI(spec, null, null);
-      w.switchToTabHavingURI(uri, true);
+      w.switchToTabHavingURI(helpURI, true);
     }
 
-    CETracking.track("sdb-openhelp-" + osVer);
+    CETracking.track("sdb-openhelp-" + extra);
   }
 };
 
@@ -56,41 +59,52 @@ let modShellSvc = Object.create(origShellSvc, {
     enumerable: true,
     writable: false,
     value: function(aClaimAllTypes, aForAllUsers) {
-      let ret = origShellSvc.setDefaultBrowser.apply(origShellSvc,
-        [].slice.call(arguments));
-
+      let args = [].slice.call(arguments);
       try {
-        CETracking.track("sdb-attempt-" + osVer);
+        PlacesUtils.asyncHistory.isURIVisited(helpURI, function(a, aIsVisited) {
+          origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
 
-        let worker = new ChromeWorker(workerURL);
-        worker.onmessage = function(aEvt) {
-          if (!aEvt.data) {
-            return;
-          }
-          let data = aEvt.data;
+          try {
+            extra += "-";
+            extra += aIsVisited ? "a" : "b";
 
-          switch (aEvt.data.type) {
-            case "error":
-              log(aEvt.data.message + " (" + aEvt.data.code + ")");
-              break;
-            case "exitcode":
-              log(aEvt.data.exeName + " exited with " + aEvt.data.code);
+            CETracking.track("sdb-attempt-" + extra);
 
-              if (origShellSvc.isDefaultBrowser(false, aClaimAllTypes)) {
-                CETracking.track("sdb-success-" + osVer);
-              } else {
-                CETracking.track("sdb-failure-" + osVer);
-
-                maybeOpenHelp();
+            let worker = new ChromeWorker(workerURL);
+            worker.onmessage = function(aEvt) {
+              if (!aEvt.data) {
+                return;
               }
-              break;
-          }
-        };
-        worker.postMessage({
-          exeName: exeName
+              let data = aEvt.data;
+
+              switch (aEvt.data.type) {
+                case "error":
+                  log(aEvt.data.message + " (" + aEvt.data.code + ")");
+                  break;
+                case "exitcode":
+                  log(aEvt.data.exeName + " exited with " + aEvt.data.code);
+
+                  if (origShellSvc.isDefaultBrowser(false, aClaimAllTypes)) {
+                    CETracking.track("sdb-success-" + extra);
+                  } else {
+                    CETracking.track("sdb-failure-" + extra);
+
+                    maybeOpenHelp();
+                  }
+                  break;
+              }
+            };
+            worker.postMessage({
+              exeName: exeName
+            });
+
+            // clear the visits to helpURI
+            PlacesUtils.history.removePage(helpURI);
+          } catch(e) {};
         });
-      } catch(e) {};
-      return ret;
+      } catch(e) {
+        origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
+      }
     }
   }
 });

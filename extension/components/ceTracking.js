@@ -403,8 +403,19 @@ function sendUsageData(data) {
       str += "&sociallogin=" + getPrefBool("social.haslogin", "null");
       str += "&socialsidebar=" + (getPrefBool("social.enabled", false) && getPrefBool("social.sidebar.open", false));
     }
-  } catch (e) {
-  }
+  } catch (e) {};
+
+  try {
+    /**
+     * detect if Fx was set/locked as default with 3rd party software.
+     * check against sdb-openhelp-*, not the {after,before} suffix.
+     */
+    let match = /\&sdb-attempt-([\d.]+)-[ab]=/.exec(str);
+    if (match) {
+      str += ("&sdb-quit-" + match[1] + "=" + isDefaultBrowser());
+    }
+  } catch(e) {};
+
   if (str == '') {
     return;
   }
