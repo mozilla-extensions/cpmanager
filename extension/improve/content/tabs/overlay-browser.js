@@ -82,8 +82,24 @@ var undoclose = {
       case "unload":
         this.uninit();
         break;
-      case "TabClose":
-        this.animate(aEvent.originalTarget);
+      case "TabClose": {
+        /**
+         * TabClose is not cancelable. Hopefully message arrives before tab is closed.
+         * If not, animation won't be shown.
+         */
+        let tab = aEvent.originalTarget;
+        let browser = gBrowser.getBrowserForTab(tab);
+        let browserMM = browser.messageManager;
+        let message = 'cpmanager@mozillaonline.com:snapshot';
+        if (tab == gBrowser.selectedTab) {
+          browserMM.addMessageListener(message, function handleMessage(aMsg) {
+            undoclose.animate(tab, aMsg.data);
+            browserMM.removeMessageListener(message, handleMessage);
+          });
+          browserMM.loadFrameScript('chrome://cmimprove/content/tabs/animationFrameScript.js', false);
+        }
+        break;
+      }
       case "TabOpen":
       case "aftercustomization":
         this.toggleRecentlyClosedTabs();
@@ -473,19 +489,19 @@ var undoclose = {
     };
   },
   animateCount: 0,
-  animate: function UC_animate(aTab) {
+  animate: function UC_animate(aTab, aCanvasData) {
     try {
       if (!Services.prefs.getBoolPref("extensions.cmimprove.features.undocloseanimation.enable", true)) {
         return;
       }
     } catch(e) {}
-    var button = CustomizableUI.getWidget("ce-undo-close-toolbar-button").forWindow(window).anchor;
-    if (!button)
-      return;
-    if (aTab != window.gBrowser.selectedTab)
-      return;
-    var panel = $("browser-panel");
 
+    var button = CustomizableUI.getWidget("ce-undo-close-toolbar-button").forWindow(window).anchor;
+    if (!button) {
+      return;
+    }
+
+    var panel = $("browser-panel");
     var linkedBrowser = window.gBrowser.selectedTab.linkedBrowser
     var top1 = linkedBrowser.boxObject.screenY - panel.boxObject.screenY + panel.boxObject.y;
     var left1 = linkedBrowser.boxObject.screenX - panel.boxObject.screenX + panel.boxObject.x;
@@ -497,18 +513,20 @@ var undoclose = {
     var width2 = 0;
     var height2 = 0;
 
-    if (left2 == 0) //no animation when close about:addons
+    if (left2 == 0)  { //no animation when close about:addons
       return;
-    if (this.animateCount++ > 0)
+    }
+    if (this.animateCount++ > 0) {
       return;
-    var win = linkedBrowser.contentWindow.content;
+    }
+    // var win = linkedBrowser.contentWindow.content;
     var canvas = $("ce-animation-canvas");
-    canvas.width = width1;
-    canvas.height = height1;
-    let ctx = canvas.getContext("2d");
-    ctx.drawWindow(win, win.scrollX, win.scrollY, width1, height1, "rgba(255,255,255,0.5)");
-    var ac = this.iQ(canvas);
+    canvas.width = aCanvasData.width;
+    canvas.height = aCanvasData.height;
+    var ctx = canvas.getContext("2d");
+    ctx.putImageData(aCanvasData, 0, 0);
 
+    var ac = this.iQ(canvas);
     ac.show();
     ac.css({
       top: top1,
