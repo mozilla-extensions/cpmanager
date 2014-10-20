@@ -333,9 +333,23 @@ mozCNGuard.prototype = {
 
     let self = this;
     if (argumentsZero instanceof Ci.nsISupportsArray) {
+      let len = argumentsZero.Count(), externalURLs = [];
+      for (let i = 0; i < len; i++) {
+        let urisstring = argumentsZero.GetElementAt(i)
+                                      .QueryInterface(Ci.nsISupportsString);
+        let uri = Services.io.newURI(urisstring.data, null, null);
+        externalURLs.push(uri.asciiSpec);
+      }
+
       this.browserHandler.startPage.split("|").forEach(function(aPage, aIndex) {
         let uri = Services.io.newURI(aPage, null, null);
         let title;
+
+        // Don't open if already in commandline argument.
+        let page = {'about:cehome': 'http://i.firefoxchina.cn/'}[uri.asciiSpec] || uri.asciiSpec;
+        if (externalURLs.indexOf(page) >= 0) {
+          return;
+        }
 
         if (self.isCEHome(aPage)) {
           aPage = uri.asciiSpec + "?from=extra_start";
