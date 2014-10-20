@@ -49,14 +49,9 @@ CPCommandLineValidator.prototype = {
     "-url"
   ],
 
-  get _hostsToMatch() {
-    delete this._hostsToMatch;
-    return this._hostsToMatch = Object.keys(this._querysToDrop);
-  },
-
-  get _querysToDrop() {
-    delete this._querysToDrop;
-    return this._querysToDrop = CCLVData.read();
+  get _patterns() {
+    delete this._patterns;
+    return this._patterns = CCLVData.read().map((aItem) => new RegExp(aItem, "i"));
   },
 
   _shouldDrop: function(aCmdLine, aArgument, aFlag) {
@@ -66,41 +61,12 @@ CPCommandLineValidator.prototype = {
       return false;
     }
 
-    if (!/^https?$/.test(aArgument.scheme)) {
-      return false;
-    }
-
-    var dropIfHostMatched = !aFlag;
-    var queryMatched = false;
-
-    var self = this;
-    var hostMatched = this._hostsToMatch.some(function(aHostToMatch) {
-      if (aArgument.asciiHost != aHostToMatch) {
-        return false;
-      }
-
-      /**
-       * include "" in querysToDrop explicitly to allow match w/o query string,
-       * it will be conveniently ignored by outdated versions of cpmanager.
-       */
-      var querysToDrop = self._querysToDrop[aHostToMatch];
-      queryMatched = querysToDrop.some(function(aQueryToDrop) {
-        return aArgument.query == aQueryToDrop;
-      })
-      return aArgument.query || queryMatched;
-    });
+    var strToMatch = [aFlag, aArgument.spec].join(' ').trim();
+    var matched = this._patterns.some((aPattern) => aPattern.test(strToMatch));
 
     logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
 
-    if (!hostMatched) {
-      return false;
-    }
-
-    if (dropIfHostMatched) {
-      return true;
-    }
-
-    return aArgument.query && queryMatched;
+    return matched;
   },
 
   /* nsICommandLineValidator */

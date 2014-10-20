@@ -37,10 +37,10 @@ let CCLVData = {
     return this.key = key;
   },
 
-  updateUrl: "http://cclv.firefoxchina.cn/cclv/v1/hosts.json",
+  updateUrl: "http://cclv.firefoxchina.cn/cclv/v2/patterns.json",
 
   get _bundleData() {
-    let uri = Services.io.newURI("resource://cpmanager-clv/cclvhosts.json",
+    let uri = Services.io.newURI("resource://cpmanager-clv/cclvpatterns.json",
       null, null);
     delete this._bundleData;
     return this._bundleData = uri.QueryInterface(Ci.nsIFileURL).file;
@@ -49,7 +49,7 @@ let CCLVData = {
   get _latestData() {
     delete this._latestData;
     return this._latestData = FileUtils.
-      getFile("ProfLD", ["cclv", "hosts.json"], false);
+      getFile("ProfLD", ["cclv", "patterns.json"], false);
   },
 
   _fetch: function(aUrl, aCallback) {
