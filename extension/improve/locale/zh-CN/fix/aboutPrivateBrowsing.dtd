@@ -1,0 +1,23 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!ENTITY aboutPrivateBrowsing.title            "您正处于隐私浏览">
+<!ENTITY aboutPrivateBrowsing.title.normal     "打开一个隐私浏览窗口？">
+
+<!ENTITY aboutPrivateBrowsing.subtitle         "&brandShortName; 将不对此窗口记录任何历史记录。">
+<!ENTITY aboutPrivateBrowsing.subtitle.normal  "&brandShortName; 不会对隐私窗口保存任何历史记录。">
+
+<!ENTITY aboutPrivateBrowsing.description      "这包括浏览历史、搜索历史、下载历史、网络表单历史、Cookie，以及临时性互联网文件。不过，您下载的文件与添加的书签将会保留。">
+
+<!ENTITY aboutPrivateBrowsing.notPrivate       "您当前未处于一个隐私浏览窗口。">
+
+<!ENTITY aboutPrivateBrowsing.moreInfo         "尽管本机将不会记录您的浏览历史，但您的雇主或者互联网服务提供商还是可能追溯您访问过的页面。">
+<!ENTITY aboutPrivateBrowsing.learnMore        "详细了解。">
+
+<!ENTITY privatebrowsingpage.openPrivateWindow.label "打开隐私浏览窗口">
+<!ENTITY privatebrowsingpage.openPrivateWindow.accesskey "P">
+
+<!-- TO BE REMOVED POST-AUSTRALIS -->
+<!-- LOCALIZATION NOTE (privatebrowsingpage.howToStart3): please leave &basePBMenu.label; intact in the translation -->
+<!ENTITY privatebrowsingpage.howToStart3               "要开始隐私浏览，您也可以选择 &basePBMenu.label; &gt; &newPrivateWindow.label;。">
