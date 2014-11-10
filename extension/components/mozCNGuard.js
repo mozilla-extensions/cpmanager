@@ -113,6 +113,69 @@ let safeBrowsingHack = {
   }
 }
 
+let userJSDetection = {
+  get sandbox() {
+    let nullprincipal = Cc["@mozilla.org/nullprincipal;1"].
+      createInstance(Ci.nsIPrincipal);
+
+    let sandbox = Cu.Sandbox(nullprincipal);
+    sandbox.user_pref = this.userPref.bind(this);
+
+    delete this.sandbox;
+    return this.sandbox = sandbox;
+  },
+
+  detect: function() {
+    let userJS = Services.dirsvc.get("ProfD", Ci.nsIFile);
+    userJS.append("user.js");
+    if (!userJS.exists()) {
+      return;
+    }
+
+    let userJSURI = Services.io.newFileURI(userJS);
+    Services.scriptloader.loadSubScriptWithOptions(userJSURI.spec, {
+      charset: "UTF-8",
+      ignoreCache: true,
+      target: this.sandbox
+    });
+  },
+
+  isCEHome: function(aURL) {
+    let spec = aURL;
+    try {
+      spec = Services.io.newURI(spec, null, null).asciiSpec;
+    } catch(e) {
+      try {
+        spec = Services.uriFixup.getFixupURIInfo(spec,
+          Ci.nsIURIFixup.FIXUP_FLAG_NONE).preferredURI.asciiSpec;
+      } catch(e) {};
+    }
+
+    return [
+      /^about:cehome$/,
+      /^http:\/\/i\.firefoxchina\.cn\/?$/
+    ].some((aExpectedSpec) => {
+      return aExpectedSpec.test(spec);
+    });
+  },
+
+  userPref: function(key, val) {
+    switch (key) {
+      case "browser.startup.homepage":
+        CETracking.track("userjs-homepage-exists");
+
+        if (val.split("|").some(this.isCEHome)) {
+          break;
+        };
+
+        CETracking.track("userjs-homepage-other");
+        break;
+      default:
+        break;
+    }
+  }
+};
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -133,6 +196,7 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
         l10nFix.init();
         safeBrowsingHack.init();
+        userJSDetection.detect();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
