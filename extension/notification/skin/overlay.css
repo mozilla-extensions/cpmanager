@@ -5,20 +5,12 @@
   height: 3em;
 }
 
-#lms-notification-icon {
-  list-style-image: url("chrome://livemargins/skin/appcenter-16.png");
-}
-#plugin_updates-notification-icon {
-  list-style-image: url("chrome://browser/skin/pluginInstall-16.png");
-}
 #texts-notification-icon {
   list-style-image: url("chrome://global/skin/icons/information-16.png");
 }
 #socialapis-notification-icon {
   list-style-image: url("chrome://cmnotification/skin/socialapi.png");
 }
-#notification-popup-box[anchorid="lms-notification-icon"] > #lms-notification-icon,
-#notification-popup-box[anchorid="plugin_updates-notification-icon"] > #lms-notification-icon,
 #notification-popup-box[anchorid="texts-notification-icon"] > #texts-notification-icon,
 #notification-popup-box[anchorid="socialapis-notification-icon"] > #socialapis-notification-icon {
   display: -moz-box;
@@ -32,13 +24,7 @@
   list-style-image: url("chrome://cmnotification/skin/discover64.png");
 }
 
-.popup-notification-icon[popupid="addon-notification-lm"] {
-  list-style-image: url("chrome://livemargins/skin/appcenter-32.png");
-  width: 32px;
-  height: 32px;
-}
-
-.popup-notification-icon[popupid="addon-notification-plugin_update"] {
+.popup-notification-icon[popupid="addon-notification-plugin"] {
   list-style-image: url("chrome://browser/skin/pluginInstall-64.png");
 }
 
@@ -51,8 +37,7 @@
 }
 
 #addon-notification-addon-notification,
-#addon-notification-lm-notification,
-#addon-notification-plugin_update-notification,
+#addon-notification-plugin-notification,
 #addon-notification-text-notification,
 #addon-notification-socialapi-notification,
 #addon-notification-popup > popupnotification {
@@ -60,8 +45,7 @@
 }
 
 #addon-notification-addon-notification .popup-notification-label,
-#addon-notification-lm-notification .popup-notification-label,
-#addon-notification-plugin_update-notification .popup-notification-label,
+#addon-notification-plugin-notification .popup-notification-label,
 #addon-notification-text-notification .popup-notification-label,
 #addon-notification-socialapi-notification .popup-notification-label,
 #addon-notification-popup .popup-notification-label {
@@ -70,8 +54,7 @@
 }
 
 #addon-notification-addon-notification a,
-#addon-notification-lm-notification a,
-#addon-notification-plugin_update-notification a,
+#addon-notification-plugin-notification a,
 #addon-notification-text-notification a,
 #addon-notification-socialapi-notification a,
 #addon-notification-popup a {
@@ -81,8 +64,7 @@
 }
 
 #addon-notification-addon-notification .text-link-gray,
-#addon-notification-lm-notification .text-link-gray,
-#addon-notification-plugin_update-notification .text-link-gray,
+#addon-notification-plugin-notification .text-link-gray,
 #addon-notification-text-notification .text-link-gray,
 #addon-notification-socialapi-notification .text-link-gray,
 #addon-notification-popup .text-link-gray {
@@ -90,8 +72,7 @@
 }
 
 #addon-notification-addon-notification .text-link-gray:hover,
-#addon-notification-lm-notification .text-link-gray:hover,
-#addon-notification-plugin_update-notification .text-link-gray:hover,
+#addon-notification-plugin-notification .text-link-gray:hover,
 #addon-notification-text-notification .text-link-gray:hover,
 #addon-notification-socialapi-notification .text-link-gray:hover,
 #addon-notification-popup .text-link-gray:hover {
@@ -99,8 +80,7 @@
 }
 
 #addon-notification-addon-notification .popup-notification-button-container,
-#addon-notification-lm-notification .popup-notification-button-container,
-#addon-notification-plugin_update-notification .popup-notification-button-container,
+#addon-notification-plugin-notification .popup-notification-button-container,
 #addon-notification-text-notification .popup-notification-button-container,
 #addon-notification-socialapi-notification .popup-notification-button-container,
 #addon-notification-popup .popup-notification-button-container {

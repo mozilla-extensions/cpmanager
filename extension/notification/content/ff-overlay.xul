@@ -13,8 +13,6 @@
     <stringbundle id="addonnotification-strings" src="chrome://cmnotification/locale/overlay.properties"/>
   </stringbundleset>
  <box id="notification-popup-box">
-    <image id="lms-notification-icon" class="notification-anchor-icon" role="button"/>
-    <image id="plugin_updates-notification-icon" class="notification-anchor-icon" role="button"/>
     <image id="texts-notification-icon" class="notification-anchor-icon" role="button"/>
     <image id="socialapis-notification-icon" class="notification-anchor-icon" role="button"/>
  </box>

@@ -73,10 +73,6 @@
                             Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI(reminder.xpi_url, null, null),
                             [addonInstall])
                     }, "application/x-xpinstall", null, reminder.addon_name);
-                } else if (reminder.type == 'lm') {
-                    var jsm = {};
-                    Cu.import('resource://livemargins/appcenter.jsm', jsm);
-                    jsm.AppCenter.installAndOpenApp(reminder.app_uid);
                 } else if (reminder.type == 'text') {
                     gBrowser.selectedTab = gBrowser.addTab(reminder.learnmore_url);
                 } else if (reminder.type == 'socialapi') {
@@ -86,7 +82,7 @@
                     let provider = Social.activateFromOrigin(providerOrigin, socialActiveNotification(oldOrigin));
 
                     socialActiveNotification(oldOrigini)(provider);
-                } else if (reminder.type == 'plugin_update') {
+                } else if (reminder.type.startsWith('plugin_')) {
                     var privacyContext = null;
                     var windowPrivate = false;
                     if (PrivateBrowsingUtils && PrivateBrowsingUtils.isWindowPrivate && PrivateBrowsingUtils.privacyContextFromWindow) {
@@ -143,50 +139,6 @@
                                 }).then(null, Cu.reportError);
                             }).then(null, Cu.reportError);
                         }).then(null, Cu.reportError);
-                    } else {
-                        var source = Services.io.newURI(reminder.plugin_url, null, null);
-                        var target = Services.dirsvc.get("TmpD", Ci.nsIFile);
-                        target.append("PluginInstaller-" + Date.now() + ".exe")
-                        target = Services.io.newFileURI(target).QueryInterface(Ci.nsIFileURL);
-
-                        var persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].
-                                        createInstance(Ci.nsIWebBrowserPersist);
-                        persist.persistFlags = Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES
-                                             | Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
-
-                        var downloadManager = Cc['@mozilla.org/download-manager;1'].getService(Ci.nsIDownloadManager);
-                        var download = downloadManager.addDownload(Ci.nsIDownload.DOWNLOAD_TYPE_DOWNLOAD,
-                            source, target, '', null, null, null, persist, windowPrivate);
-                        var downloadProgressListener = {
-                            completed: [
-                                Ci.nsIDownloadManager.DOWNLOAD_FINISHED,
-                                Ci.nsIDownloadManager.DOWNLOAD_FAILED,
-                                Ci.nsIDownloadManager.DOWNLOAD_CANCELED,
-                                Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_PARENTAL,
-                                Ci.nsIDownloadManager.DOWNLOAD_DIRTY,
-                                Ci.nsIDownloadManager.DOWNLOAD_BLOCKED_POLICY
-                            ],
-                            onDownloadStateChange: function(a, aDownload) {
-                                if (aDownload.source.spec == source.spec && aDownload.targetFile.path == target.file.path &&
-                                    downloadProgressListener.completed.indexOf(aDownload.state) > -1) {
-                                    downloadManager.removeListener(downloadProgressListener);
-                                    if (aDownload.state == Ci.nsIDownloadManager.DOWNLOAD_FINISHED) {
-                                        target.file.launch();
-                                    }
-                                    MOA.AN.Tracker.track({
-                                        rid: MOA.AN.RuleCenter.getRID(reminder),
-                                        type: reminder.type,
-                                        extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
-                                        action: ('download_' + aDownload.state)
-                                    });
-                                    aDownload.remove();
-                                }
-                            }
-                        };
-                        downloadManager.addListener(downloadProgressListener);
-                        persist.progressListener = download;
-
-                        persist.saveURI(source, null, null, null, null, target, privacyContext);
                     }
                 }
                 _closeInstallNoti(tabId);
@@ -353,10 +305,11 @@
         }
         var message = [MOA.AN.Lib.getString(reminder.type + '.FCERec2U', [reminderName]),
                        reminder.desc].join(' ')
+        var type = reminder.type.split('_')[0];
         _notification = PopupNotifications.show(MOA.AN.Lib.getBrowserForTabId(tabId),
-            "addon-notification-" + reminder.type,
+            "addon-notification-" + type,
             message,
-            reminder.type + "s-notification-icon",
+            type + "s-notification-icon",
             mainAction,
             null,
             popupOption
@@ -377,12 +330,6 @@
             showingNotifications[notification.reminder_id] = 1;
 
         var curBrowser = MOA.AN.Lib.getBrowserForTabId(tabId);
-        if (reminder.type == 'plugin_pfs') {
-            var plugin = curBrowser.contentDocument.createElement('object');
-            plugin.type = reminder.mime_type;
-            gPluginHandler.pluginUnavailable(plugin, 'PluginNotFound');
-            return;
-        }
         _system_popup_countdown = new MOA.AN.Lib.CountDown({
             onCounting: function() {
                 if (!PopupNotifications.isPanelOpen) {
@@ -434,7 +381,7 @@
         var notification = tabNotiQueue[tabId];
         var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 
-        if (['addon', 'lm', 'plugin_pfs', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
+        if (['addon', 'plugin_install', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
             _show_install_notification(tabId);
         }
         MOA.AN.RuleCenter.notificationShown()
