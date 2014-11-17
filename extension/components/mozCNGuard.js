@@ -21,28 +21,6 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
-let l10nFix = {
-  init: function() {
-    if (Services.vc.compare(Services.appinfo.version, "34.0") < 0 ||
-        Services.vc.compare(Services.appinfo.version, "34.*") > 0) {
-      return;
-    }
-
-    let xcr = Cc["@mozilla.org/chrome/chrome-registry;1"].
-      getService(Ci.nsIXULChromeRegistry);
-    let locale = xcr.getSelectedLocale("browser");
-    if (locale !== "zh-CN") {
-      return;
-    }
-
-    let fix = "chrome://cmimprove/locale/fix/fix.manifest";
-    fix = Services.io.newURI(fix, null, null);
-    fix = xcr.convertChromeURL(fix).QueryInterface(Ci.nsIFileURL).file;
-    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
-      autoRegister(fix);
-  }
-};
-
 let safeBrowsingHack = {
   _shouldCancel: false,
   _skipSBData: null,
@@ -194,7 +172,6 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
-        l10nFix.init();
         safeBrowsingHack.init();
         userJSDetection.detect();
         break;

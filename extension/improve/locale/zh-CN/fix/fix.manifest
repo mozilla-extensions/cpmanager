@@ -1,3 +1,0 @@
-override chrome://browser/locale/aboutPrivateBrowsing.dtd chrome://cmimprove/locale/fix/aboutPrivateBrowsing.dtd
-override chrome://browser/locale/preferences/main.dtd     chrome://cmimprove/locale/fix/preferences/main.dtd
-override chrome://browser/locale/shellservice.properties  chrome://cmimprove/locale/fix/shellservice.properties
