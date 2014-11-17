@@ -1,4 +1,8 @@
 window.addEventListener("load", function() {
+  if (Services.blocklist.getPluginInfoURL) {
+    return;
+  }
+
   var pluginHandler = {
     handleEvent: function(event) {
       var eventType = event.type;
@@ -25,13 +29,6 @@ window.addEventListener("load", function() {
     } else {
       return Services.urlFormatter.formatURLPref("plugins.update.url");
     }
-  }
-  if (gPluginHandler && gPluginHandler.supportedPlugins) {
-    gPluginHandler.supportedPlugins.mimetypes["application/qvod-plugin"] = "qvod";
-    gPluginHandler.supportedPlugins.plugins["qvod"] = {
-      "displayName": "Qvod plugin",
-      "installWINNT": true,
-    };
   }
   if (gPluginHandler && gPluginHandler.openPluginUpdatePage) {
     var openPluginUpdatePage = gPluginHandler.openPluginUpdatePage;
