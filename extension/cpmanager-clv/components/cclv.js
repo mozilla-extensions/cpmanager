@@ -51,12 +51,12 @@ CPCommandLineValidator.prototype = {
 
   get _patterns() {
     delete this._patterns;
-    return this._patterns = CCLVData.read().map((aItem) => new RegExp(aItem, "i"));
+    return this._patterns = CCLVData.read().map((aItem) => new RegExp(aItem));
   },
 
   _shouldDrop: function(aCmdLine, aArgument, aFlag) {
     try {
-      aArgument = aCmdLine.resolveURI(aArgument).QueryInterface(Ci.nsIURL);
+      aArgument = this.resolveURIInternal(aCmdLine, aArgument);
     } catch(e) {
       return false;
     }
@@ -67,6 +67,34 @@ CPCommandLineValidator.prototype = {
     logAndTrack(aFlag ? (aFlag + " " + aArgument.spec) : aArgument.spec);
 
     return matched;
+  },
+
+  resolveURIInternal: function(aCmdLine, aArgument) {
+    var uri = aCmdLine.resolveURI(aArgument);
+    var urifixup = Cc["@mozilla.org/docshell/urifixup;1"]
+                             .getService(Ci.nsIURIFixup);
+
+    if (!(uri instanceof Ci.nsIFileURL)) {
+      return urifixup.createFixupURI(aArgument,
+                                     urifixup.FIXUP_FLAG_FIX_SCHEME_TYPOS);
+    }
+
+    try {
+      if (uri.file.exists())
+        return uri;
+    } catch (e) {
+      Cu.reportError(e);
+    }
+
+    // We have interpreted the argument as a relative file URI, but the file
+    // doesn't exist. Try URI fixup heuristics: see bug 290782.
+    try {
+      uri = urifixup.createFixupURI(aArgument, 0);
+    } catch (e) {
+      Cu.reportError(e);
+    }
+
+    return uri;
   },
 
   /* nsICommandLineValidator */
