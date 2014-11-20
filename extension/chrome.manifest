@@ -50,6 +50,7 @@ locale   cmimprove     zh-CN         improve/locale/zh-CN/
 skin     cmimprove     classic/1.0   improve/skin/
 skin     cmimprove-os  classic/1.0   improve/skin/
 skin     cmimprove-os  classic/1.0   improve/skin/mac/ os=Darwin
+skin     cmimprove-os  classic/1.0   improve/skin/mac/yosemite/ os=Darwin osversion>=10.10
 skin     cmimprove-os  classic/1.0   improve/skin/linux/ os=Linux
 
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
