@@ -11,7 +11,6 @@ pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
 pref("plugin.default.state", 2);
-pref("security.ssl.enable_ocsp_stapling", false);
 
 //plugin checker for flash
 pref("plugins.update.flash.WINNT.url","http://r.g-fox.cn/plugin/flash_WINNT");
