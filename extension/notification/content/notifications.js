@@ -129,10 +129,15 @@
                                         }
                                     }
                                 }).then(function(aState) {
+                                    var extra = '';
+                                    if (reminder.type == 'plugin_update') {
+                                        extra = [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|');
+                                    }
+
                                     MOA.AN.Tracker.track({
                                         rid: MOA.AN.RuleCenter.getRID(reminder),
                                         type: reminder.type,
-                                        extra: [reminder.plugin_name, navigator.plugins[reminder.plugin_name].version].join('|'),
+                                        extra: extra,
                                         action: ('download_' + aState)
                                     });
                                     aDownloadList.remove(aDownload);
