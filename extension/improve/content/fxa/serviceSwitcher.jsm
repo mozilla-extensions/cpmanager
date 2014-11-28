@@ -172,20 +172,27 @@ function resetFxaServices() {
 
 
 function onlySyncBookmark() {
-  [
-    { key: 'services.sync.engine.addons', value: false},
-    { key: 'services.sync.engineStatusChanged.addons', value: true },
-    { key: 'services.sync.engine.history', value: false},
-    { key: 'services.sync.engineStatusChanged.history', value: true },
-    { key: 'services.sync.engine.passwords', value: false},
-    { key: 'services.sync.engineStatusChanged.passwords', value: true },
-    { key: 'services.sync.engine.prefs', value: false},
-    { key: 'services.sync.engineStatusChanged.prefs', value: true },
-    { key: 'services.sync.engine.tabs', value: false},
-    { key: 'services.sync.engineStatusChanged.tabs', value: true },
-    { key: 'services.sync.engineStatusChanged.prefs.modified', value: true }
-  ].forEach(aKeyValue => {
-    Services.prefs.setBoolPref(aKeyValue.key, aKeyValue.value);
+  let toDecline = ['addons', 'history', 'passwords', 'prefs', 'tabs'];
+
+  toDecline.forEach(aKey => {
+    Services.prefs.setBoolPref('services.sync.engine.' + aKey, false);
+  });
+  toDecline = toDecline.join(',');
+  Services.prefs.setCharPref('services.sync.declinedEngines', toDecline);
+}
+
+function repairOnlySyncBookmark() {
+  getUsageType().then(aType => {
+    if (aType !== UT_NO_SYNC_USED) {
+      return;
+    }
+
+    let prefix = "services.sync.engineStatusChanged.";
+    Services.prefs.getChildList(prefix).forEach(aKey => {
+      Services.prefs.clearUserPref(aKey);
+    });
+
+    onlySyncBookmark();
   });
 }
 
@@ -255,6 +262,7 @@ function init() {
 
   if (alreadyChecked()) {
     startPrefWatchDog();
+    repairOnlySyncBookmark();
     done();
     return;
   }
