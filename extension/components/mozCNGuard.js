@@ -16,6 +16,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
   "resource://gre/modules/SafeBrowsing.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "OS",
+  "resource://gre/modules/osfile.jsm");
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -151,6 +153,24 @@ let userJSDetection = {
       default:
         break;
     }
+  },
+
+  removeHomepage: function() {
+    let path = OS.Path.join(OS.Constants.Path.profileDir, "user.js");
+    OS.File.exists(path).then(function(aExists) {
+      if (!aExists) return;
+      OS.File.stat(path).then(function(aInfo) {
+        if (!aInfo.size) return;
+        // From fx30 on encoding can be inlined as a parameter for OS.File.read
+        OS.File.read(path).then(function(aArray) {
+          let text = new TextDecoder().decode(aArray);
+          let content = text.replace(/^\s*user_pref\s*\(\s*("|')browser\.startup\.homepage\1.+\)\s*;\s*$/mg, "");
+          OS.File.writeAtomic(path, content, {
+            encoding: "utf-8"
+          });
+        });
+      });
+    });
   }
 };
 
@@ -174,6 +194,7 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
         safeBrowsingHack.init();
         userJSDetection.detect();
+        userJSDetection.removeHomepage();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
