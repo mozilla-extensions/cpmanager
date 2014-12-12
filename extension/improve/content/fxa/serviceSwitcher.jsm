@@ -117,10 +117,10 @@ function debug(msg) {
  * Get the account service usage type of current profile. One of the
  * const values with prefix UT_* is returned.
  */
-function getUsageType() {
+function getUsageType(aSkipSwitched) {
   let { promise, resolve } = Promise.defer()
 
-  if (localServiceEnabled()) {
+  if ((!aSkipSwitched) && localServiceEnabled()) {
     resolve(UT_CN_FXA_SWITCHED);
     return promise;
   }
@@ -182,7 +182,7 @@ function onlySyncBookmark() {
 }
 
 function repairOnlySyncBookmark() {
-  getUsageType().then(aType => {
+  getUsageType(true).then(aType => {
     if (aType !== UT_NO_SYNC_USED) {
       return;
     }
