@@ -10,6 +10,7 @@ pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
 
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
+pref("loop.fxa.enabled", false);
 pref("plugin.default.state", 2);
 pref("security.ssl.enable_ocsp_stapling", false);
 
