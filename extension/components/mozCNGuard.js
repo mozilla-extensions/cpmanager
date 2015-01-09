@@ -18,6 +18,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
+  "resource:///modules/CustomizableUI.jsm");
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -174,6 +176,45 @@ let userJSDetection = {
   }
 };
 
+let socialShareRemoval = {
+  id: "social-share-button",
+  prefKey: "extensions.cpmanager@mozillaonline.com.socialShareRemoved",
+
+  init: function() {
+    if (Services.vc.compare(Services.appinfo.version, "35.0") < 0) {
+      return;
+    }
+
+    let removed = false;
+    try {
+      removed = Services.prefs.getBoolPref(this.prefKey);
+    } catch(e) {};
+    if (removed) {
+      return;
+    }
+
+    CustomizableUI.addListener(this);
+  },
+  onAreaNodeRegistered: function(aArea) {
+    if (aArea !== CustomizableUI.AREA_NAVBAR) {
+      return;
+    }
+
+    Services.prefs.setBoolPref(this.prefKey, true);
+    CustomizableUI.removeListener(this);
+
+    let placementArea = CustomizableUI.getPlacementOfWidget(this.id);
+    if (!placementArea || placementArea.area !== CustomizableUI.AREA_NAVBAR) {
+      return;
+    }
+
+    if (!CustomizableUI.isWidgetRemovable(this.id)) {
+      return;
+    }
+    CustomizableUI.removeWidgetFromArea(this.id);
+  }
+};
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -195,6 +236,7 @@ mozCNGuard.prototype = {
         safeBrowsingHack.init();
         userJSDetection.detect();
         userJSDetection.removeHomepage();
+        socialShareRemoval.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
