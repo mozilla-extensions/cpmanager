@@ -451,7 +451,8 @@
     window.setTimeout(function() {
       Cu.import("resource://gre/modules/AddonManager.jsm");
       AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
-        if(addon && !addon.userDisabled && !addon.appDisabled) {
+        if (addon && !addon.userDisabled && !addon.appDisabled &&
+            Services.vc.compare(addon.version, '5.2') < 0) {
           appcenterEnabled = true;
         }
         registerDndHandler();
