@@ -22,7 +22,7 @@
       } catch (e) {
         features += ",modal";
       }
-      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", features, "safeflagpane").focus();
+      window.openDialog("chrome://cmsafeflag/content/options.xul", "cpmanagerOptions", features, "generalpane").focus();
     }
   </script>
   <stringbundleset id="stringbundleset">

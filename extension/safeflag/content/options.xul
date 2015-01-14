@@ -8,9 +8,8 @@
   title="&title;"
   id="cpmanagerOptions">
 
-  <prefpane id="safeflagpane"
-            label="&safeflagpane.label;"
-            image="chrome://cmsafeflag/skin/info-safe32.png"
-            src="chrome://cmsafeflag/content/safeflagpane.xul"/>
-
+  <prefpane id="generalpane"
+            label="&generalpane.label;"
+            image="chrome://cmsafeflag/skin/general.png"
+            src="chrome://cmsafeflag/content/generalpane.xul"/>
 </prefwindow>
