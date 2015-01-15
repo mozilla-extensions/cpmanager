@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE overlay SYSTEM "chrome://cmimprove/locale/hello-options.dtd">
+
+<overlay
+  id="improve-hello-options-overlay"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <preferences id="preferences">
+    <preference id="b-enableloopfxa" name="loop.fxa.enabled" type="bool"/>
+  </preferences>
+  <vbox id="checkboxes">
+    <checkbox id="c-enableloopfxa" preference="b-enableloopfxa" label="&c-enableloopfxa.label;"/>
+  </vbox>
+
+</overlay>

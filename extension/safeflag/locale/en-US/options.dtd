@@ -7,4 +7,3 @@
 
 <!ENTITY c-enableurl2qr.label "Enable QR Code">
 <!ENTITY c-enablegesture.label "Enable drag and drop handling">
-<!ENTITY c-enableloopfxa.label "Enable Firefox Accounts for Hello">
