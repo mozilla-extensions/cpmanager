@@ -155,7 +155,16 @@ InstallerObserver.prototype = {
                               .createInstance(Components.interfaces.nsIProcess);
       process.init(result);
       var self = this;
-      process.runAsync([], 0, {
+
+      var args = [];
+      Components.utils.import("resource://gre/modules/Services.jsm");
+      // Silent install the Adobe Flash Player on Windows.
+      if (this._plugin.name === "Adobe Flash Player" &&
+          Services.appinfo.OS === "WINNT") {
+        args.push('-install');
+      }
+
+      process.runAsync(args, args.length, {
         observe: function(subject, topic, data) {
           if (topic != "process-finished") {
             Components.utils.reportError("Failed to launch installer");

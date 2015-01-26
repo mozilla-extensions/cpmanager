@@ -35,6 +35,8 @@ style     chrome://browser/content/browser.xul               chrome://cmnotifica
 content  cmpfs                                  pfs/content/
 overlay  chrome://browser/content/browser.xul   chrome://cmpfs/content/overlay-browser.xul
 
+override chrome://mozapps/content/plugins/pluginInstallerService.js   chrome://cmpfs/content/plugins/pluginInstallerService.js
+
 locale   cmpfs  en-US        pfs/locale/en-US/
 locale   cmpfs  zh-CN        pfs/locale/zh-CN/
 
