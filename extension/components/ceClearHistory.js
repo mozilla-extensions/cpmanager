@@ -83,14 +83,14 @@ function clearHistory()
 //  catch (e) { }
 }
 
-function getClearRange (days) {
+function getClearRange(days) {
   var startDate = 0;
   var endDate = Date.now() * 1000;
   endDate -= days * 24 * 3600000000; // 1*60*60*1000000
   return [startDate, endDate];
 }
 
-let chFactoryClass = function() {
+function chFactoryClass() {
   this.wrappedJSObject = this;
 }
 
@@ -116,10 +116,4 @@ chFactoryClass.prototype = {
 
 }
 
-if (XPCOMUtils.generateNSGetFactory) {
-  const NSGetFactory = XPCOMUtils.generateNSGetFactory([chFactoryClass]);
-} else {
-  const NSGetModule = function (aCompMgr, aFileSpec) {
-    return XPCOMUtils.generateModule([chFactoryClass]);
-  }
-}
+const NSGetFactory = XPCOMUtils.generateNSGetFactory([chFactoryClass]);
