@@ -17,9 +17,19 @@ var safeflag = {
 
     url = Services.scriptSecurityManager.getNoAppCodebasePrincipal(Services.io.newURI(url, null, null));
     try {
-      _ucdbSvc.lookup(url, lookupCallback);
+      // since FF30, see <https://bugzil.la/985623>
+      _ucdbSvc.lookup(url, [
+        'goog-malware-shavar',
+        'googpub-malware-shavar',
+        'goog-phish-shavar',
+        'googpub-phish-shavar'
+      ].join(','), lookupCallback);
     } catch(e) {
-      lookupCallback('');
+      try {
+        _ucdbSvc.lookup(url, lookupCallback);
+      } catch(_e) {
+        lookupCallback('');
+      }
     }
   }
 };
