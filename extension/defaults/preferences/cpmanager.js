@@ -6,8 +6,6 @@ pref("xpinstall.whitelist.add.mozcn", "g-fox.cn,mozilla.com.cn,firefox.com.cn,mo
 
 pref("browser.uitour.whitelist.add.mozcn", "desktop.firefox.com.cn");
 
-pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
-
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
 pref("loop.fxa.enabled", false);
