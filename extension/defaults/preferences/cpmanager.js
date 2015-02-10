@@ -14,11 +14,6 @@ pref("loop.fxa.enabled", false);
 pref("plugin.default.state", 2);
 pref("security.ssl.enable_ocsp_stapling", false);
 
-//plugin checker for flash
-pref("plugins.update.flash.WINNT.url","http://r.g-fox.cn/plugin/flash_WINNT");
-pref("plugins.update.flash.Darwin.url","http://r.g-fox.cn/plugin/flash_Darwin");
-//pref("plugins.update.flash.Linux.url","http://r.g-fox.cn/plugin/flash_Linux");
-
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
 pref("extensions.cpmanager.tracking.enabled", true);

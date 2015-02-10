@@ -33,7 +33,7 @@ override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotifica
 style     chrome://browser/content/browser.xul               chrome://cmnotification/skin/overlay-win.css            os=WINNT
 
 content  cmpfs                                  pfs/content/
-overlay  chrome://browser/content/browser.xul   chrome://cmpfs/content/overlay-browser.xul
+overlay  chrome://browser/content/browser.xul   chrome://cmpfs/content/overlay-browser.xul  os=WINNT
 
 override chrome://mozapps/content/plugins/pluginInstallerService.js   chrome://cmpfs/content/plugins/pluginInstallerService.js
 

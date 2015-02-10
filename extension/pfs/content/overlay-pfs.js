@@ -186,7 +186,6 @@
 
   function init() {
     // Check if PFS is killed. We only bring PFS back for PFS-died Firefox.
-    // FIXME This might not work in FF 33, need to find out.
     if (gPluginHandler && gPluginHandler.supportedPlugins) {
       return;
     }

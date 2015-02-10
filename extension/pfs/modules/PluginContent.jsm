@@ -278,6 +278,10 @@ CMPluginContent.prototype = {
         }
         break;
       }
+      case "PluginVulnerableUpdatable":
+        this.addLinkClickCallback(this.getPluginUI(plugin, "checkForUpdatesLink"),
+          "installSinglePlugin", plugin);
+        break;
     }
   }
 };

@@ -1,91 +1,64 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 window.addEventListener("load", function() {
-  if (Services.blocklist.getPluginInfoURL) {
+  // Same as overlay-pfs.js, only do the hacking in PFS killed versions.
+  if (gPluginHandler && gPluginHandler.supportedPlugins) {
     return;
   }
 
-  var pluginHandler = {
-    handleEvent: function(event) {
-      var eventType = event.type;
-
-      if (eventType == "PluginBindingAttached") {
-        var plugin = event.target;
-        var doc = plugin.ownerDocument;
-
-        if (!(plugin instanceof Ci.nsIObjectLoadingContent))
-          return;
-        var overlay = doc.getAnonymousElementByAttribute(plugin, "anonid", "checkForUpdatesLink");
-        overlay.textContent = gNavigatorBundle.getString("pluginActivate.updateLabel");
+  window.setTimeout(() => {
+    if (gPluginHandler && gPluginHandler.openPluginUpdatePage) {
+      var openPluginUpdatePage = gPluginHandler.openPluginUpdatePage;
+      gPluginHandler.openPluginUpdatePage = function(aEvent) {
+        /* Do nothing here, we will open the PFS dialog.*/
       }
     }
-  };
 
-  gBrowser.addEventListener("PluginBindingAttached", pluginHandler, true, true);
-  function getFlashUpdateUrl() {
-    var os = Services.appinfo.OS;
-    if (os == "WINNT") {
-      return Services.urlFormatter.formatURLPref("plugins.update.flash.WINNT.url");
-    } else if (os == "Darwin") {
-      return Services.urlFormatter.formatURLPref("plugins.update.flash.Darwin.url");
-    } else {
-      return Services.urlFormatter.formatURLPref("plugins.update.url");
-    }
-  }
-  if (gPluginHandler && gPluginHandler.openPluginUpdatePage) {
-    var openPluginUpdatePage = gPluginHandler.openPluginUpdatePage;
-    gPluginHandler.openPluginUpdatePage = function(aEvent) {
-      try {
-        var node = aEvent.target;
-        if (node.tagName.toLowerCase() != "object" && node.tagName.toLowerCase() != "embed") {
-          node = document.getBindingParent(aEvent.target);
-        }
-        var info = gPluginHandler._getPluginInfo(node)
-        var type = info.mimetype;
-        var os = Services.appinfo.OS;
-        if (type == "application/x-shockwave-flash" && os == "WINNT") {
-          openUILinkIn(Services.urlFormatter.formatURLPref("plugins.update.flash.WINNT.url"), "current");
-        } else if (type == "application/x-shockwave-flash" && os == "Darwin") {
-          openURL(Services.urlFormatter.formatURLPref("plugins.update.flash.Darwin.url"));
-        } else {
-          openPluginUpdatePage(aEvent);
-        }
-      } catch (e) {
-        openPluginUpdatePage(aEvent);
-      }
-    }
-  }
-
-  if (gPluginHandler && gPluginHandler._clickToPlayNotificationEventCallback
-                     && gPluginHandler._showClickToPlayNotification) {
-    var _showClickToPlayNotification = gPluginHandler._showClickToPlayNotification.bind(gPluginHandler);
-    gPluginHandler._showClickToPlayNotification = (function(aBrowser, aPrimaryPlugin) {
-      _showClickToPlayNotification(aBrowser, aPrimaryPlugin);
-      var notification = PopupNotifications.getNotification("click-to-play-plugins", aBrowser);
-      if (!notification) {
-        return;
-      }
-      //show panel now
-      var panel = document.getElementById("click-to-play-plugins-notification");
-      if (panel) {
-        var cas = panel.notification.options.centerActions || [];
-        cas.forEach(function(ca) {
-          if (ca.mimetype == "application/x-shockwave-flash") {
-            var link = document.getAnonymousElementByAttribute(panel, "anonid", "click-to-play-plugins-notification-link");
-            link.href = getFlashUpdateUrl();
+    if (gPluginHandler && gPluginHandler.showClickToPlayNotification &&
+        gPluginHandler._clickToPlayNotificationEventCallback) {
+      var showClickToPlayNotification =
+        gPluginHandler.showClickToPlayNotification.bind(gPluginHandler);
+      gPluginHandler.showClickToPlayNotification =
+        function() {
+          showClickToPlayNotification.apply(null, arguments)
+          var browser = arguments[0];
+          var plugins = arguments[1];
+          var notification =
+            PopupNotifications.getNotification("click-to-play-plugins", browser);
+          if (!notification) {
+            return;
           }
-        });
-      }
-      //show panel later
-      notification.options.eventCallback = function(event) {
-        gPluginHandler._clickToPlayNotificationEventCallback.bind(this)(event);
-        if (event == "showing") {
-          var cas = this.options.centerActions || [];
-          cas.forEach(function(ca) {
-            if (ca.mimetype == "application/x-shockwave-flash") {
-              ca.detailsLink = getFlashUpdateUrl();
+          notification.options.eventCallback = function(event) {
+            gPluginHandler._clickToPlayNotificationEventCallback(event);
+            if (event == "shown") {
+              let notificationElement =
+                document.getElementById('click-to-play-plugins-notification');
+
+              if (!notificationElement) {
+                return;
+              }
+
+              notificationElement.addEventListener('click', function(aEvt) {
+                if (aEvt.originalTarget.getAttribute('anonid') ==
+                    "click-to-play-plugins-notification-link") {
+                  aEvt.preventDefault();
+                  aEvt.stopPropagation();
+
+                  var missingPlugins = new Map();
+                  plugins.forEach(aPlugin => {
+                    missingPlugins.set(aPlugin.mimetype, aPlugin);
+                  });
+                  openDialog("chrome://cmpfs/content/plugins/pluginInstallerWizard.xul",
+                             "PFSWindow", "chrome,centerscreen,resizable=yes",
+                             {plugins: missingPlugins, browser: browser});
+                }
+              }, true);
             }
-          });
-        }
-      };
-    }).bind(gPluginHandler)
-  }
+          };
+        };
+    }
+  }, 500);
 }, false);
+
