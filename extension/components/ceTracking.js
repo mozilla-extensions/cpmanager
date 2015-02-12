@@ -235,11 +235,11 @@ function getPluginVersion(name) {
   return "";
 }
 
-function isDefaultBrowser() {
+function isDefaultBrowser(aForAllTypes) {
   try {
     return Cc["@mozilla.org/browser/shell-service;1"]
              .getService(Components.interfaces.nsIShellService)
-             .isDefaultBrowser(false, true);
+             .isDefaultBrowser(false, aForAllTypes);
   } catch (e) {
     return null;
   }
@@ -307,7 +307,8 @@ function getADUData() {
   if (usageDataEnabled()) {
     adudata = adudata
             + "&ude=true"
-            + "&default=" + isDefaultBrowser()
+            + "&default=" + isDefaultBrowser(true)
+            + "&defaultHttp=" + isDefaultBrowser(false)
             + "&cehome=" + cpmanager_paramCEHome()
             + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
             + getMOExts()
@@ -412,7 +413,7 @@ function sendUsageData(data) {
      */
     let match = /\&sdb-attempt-([\d.]+)-[ab]=/.exec(str);
     if (match) {
-      str += ("&sdb-quit-" + match[1] + "=" + isDefaultBrowser());
+      str += ("&sdb-quit-" + match[1] + "=" + isDefaultBrowser(true));
     }
   } catch(e) {};
 

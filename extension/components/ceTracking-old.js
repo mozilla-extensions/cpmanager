@@ -209,11 +209,11 @@ function getPluginVersion(name) {
   return "";
 }
 
-function isDefaultBrowser() {
+function isDefaultBrowser(aForAllTypes) {
   try {
     return Cc["@mozilla.org/browser/shell-service;1"]
              .getService(Components.interfaces.nsIShellService)
-             .isDefaultBrowser(false, true);
+             .isDefaultBrowser(false, aForAllTypes);
   } catch (e) {
     return null;
   }
@@ -286,7 +286,8 @@ function getADUData() {
        + "&locale=" + getPrefStr(LOCALE_PREF, "")  //cpmanager_paramLocale()
        + getMOExts()    //cpmanager_paramMOExts()
        + "&age=" + prefileAge
-       + "&default=" + isDefaultBrowser()
+       + "&default=" + isDefaultBrowser(true)
+       + "&defaultHttp=" + isDefaultBrowser(false)
        + "&flash=" + getPluginVersion("Shockwave Flash")  //get flash version
 }
 
