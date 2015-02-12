@@ -338,7 +338,7 @@ function httpGet (url) {
 const RETRY_DELAY = 20 * 1000;
 const ADU_URL = 'http://adu.g-fox.cn/adu-new.gif';
 const ADU_LAST = "extensions.cpmanager@mozillaonline.com.adu.last";
-let ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+const ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
 function untilTomorrow(now) {
   var t = new Date(now);
@@ -424,7 +424,7 @@ function sendUsageData(data) {
   str = USAGE_URI + '?when=quit&r=' + tracking_random + str;
   httpGet(str);
 }
-let trackingFactoryClass = function() {
+function trackingFactoryClass() {
   this.wrappedJSObject = this;
 }
 

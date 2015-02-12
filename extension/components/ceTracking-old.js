@@ -15,22 +15,7 @@ const LOCALE_PREF = "general.useragent.locale";
 const CHANNEL_PREF = "app.chinaedition.channel"
 const DISTRIBUTION_PREF = "distribution.version"
 
-//Cu.import("resource://gre/modules/Services.jsm");
-let Services = {};
-
-XPCOMUtils.defineLazyGetter(Services, "prefs", function () {
-  return Cc["@mozilla.org/preferences-service;1"]
-           .getService(Ci.nsIPrefService)
-           .QueryInterface(Ci.nsIPrefBranch2);
-});
-XPCOMUtils.defineLazyGetter(Services, "dirsvc", function () {
-  return Cc["@mozilla.org/file/directory_service;1"]
-           .getService(Ci.nsIDirectoryService)
-           .QueryInterface(Ci.nsIProperties);
-});
-XPCOMUtils.defineLazyServiceGetter(Services, "obs",
-                                   "@mozilla.org/observer-service;1",
-                                   "nsIObserverService");
+Cu.import("resource://gre/modules/Services.jsm");
 
 
 function LOG(txt) {
@@ -308,7 +293,7 @@ function httpGet (url) {
   }
 };
 const RETRY_DELAY = 20*1000;
-let ADU_Task = [
+const ADU_Task = [
   {
     task: "5s",
     delay: 5*1000,
@@ -320,8 +305,8 @@ let ADU_Task = [
     url: 'http://adu.g-fox.cn/adu-1.gif',
   },
 ];
-let ADUIndex = 0;
-let ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+var ADUIndex = 0;
+const ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
 function sendADU(index) {
   if (index >= ADU_Task.length) {
@@ -345,7 +330,7 @@ function _ADU(delay) {
   }, delay, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
-let trackingFactoryClassOld = function() {
+function trackingFactoryClassOld() {
   this.wrappedJSObject = this;
 }
 
@@ -373,10 +358,4 @@ trackingFactoryClassOld.prototype = {
 
 }
 
-if (XPCOMUtils.generateNSGetFactory) {
-  const NSGetFactory = XPCOMUtils.generateNSGetFactory([trackingFactoryClassOld]);
-} else {
-  const NSGetModule = function (aCompMgr, aFileSpec) {
-    return XPCOMUtils.generateModule([trackingFactoryClassOld]);
-  }
-}
+const NSGetFactory = XPCOMUtils.generateNSGetFactory([trackingFactoryClassOld]);
