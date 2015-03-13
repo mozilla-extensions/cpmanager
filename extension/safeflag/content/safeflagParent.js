@@ -63,6 +63,14 @@
     // Hack `BrowserOnClick` to navigate user to customized reportURL page.
     _onAboutBlocked = BrowserOnClick.onAboutBlocked.bind(BrowserOnClick);
     BrowserOnClick.onAboutBlocked = function(elementId, isMalware, isTopFrame, location) {
+
+      // The parameters are changed after <https://bugzil.la/989875> was landed,
+      // for the sake of simplicity, let's just change the id of report button
+      // back to `reportButton`, so it could be handled by the internal handler.
+      if (elementId.id && elementId.id == 'cnReportButton') {
+        elementId.id = 'reportButton';
+      }
+
       _onAboutBlocked.apply(null, arguments);
 
       // Depending on what page we are displaying here (malware/phishing)

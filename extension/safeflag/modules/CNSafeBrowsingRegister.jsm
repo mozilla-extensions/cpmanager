@@ -45,7 +45,11 @@ function maybeRegister() {
                             domain + 'downloads?pver=2.2',
                             domain + 'gethash?pver=2.2')
   listManager.enableUpdate(listTypes);
-  listManager.maybeToggleUpdateChecking();
+
+  // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
+  if (listManager.maybeToggleUpdateChecking) {
+    listManager.maybeToggleUpdateChecking();
+  }
 }
 
 // We have to clear the pref everytime FF restart, otherwise
