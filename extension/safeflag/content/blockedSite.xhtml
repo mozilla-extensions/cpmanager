@@ -3,10 +3,8 @@
 <!DOCTYPE html [
   <!ENTITY % htmlDTD PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
   %htmlDTD;
-  <!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
-  %globalDTD;
-  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
-  %brandDTD;
+  <!ENTITY % safeflagDTD SYSTEM "chrome://cmsafeflag/locale/safeflag.dtd">
+  %safeflagDTD;
 ]>
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -188,25 +186,16 @@
 
   <body>
     <div id="container">
-      <div class="header">
-        此网站是<span class="type phishing">欺诈网站</span><span class="type malware">恶意网站</span>，建议关闭
-      </div>
+      <div class="header">&safeflag.aboutBlocked.header;</div>
       <div class="description">
-        <div class="content phishing">
-        您访问的网站<span class="site-host"></span>被报告为欺诈网站，可能通过伪造内容盗取您的个人信息和账号、造成您的财产损失，建议谨慎访问。
-        </div>
-        <div class="content malware">
-        您访问的网站<span class="site-host"></span>被报告为恶意攻击网站，可能给您的电脑安装恶意软件，盗取您的信息或利用你的电脑攻击他人，建议谨慎访问。
-        </div>
+        <div class="content phishing">&safeflag.aboutBlocked.contentPhishing;</div>
+        <div class="content malware">&safeflag.aboutBlocked.contentMalware;</div>
       </div>
       <div class="ops">
-        <div href="#" id="getMeOutButton">关闭网页</div>
-        <a href="#" id="ignoreWarningButton">忽略警告，继续访问</a>
+        <div href="#" id="getMeOutButton">&safeflag.aboutBlocked.getMeOutButton;</div>
+        <a href="#" id="ignoreWarningButton">&safeflag.aboutBlocked.ignoreWarningButton;</a>
       </div>
-      <div class="footer">
-        以上安全检索数据，由<span class="partner alliance">安全联盟</span>、<span class="partner pingan">凭安科技</span> 和 Google 联合提供。
-        <a href="#" id="cnReportButton">站长申诉</a>
-      </div>
+      <div class="footer">&safeflag.aboutBlocked.footer;</div>
     </div>
     <!--
     - Note: It is important to run the script this way, instead of using
