@@ -18,7 +18,7 @@ var _ucdbSvc = Cc["@mozilla.org/url-classifier/dbservice;1"].
 
 const MALWARE_LIST_TYPES = ['goog-malware-shavar', 'googpub-malware-shavar'];
 const GOOG_PHISH_LIST_TYPES = ['goog-phish-shavar', 'googpub-phish-shavar'];
-const CN_PHISH_LIST_TYPES = ['utnpnb-phish-shavar'];
+const CN_PHISH_LIST_TYPES = ['utnpnb-phish-shavar', 'aqksb-phish-shavar'];
 const GOOG_LIST_TYPES = MALWARE_LIST_TYPES.concat(GOOG_PHISH_LIST_TYPES);
 const PHISH_LIST_TYPES = GOOG_PHISH_LIST_TYPES.concat(CN_PHISH_LIST_TYPES);
 const LOOKUP_TABLE = MALWARE_LIST_TYPES.concat(GOOG_PHISH_LIST_TYPES).

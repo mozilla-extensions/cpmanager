@@ -22,7 +22,7 @@ XPCOMUtils.defineLazyModuleGetter(this, 'clearTimeout',
 
 let timer = null;
 
-let listTypes = 'utnpnb-phish-shavar';
+let listTypes = 'utnpnb-phish-shavar,aqksb-phish-shavar';
 let domain = Services.prefs.getCharPref('extensions.cpmanager.safeflag.provider');
 let listManager = Cc["@mozilla.org/url-classifier/listmanager;1"].
                     getService(Ci.nsIUrlListManager);
@@ -41,10 +41,12 @@ function maybeRegister() {
   Services.prefs.setCharPref('urlclassifier.phishTable',
     'goog-phish-shavar,' + listTypes + ',test-phish-simple');
 
-  listManager.registerTable(listTypes,
-                            domain + 'downloads?pver=2.2',
-                            domain + 'gethash?pver=2.2')
-  listManager.enableUpdate(listTypes);
+  listTypes.split(',').forEach(aListType => {
+    listManager.registerTable(aListType,
+                              domain + 'downloads?pver=2.2',
+                              domain + 'gethash?pver=2.2')
+    listManager.enableUpdate(aListType);
+  });
 
   // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
   if (listManager.maybeToggleUpdateChecking) {
