@@ -67,7 +67,7 @@
       // The parameters are changed after <https://bugzil.la/989875> was landed,
       // for the sake of simplicity, let's just change the id of report button
       // back to `reportButton`, so it could be handled by the internal handler.
-      if (elementId.id && elementId.id == 'cnReportButton') {
+      if (elementId && elementId.id && elementId.id == 'cnReportButton') {
         elementId.id = 'reportButton';
       }
 
