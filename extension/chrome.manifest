@@ -99,10 +99,10 @@ contract @mozillaonline.com/uchcstartup;1 {547a9101-517b-41a8-8e46-0b63b6ec818a}
 category profile-after-change UCHCStartup @mozillaonline.com/uchcstartup;1                         appversion<33.0
 
 # limit to most recent release version to prevent breakage, also not for Win8
-component {055d195f-168e-4d98-b18a-71bfbfd3f617} components/nsShellService.js          os=WINNT osversion<6.2 appversion<37.0
-component {1a80db92-3b6b-4872-968a-8711f53a09ba} components/nsShellServiceStartup.js   os=WINNT osversion<6.2 appversion<37.0
-contract @mozillaonline.com/shell-svc-startup;1 {1a80db92-3b6b-4872-968a-8711f53a09ba} os=WINNT osversion<6.2 appversion<37.0
-category profile-after-change ShellSvcStartup @mozillaonline.com/shell-svc-startup;1   os=WINNT osversion<6.2 appversion<37.0
+component {055d195f-168e-4d98-b18a-71bfbfd3f617} components/nsShellService.js          os=WINNT osversion<6.2 appversion<38.0
+component {1a80db92-3b6b-4872-968a-8711f53a09ba} components/nsShellServiceStartup.js   os=WINNT osversion<6.2 appversion<38.0
+contract @mozillaonline.com/shell-svc-startup;1 {1a80db92-3b6b-4872-968a-8711f53a09ba} os=WINNT osversion<6.2 appversion<38.0
+category profile-after-change ShellSvcStartup @mozillaonline.com/shell-svc-startup;1   os=WINNT osversion<6.2 appversion<38.0
 
 component {9a52065c-1cdc-4605-bf36-1ac1f0129bf7} improve/content/fxa/serviceSwitcher.js
 contract @mozillaonline.com/fxa-switcher;1 {9a52065c-1cdc-4605-bf36-1ac1f0129bf7}
