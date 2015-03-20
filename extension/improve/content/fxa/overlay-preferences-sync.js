@@ -53,10 +53,16 @@
     })
   }
 
-  document.getElementById('paneSync').addEventListener('paneload', function() {
+  let paneSync = document.getElementById('paneSync');
+  let onLoad = function() {
     let toggler = document.getElementById('cn-fxa-switcher');
     toggler.onclick = toggle;
     updateUI();
-  });
+  }
+  if (paneSync) {
+    paneSync.addEventListener('paneload', onLoad);
+  } else {
+    window.addEventListener('DOMContentLoaded', onLoad);
+  }
 })();
 
