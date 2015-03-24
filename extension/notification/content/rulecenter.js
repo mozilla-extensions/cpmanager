@@ -390,10 +390,12 @@
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_update);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_text);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_socialapi);
-            var OS = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+
             for (var i in _reminders) {
                 var reminder = _reminders[i];
-                if (reminder.platform && reminder.platform != OS) {
+                if ((reminder.min_fx_ver && Services.vc.compare(Services.appinfo.version, reminder.min_fx_ver) < 0) ||
+                    (reminder.max_fx_ver && Services.vc.compare(Services.appinfo.version, reminder.max_fx_ver) > 0) ||
+                    (reminder.platform && reminder.platform != Services.appinfo.OS)) {
                     delete _reminders[i]
                 }
             }

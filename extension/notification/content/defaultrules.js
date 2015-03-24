@@ -59,7 +59,7 @@
 		}
 	};
 
-	ns.VERSION = '0.6';
+	ns.VERSION = '0.7';
 	ns.getDefaultRules = function() {
 		return _rules_sincefx4
 	};
