@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 (function() {
   var ns = MOA.ns('SafeFlag.Layout')
 
@@ -30,8 +26,6 @@
 
   // remenber default className of urlbar to switch its background color
   var default_className = null;
-  var current_tab_safeflag = null;
-
   function _updateIcon() {
     var urlbar = document.getElementById('urlbar');
     if (null == default_className) {
@@ -45,6 +39,7 @@
     if (!_isActivated())
       return;
 
+    var current_tab_safeflag = MOA.SafeFlag.Monitor.getCurrentTabSafeflag();
     if (!current_tab_safeflag)
       return;
 
@@ -70,13 +65,11 @@
     icon.hidden = false;
   }
 
-  ns.updateIcon = function(aClassifyResult) {
-    current_tab_safeflag = aClassifyResult;
+  ns.updateIcon = function() {
     _updateIcon();
   };
 
   function _onPrefChange(branch, prefName) {
-    window.messageManager.broadcastAsyncMessage('SafeFlag::enabledChanged')
     switch (prefName) {
       case 'enable':
         if (MOA.SafeFlag.Utils.getPrefs().getBoolPref("enable")) {
@@ -108,6 +101,7 @@
     if (!_isActivated())
       return;
 
+    var current_tab_safeflag = MOA.SafeFlag.Monitor.getCurrentTabSafeflag();
     if (!current_tab_safeflag)
       return;
 
