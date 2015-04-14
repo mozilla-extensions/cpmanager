@@ -8,9 +8,12 @@ const Ci = Components.interfaces;
 const Cu = Components.utils;
 const Cc = Components.classes;
 
-let TOKEN_SERVER     = 'https://sync.firefox.com.cn';
-let AUTH_SERVER      = 'https://api-accounts.firefox.com.cn';
-let ACCOUNTS_SERVER  = 'https://accounts.firefox.com.cn';
+let TOKEN_SERVER        = 'https://sync.firefox.com.cn';
+let AUTH_SERVER         = 'https://api-accounts.firefox.com.cn';
+let ACCOUNTS_SERVER     = 'https://accounts.firefox.com.cn';
+let OAUTH_SERVER        = 'https://oauth.firefox.com.cn';
+let PROFILE_SERVER      = 'https://profile.firefox.com.cn';
+let READINGLIST_SERVER  = 'https://readinglist.firefox.com.cn';
 
 const DEBUG = 0;
 
@@ -20,18 +23,24 @@ if (useTestDomain) {
   TOKEN_SERVER       = 'https://sync.testfirefox.com.cn';
   AUTH_SERVER        = 'https://api-accounts.testfirefox.com.cn';
   ACCOUNTS_SERVER    = 'https://accounts.testfirefox.com.cn';
+  OAUTH_SERVER       = 'https://oauth.testfirefox.com.cn';
+  PROFILE_SERVER     = 'https://profile.testfirefox.com.cn';
+  READINGLIST_SERVER = 'https://readinglist.testfirefox.com.cn';
 }
 
-const TOKEN_SERVER_URI = TOKEN_SERVER    + '/token/1.0/sync/1.5';
-const AUTH_URI         = AUTH_SERVER     + '/v1';
-const FORCE_AUTH_URI   = ACCOUNTS_SERVER + '/force_auth?service=sync&context=fx_desktop_v1';
-const SIGHIN_URI       = ACCOUNTS_SERVER + '/signin?service=sync&context=fx_desktop_v1';
-const SIGHUP_URI       = ACCOUNTS_SERVER + '/signup?service=sync&context=fx_desktop_v1';
-const REMOTE_URI       = ACCOUNTS_SERVER + '/?service=sync&context=fx_desktop_v1';
-const SETTINGS_URI     = ACCOUNTS_SERVER + '/settings';
-const PRIVACY_URL      = ACCOUNTS_SERVER + '/legal/privacy';
-const TERMS_URL        = ACCOUNTS_SERVER + '/legal/terms';
-const STATUS_URL       = ACCOUNTS_SERVER + '/status/';
+const TOKEN_SERVER_URI = TOKEN_SERVER       + '/token/1.0/sync/1.5';
+const AUTH_URI         = AUTH_SERVER        + '/v1';
+const FORCE_AUTH_URI   = ACCOUNTS_SERVER    + '/force_auth?service=sync&context=fx_desktop_v1';
+const OAUTH_URI        = OAUTH_SERVER       + '/v1';
+const PROFILE_URI      = PROFILE_SERVER     + '/v1';
+const SIGHIN_URI       = ACCOUNTS_SERVER    + '/signin?service=sync&context=fx_desktop_v1';
+const SIGHUP_URI       = ACCOUNTS_SERVER    + '/signup?service=sync&context=fx_desktop_v1';
+const REMOTE_URI       = ACCOUNTS_SERVER    + '/?service=sync&context=fx_desktop_v1';
+const SETTINGS_URI     = ACCOUNTS_SERVER    + '/settings';
+const READINGLIST_URI  = READINGLIST_SERVER + '/v1';
+const STATUS_URL       = ACCOUNTS_SERVER    + '/status/';
+const PRIVACY_URL      = ACCOUNTS_SERVER    + '/legal/privacy';
+const TERMS_URL        = ACCOUNTS_SERVER    + '/legal/terms';
 
 const PREF_SYNC_TOKENSERVER = 'services.sync.tokenServerURI';
 
@@ -40,10 +49,13 @@ const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
 const SERVICE_PREFS = {
   'identity.fxaccounts.auth.uri': AUTH_URI,
   'identity.fxaccounts.remote.force_auth.uri': FORCE_AUTH_URI,
+  'identity.fxaccounts.remote.oauth.uri': OAUTH_URI,
+  'identity.fxaccounts.remote.profile.uri': PROFILE_URI,
   'identity.fxaccounts.remote.signin.uri': SIGHIN_URI,
   'identity.fxaccounts.remote.signup.uri': SIGHUP_URI,
   'identity.fxaccounts.remote.uri': REMOTE_URI,
   'identity.fxaccounts.settings.uri': SETTINGS_URI,
+  // 'readinglist.server': READINGLIST_URI,
   'services.sync.statusURL': STATUS_URL,
   'services.sync.fxa.privacyURL': PRIVACY_URL,
   'services.sync.fxa.termsURL': TERMS_URL,
