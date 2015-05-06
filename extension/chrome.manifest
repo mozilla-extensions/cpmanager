@@ -20,6 +20,7 @@ locale   cmnotification   en-US         notification/locale/en-US/
 locale   cmnotification   zh-CN         notification/locale/zh-CN/
 overlay   chrome://browser/content/browser.xul          chrome://cmsafeflag/content/overlay.xul
 override  chrome://safeflag/content/overlay.xul         chrome://cmsafeflag/content/safeflag_blank.xul
+override  chrome://browser/content/blockedSite.xhtml    chrome://cmsafeflag/content/blockedSite.xhtml
 style     chrome://global/content/customizeToolbar.xul  chrome://cmsafeflag/skin/overlay.css
 
 style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin/linux/overlay.css  os=Linux
