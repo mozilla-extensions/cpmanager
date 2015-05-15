@@ -6,7 +6,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
-var EXPORTED_SYMBOLS = [];
+var EXPORTED_SYMBOLS = ["GetHashURL"];
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
@@ -26,6 +26,9 @@ let listTypes = 'utnpnb-phish-shavar,aqksb-phish-shavar';
 let domain = Services.prefs.getCharPref('extensions.cpmanager.safeflag.provider');
 let listManager = Cc["@mozilla.org/url-classifier/listmanager;1"].
                     getService(Ci.nsIUrlListManager);
+let DownloadsURL = domain + 'downloads?pver=2.2';
+let GetHashURL = domain + 'gethash?pver=2.2';
+
 function maybeRegister() {
   // Same here, we need to make sure the internal safe browsing has been
   // initialized, so the gethashurl won't be override.
@@ -42,9 +45,7 @@ function maybeRegister() {
     'goog-phish-shavar,' + listTypes + ',test-phish-simple');
 
   listTypes.split(',').forEach(aListType => {
-    listManager.registerTable(aListType,
-                              domain + 'downloads?pver=2.2',
-                              domain + 'gethash?pver=2.2')
+    listManager.registerTable(aListType, DownloadsURL, GetHashURL);
     listManager.enableUpdate(aListType);
   });
 

@@ -12,5 +12,5 @@
 <!ENTITY safeflag.aboutBlocked.contentMalware "This web page at <span class='site-host'></span> has been reported as an attack page and has been blocked based on your security preferences." >
 <!ENTITY safeflag.aboutBlocked.getMeOutButton "Get me out of here!" >
 <!ENTITY safeflag.aboutBlocked.ignoreWarningButton "Ignore this warning" >
-<!ENTITY safeflag.aboutBlocked.footer "Powered by <span class='partner alliance'>安全联盟</span>, <span class='partner pingan'>凭安科技</span> and Google. <a href='#' id='cnReportButton'>Why was this page blocked?</a>" >
+<!ENTITY safeflag.aboutBlocked.footer "Powered by <span class='partner pingan'>凭安科技</span>, <span class='partner alliance'>安全联盟</span> and Google. <a href='#' id='cnReportButton'>Why was this page blocked?</a>" >
 
