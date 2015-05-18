@@ -26,8 +26,20 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
 });
 
 let safeBrowsingHack = {
-  _shouldCancel: false,
+  _shouldCancel: {
+    "apprep": true,
+    "gethash": false,
+  },
   _skipSBData: null,
+
+  get appRepURL() {
+    let appRepURL = "";
+    try {
+      appRepURL = Services.prefs.getCharPref("browser.safebrowsing.appRepURL");
+    } catch(e) {};
+    delete this.appRepURL;
+    return this.appRepURL = appRepURL;
+  },
 
   get prefs() {
     let prefix = "urlclassifier.gethash.";
@@ -42,7 +54,7 @@ let safeBrowsingHack = {
      * feature in vanilla Fx.
      */
     if (this.prefs.getPrefType("timeout_ms") == Services.prefs.PREF_INVALID) {
-      this._shouldCancel = true;
+      this._shouldCancel["gethash"] = true;
     } else {
       this.prefs.setIntPref("timeout_ms", 10e3);
     }
@@ -54,24 +66,26 @@ let safeBrowsingHack = {
     let uri = channel.originalURI;
 
     if (uri.asciiSpec == SafeBrowsing.gethashURL) {
-      this.maybeCancelGetHashOnTimeout(channel);
+      this.maybeCancelOnTimeout(channel, "gethash");
+    } else if (uri.asciiSpec == this.appRepURL) {
+      this.maybeCancelOnTimeout(channel, "apprep");
     } else {
       this.skipFalsePositiveSB(channel, uri);
     }
   },
 
-  maybeCancelGetHashOnTimeout: function (aChannel) {
-    if (!this._shouldCancel) {
+  maybeCancelOnTimeout: function (aChannel, aType) {
+    if (!this._shouldCancel[aType]) {
       return;
     }
 
     setTimeout(function() {
       if (aChannel && aChannel.isPending()) {
         aChannel.cancel(Cr.NS_ERROR_ABORT);
-        CETracking.track("sb-gethash-abort");
+        CETracking.track("sb-" + aType + "-abort");
       }
     }, 10e3);
-    CETracking.track("sb-gethash-found");
+    CETracking.track("sb-" + aType + "-found");
   },
 
   skipFalsePositiveSB: function (aChannel, aURI) {
@@ -386,7 +400,7 @@ mozCNGuard.prototype = {
         let title;
 
         // Don't open if already in commandline argument.
-        let page = {'about:cehome': 'http://i.firefoxchina.cn/'}[uri.asciiSpec] || uri.asciiSpec;
+        let page = {"about:cehome": "http://i.firefoxchina.cn/"}[uri.asciiSpec] || uri.asciiSpec;
         if (externalURLs.indexOf(page) >= 0) {
           return;
         }
