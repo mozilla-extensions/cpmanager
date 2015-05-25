@@ -104,6 +104,10 @@
     window.setTimeout(function() {
       gBrowser.addProgressListener(listener);
       Services.prefs.addObserver("extensions.cmimprove.url2qr.", ns, false);
+      document.getElementById("download-fennec").onclick = function() {
+        window.openDialog("chrome://cmimprove/content/url2qr/dialog.xul", "Wizard_Dialog", "centerscreen,outerHeight=550,outerWidth=560,modal");
+        ce_tracking.track("url2qr-fennecwizard");
+      };
     }, 1000);
   }, false);
   window.addEventListener("unload", function() {

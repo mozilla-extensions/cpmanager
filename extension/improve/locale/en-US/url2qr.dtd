@@ -1,4 +1,9 @@
 <!ENTITY mo-url2qr.generateQR "Generate QR Code of current page">
-<!ENTITY mo-url2qr.instructions "Scan with your phone to open it">
-<!ENTITY mo-url2qr.instructions1 "Using">
-<!ENTITY mo-url2qr.instructions2 "Or other scanners like WeChat">
+<!ENTITY mo-url2qr.instructionsOpenWithPhone "Open this page on the phone">
+<!ENTITY mo-url2qr.instructionsDirectScan "scan with your phone">
+<!ENTITY mo-url2qr.instructionsRecommendInfoPartOne " Want to synchronize data between your ">
+<!ENTITY mo-url2qr.instructionsRecommendInfoPartTwo "PC and mobile phone?">
+<!ENTITY mo-url2qr.instructionsDownloadFennec "Download Firefox for Android">
+<!ENTITY mo-url2qr.fennecWizardStepOne "① Scan to download Firefox for Android">
+<!ENTITY mo-url2qr.fennecWizardStepTwo "② Synchronize your data with Firefox account">
+<!ENTITY mo-url2qr.fennecWizardTitle "Firefox for Android Wizard">

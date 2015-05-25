@@ -9,21 +9,8 @@
   }
 }
 
-#mo-url2qr-popup > image,
-#mo-url2qr-popup > hbox {
-  margin: 0 20px;
-}
-
-#mo-url2qr-popup > hbox {
-  height: 28px;
-}
-
-#mo-url2qr-popup > hbox:first-of-type {
-  height: 42px;
-}
-
-#mo-url2qr-popup > hbox:last-of-type {
-  margin-bottom: 10px;
+#mo-url2qr-popup > #open-with-phone {
+  #width: 320px;
 }
 
 #mo-url2qr-popup > hbox > label {
@@ -31,14 +18,45 @@
   font-family: sans-serif;
   font-size: 13px;
   line-height: 1.5;
-  -moz-margin-start: 2px;
-  -moz-margin-end: 2px;
-}
-
-#mo-url2qr-popup > hbox:first-of-type > label {
-  font-size: 18px;
 }
 
 #mo-url2qr-popup > hbox > label.text-link {
   color: #06c;
+}
+
+#mo-url2qr-popup > #open-with-phone {
+  height: 42px;
+  font-size: 18px;
+  margin: 20px 0 0 0;
+  font-weight: bold;
+  color: #3C3C3C;
+}
+
+#mo-url2qr-popup > #download-fennec {
+  background-color: #63A319;
+  height: 48px;
+  width: 230px;
+  margin: 40px 40px 10px 40px;
+  border-radius: 3px;
+}
+
+#mo-url2qr-popup > #download-fennec label {
+  color: #FFFFFF;
+  font-size: 20px;
+  margin-left: 22px;
+  font-weight: bold;
+}
+
+#mo-url2qr-popup > .recommend {
+  font-size: 14px;
+  color: #545454;
+}
+
+#mo-url2qr-popup > #direct-scan label {
+  font-size: 14px;
+  color: #646464;
+}
+
+#mo-url2qr-popup > #recommend-part-two {
+  margin-bottom: 30px;
 }

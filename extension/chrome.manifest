@@ -8,6 +8,7 @@ resource  tracking-components        components/binary/
 resource  cpmanager-clv         cpmanager-clv/modules/
 
 resource  cmsafeflag               safeflag/modules/
+resource  url2qr                   improve/content/url2qr/
 
 content   cmsafeflag               safeflag/content/  contentaccessible=yes
 locale    cmsafeflag  en-US        safeflag/locale/en-US/

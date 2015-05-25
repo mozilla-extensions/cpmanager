@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://cmimprove/skin/url2qr_dialog.css" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://cmimprove/locale/url2qr.dtd">
+
+<dialog xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&mo-url2qr.fennecWizardTitle;"
+        id="fennec_install_wizard"
+        buttons="accept">
+  <html:table>
+    <html:tr>
+      <html:td>
+        <html:p id="step-one">&mo-url2qr.fennecWizardStepOne;</html:p>
+      </html:td>
+      <html:td>
+        <html:p id="step-two">&mo-url2qr.fennecWizardStepTwo;</html:p>
+      </html:td>
+    </html:tr>
+    <html:tr>
+      <html:td>
+        <image id="qrcode"/>
+      </html:td>
+      <html:td>
+        <image id="settings"/>
+      </html:td>
+    </html:tr>
+  </html:table>
+</dialog>
