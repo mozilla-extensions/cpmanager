@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function() {
+var mozCNSyncHack = (function() {
   const Cu = Components.utils;
   const Cr = Components.results;
   const Ci = Components.interfaces;
@@ -17,12 +17,15 @@
     "resource://gre/modules/Services.jsm");
 
   let _bundles = null;
-  function _(key) {
+  function _(key, args) {
     if (!_bundles) {
       _bundles = Services.strings.createBundle("chrome://cmimprove/locale/fxa.properties");
     }
 
-    return _bundles.GetStringFromName(key);
+    key = "fxa.preferences." + key;
+    return args ?
+      _bundles.formatStringFromName(key, args, args.length) :
+      _bundles.GetStringFromName(key);
   }
 
   function toggle() {
@@ -36,12 +39,13 @@
   function updateUI() {
     let toggler = document.getElementById('cn-fxa-switcher');
     toggler.value =
-      FxaSwitcher.localServiceEnabled ? _('fxa.preferences.label.switchToGlobal') :
-        _('fxa.preferences.label.switchToLocal');
+      FxaSwitcher.localServiceEnabled ?
+        _('label.switchToGlobal') :
+        _('label.switchToLocal');
 
     if (FxaSwitcher.localServiceEnabled) {
       let caption = document.querySelector('#fxaGroup > caption:first-child');
-      caption.label = _('fxa.preferences.caption.label');
+      caption.label = _('caption.label');
     }
 
     // We only change the color of the label that open old sync support page. However, there is
@@ -51,6 +55,15 @@
         aLabel.style.color = '#999';
       }
     })
+
+    let selector = 'checkbox[preference^="engine."]';
+    [].filter.call(document.querySelectorAll(selector), checkbox => {
+      return document.getElementById(checkbox.getAttribute("preference")).
+        name.startsWith("services.sync.engine.");
+    }).forEach(checkbox => {
+      checkbox.setAttribute("onsynctopreference",
+        "return mozCNSyncHack.onSyncToEnablePref(this);");
+    });
   }
 
   let paneSync = document.getElementById('paneSync');
@@ -64,5 +77,24 @@
   } else {
     window.addEventListener('DOMContentLoaded', onLoad);
   }
+
+  let onSyncToEnablePref = function(checkbox) {
+    if (checkbox.checked) {
+      return undefined;
+    }
+
+    let p = Services.prompt;
+    let shouldDisable = p.confirmEx(window,
+      _('warning.title', [checkbox.label]),
+      _('warning.message', [checkbox.label]),
+      p.STD_YES_NO_BUTTONS + p.BUTTON_POS_1_DEFAULT + p.BUTTON_DELAY_ENABLE,
+      '', '', '', null, {}) === 0;
+
+    if (!shouldDisable) {
+      checkbox.checked = true;
+    }
+  };
+
+  return { onSyncToEnablePref: onSyncToEnablePref };
 })();
 
