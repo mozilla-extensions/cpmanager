@@ -61,6 +61,10 @@ var mozCNSyncHack = (function() {
       return document.getElementById(checkbox.getAttribute("preference")).
         name.startsWith("services.sync.engine.");
     }).forEach(checkbox => {
+      if (checkbox.hasAttribute("onsynctopreference")) {
+        return;
+      }
+
       checkbox.setAttribute("onsynctopreference",
         "return mozCNSyncHack.onSyncToEnablePref(this);");
     });
