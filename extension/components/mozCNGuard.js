@@ -18,6 +18,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "GetHashURL",
+  "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 
@@ -65,12 +67,20 @@ let safeBrowsingHack = {
     channel.QueryInterface(Ci.nsIHttpChannel);
     let uri = channel.originalURI;
 
-    if (uri.asciiSpec == SafeBrowsing.gethashURL) {
-      this.maybeCancelOnTimeout(channel, "gethash");
-    } else if (uri.asciiSpec == this.appRepURL) {
-      this.maybeCancelOnTimeout(channel, "apprep");
-    } else {
-      this.skipFalsePositiveSB(channel, uri);
+    switch (uri.asciiSpec) {
+      case SafeBrowsing.gethashURL:
+        this.maybeCancelOnTimeout(channel, "gethash");
+        CETracking.track("sb-gethash-google");
+        break;
+      case this.appRepURL:
+        this.maybeCancelOnTimeout(channel, "apprep");
+        break;
+      case GetHashURL:
+        CETracking.track("sb-gethash-mozcn");
+        break;
+      default:
+        this.skipFalsePositiveSB(channel, uri);
+        break;
     }
   },
 
@@ -430,17 +440,25 @@ mozCNGuard.prototype = {
   initProgressListener: function MCG_initProgressListener(aSubject) {
     let w = aSubject;
     w.gBrowser.addTabsProgressListener({
+      // see /xpcom/base/ErrorList.h
+      get NS_ERROR_PHISHING_URI() {
+        return 1 * Math.pow(2, 31) + (0x45 + 24) * Math.pow(2, 16) + 31;
+      },
       onLocationChange: function(a, b, aRequest, aLocation, aFlags) {
         if (aFlags & Ci.nsIWebProgressListener.LOCATION_CHANGE_ERROR_PAGE) {
-          let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);
-          if (baseDomain == "taobao.com" &&
-              aRequest.status == Cr.NS_ERROR_NET_RESET) {
-            let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
-                              "r=%RANDOM%&spec=%SPEC%";
-            let url = urlTemplate.
-              replace("%SPEC%", encodeURIComponent(aLocation.asciiSpec)).
-              replace("%RANDOM%", Math.random());
-            CETracking.send(url);
+          if (aRequest.status == this.NS_ERROR_PHISHING_URI) {
+            CETracking.track("sb-blocked-phish");
+          } else {
+            let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);
+            if (baseDomain == "taobao.com" &&
+                aRequest.status == Cr.NS_ERROR_NET_RESET) {
+              let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
+                                "r=%RANDOM%&spec=%SPEC%";
+              let url = urlTemplate.
+                replace("%SPEC%", encodeURIComponent(aLocation.asciiSpec)).
+                replace("%RANDOM%", Math.random());
+              CETracking.send(url);
+            }
           }
         }
       }
