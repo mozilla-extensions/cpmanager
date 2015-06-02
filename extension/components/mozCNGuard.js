@@ -37,7 +37,7 @@ let safeBrowsingHack = {
   get appRepURL() {
     let appRepURL = "";
     try {
-      appRepURL = this.prefs.getCharPref("appRepURL");
+      appRepURL = this.prefs["apprep"].getCharPref("appRepURL");
     } catch(e) {};
     delete this.appRepURL;
     return this.appRepURL = appRepURL;
