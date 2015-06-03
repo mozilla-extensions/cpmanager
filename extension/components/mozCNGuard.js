@@ -29,7 +29,7 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
 
 let safeBrowsingHack = {
   _shouldCancel: {
-    "apprep": false,
+    "apprep": true,
     "gethash": false,
   },
   _skipSBData: null,
@@ -37,18 +37,16 @@ let safeBrowsingHack = {
   get appRepURL() {
     let appRepURL = "";
     try {
-      appRepURL = this.prefs["apprep"].getCharPref("appRepURL");
+      appRepURL = Services.prefs.getCharPref("browser.safebrowsing.appRepURL");
     } catch(e) {};
     delete this.appRepURL;
     return this.appRepURL = appRepURL;
   },
 
   get prefs() {
+    let prefix = "urlclassifier.gethash.";
     delete this.prefs;
-    return this.prefs = {
-      "apprep": Services.prefs.getDefaultBranch("browser.safebrowsing."),
-      "gethash": Services.prefs.getDefaultBranch("urlclassifier.gethash.")
-    };
+    return this.prefs = Services.prefs.getDefaultBranch(prefix);
   },
 
   init: function() {
@@ -57,20 +55,10 @@ let safeBrowsingHack = {
      * https://bugzil.la/1024555, as part of the cancel gethash on timeout
      * feature in vanilla Fx.
      */
-    if (this.prefs["gethash"].getPrefType("timeout_ms") ==
-        Services.prefs.PREF_INVALID) {
+    if (this.prefs.getPrefType("timeout_ms") == Services.prefs.PREF_INVALID) {
       this._shouldCancel["gethash"] = true;
     } else {
-      this.prefs["gethash"].setIntPref("timeout_ms", 10e3);
-    }
-    /**
-     * The pref browser.safebrowsing.downloads.remote.timeout_ms was introduced
-     * in https://bugzil.la/1165816, as part of the cancel apprep on timeout
-     * feature in vanilla Fx.
-     */
-    if (this.prefs["apprep"].getPrefType("downloads.remote.timeout_ms") ==
-        Services.prefs.PREF_INVALID) {
-      this._shouldCancel["apprep"] = true;
+      this.prefs.setIntPref("timeout_ms", 10e3);
     }
   },
 
@@ -251,25 +239,6 @@ let socialShareRemoval = {
   }
 };
 
-let defaultFontHack = {
-  get prefs() {
-    delete this.prefs;
-    return this.prefs = Services.prefs.getDefaultBranch("font.");
-  },
-
-  init: function() {
-    switch (Services.appinfo.OS) {
-      case "WINNT":
-        let key = "name-list.sans-serif.zh-CN",
-            val = "Microsoft YaHei, MS Song, SimSun, SimSun-ExtB";
-        this.prefs.setCharPref(key, val);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -292,7 +261,6 @@ mozCNGuard.prototype = {
         userJSDetection.detect();
         userJSDetection.removeHomepage();
         socialShareRemoval.init();
-        defaultFontHack.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
