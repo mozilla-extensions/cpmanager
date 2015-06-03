@@ -24,6 +24,8 @@ let timer = null;
 
 let listTypes = 'utnpnb-phish-shavar,aqksb-phish-shavar';
 let domain = Services.prefs.getCharPref('extensions.cpmanager.safeflag.provider');
+let dbService = Cc["@mozilla.org/url-classifier/dbservice;1"].
+                  getService(Ci.nsIUrlClassifierDBService);
 let listManager = Cc["@mozilla.org/url-classifier/listmanager;1"].
                     getService(Ci.nsIUrlListManager);
 let DownloadsURL = domain + 'downloads?pver=2.2';
@@ -39,20 +41,29 @@ function maybeRegister() {
 
   clearTimeout(timer);
 
-  // We need to set the pref before `lookup`, otherwise `lookup` won't
-  // work when querying our own list type.
-  Services.prefs.setCharPref('urlclassifier.phishTable',
-    'goog-phish-shavar,' + listTypes + ',test-phish-simple');
+  dbService.getTables(function(tables) {
+    let listTypeExisted = listTypes.split(",").some(function(listType) {
+      return tables.indexOf(listType) > -1;
+    });
+    if (!listTypeExisted && Math.random() > 0.1) {
+      return;
+    }
 
-  listTypes.split(',').forEach(aListType => {
-    listManager.registerTable(aListType, DownloadsURL, GetHashURL);
-    listManager.enableUpdate(aListType);
+    // We need to set the pref before `lookup`, otherwise `lookup` won't
+    // work when querying our own list type.
+    Services.prefs.setCharPref('urlclassifier.phishTable',
+      'goog-phish-shavar,' + listTypes + ',test-phish-simple');
+
+    listTypes.split(',').forEach(aListType => {
+      listManager.registerTable(aListType, DownloadsURL, GetHashURL);
+      listManager.enableUpdate(aListType);
+    });
+
+    // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
+    if (listManager.maybeToggleUpdateChecking) {
+      listManager.maybeToggleUpdateChecking();
+    }
   });
-
-  // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
-  if (listManager.maybeToggleUpdateChecking) {
-    listManager.maybeToggleUpdateChecking();
-  }
 }
 
 // We have to clear the pref everytime FF restart, otherwise
