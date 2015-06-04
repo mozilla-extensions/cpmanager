@@ -18,8 +18,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "GetHashURL",
-  "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 
@@ -60,6 +58,9 @@ let safeBrowsingHack = {
     } else {
       this.prefs.setIntPref("timeout_ms", 10e3);
     }
+
+    // do not consult {aqksb,utnpnb}-phish-shavar
+    Services.prefs.clearUserPref('urlclassifier.phishTable');
   },
 
   onHttpRequest: function(aSubject) {
@@ -70,13 +71,9 @@ let safeBrowsingHack = {
     switch (uri.asciiSpec) {
       case SafeBrowsing.gethashURL:
         this.maybeCancelOnTimeout(channel, "gethash");
-        CETracking.track("sb-gethash-google");
         break;
       case this.appRepURL:
         this.maybeCancelOnTimeout(channel, "apprep");
-        break;
-      case GetHashURL:
-        CETracking.track("sb-gethash-mozcn");
         break;
       default:
         this.skipFalsePositiveSB(channel, uri);
@@ -446,7 +443,7 @@ mozCNGuard.prototype = {
       },
       onLocationChange: function(a, b, aRequest, aLocation, aFlags) {
         if (aFlags & Ci.nsIWebProgressListener.LOCATION_CHANGE_ERROR_PAGE) {
-          if (aRequest.status == this.NS_ERROR_PHISHING_URI) {
+          if (aRequest.status & this.NS_ERROR_PHISHING_URI) {
             CETracking.track("sb-blocked-phish");
           } else {
             let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);

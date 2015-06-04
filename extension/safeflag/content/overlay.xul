@@ -9,7 +9,7 @@
 
   <script src="chrome://cmsafeflag/content/moa.js"></script>
   <script src="chrome://cmsafeflag/content/utils.js"></script>
-  <script src="chrome://cmsafeflag/content/safeflagParent.js"></script>
+  <script src="chrome://cmsafeflag/content/safeflag.js"></script>
   <script src="chrome://cmsafeflag/content/flaglayout.js"></script>
   <script type="application/javascript">
     function openSafeFlagOptions() {
