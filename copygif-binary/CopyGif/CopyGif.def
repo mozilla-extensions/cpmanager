@@ -1,0 +1,4 @@
+LIBRARY CopyGif
+
+EXPORTS
+	setClipboard	@1

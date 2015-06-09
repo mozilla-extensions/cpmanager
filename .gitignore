@@ -11,3 +11,11 @@ Thumbs.db
 *.pdb
 *.project
 *.suo
+copygif-binary/Release
+copygif-binary/Debug
+copygif-binary/ipch
+copygif-binary/CopyGif.sdf
+copygif-binary/CopyGif.opensdf
+copygif-binary/CopyGif/Release
+copygif-binary/CopyGif/Debug
+copygif-binary/CopyGif/CopyGif.vcxproj.user
