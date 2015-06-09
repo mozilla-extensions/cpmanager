@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>cpmanager@mozillaonline.com</em:id>
-		<em:version>1.3.4</em:version>
+		<em:version>1.3.5</em:version>
 		<em:name>Addons Manager</em:name>
 		<em:description>To manage the addons package in Firefox.</em:description>
 		<em:creator>Mozilla Online Limited</em:creator>
