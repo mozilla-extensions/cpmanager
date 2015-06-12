@@ -18,6 +18,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "GetHashURL",
+  "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 
@@ -61,9 +63,6 @@ let safeBrowsingHack = {
       this._shouldCancel["apprep"] = true;
     }
 
-    // do not consult {aqksb,utnpnb}-phish-shavar
-    Services.prefs.clearUserPref('urlclassifier.phishTable');
-
     this.defaultPrefTweak();
   },
 
@@ -83,9 +82,13 @@ let safeBrowsingHack = {
     switch (uri.asciiSpec) {
       case SafeBrowsing.gethashURL:
         this.maybeCancelOnTimeout(channel, "gethash");
+        CETracking.track("sb-gethash-google");
         break;
       case this.appRepURL:
         this.maybeCancelOnTimeout(channel, "apprep");
+        break;
+      case GetHashURL:
+        CETracking.track("sb-gethash-mozcn");
         break;
       default:
         this.skipFalsePositiveSB(channel, uri);
