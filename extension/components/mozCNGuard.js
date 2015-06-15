@@ -18,7 +18,7 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "GetHashURL",
+XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
   "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
@@ -87,11 +87,27 @@ let safeBrowsingHack = {
       case this.appRepURL:
         this.maybeCancelOnTimeout(channel, "apprep");
         break;
-      case GetHashURL:
+      case mozCNSafeBrowsing.gethashURL:
         CETracking.track("sb-gethash-mozcn");
         break;
       default:
         this.skipFalsePositiveSB(channel, uri);
+        break;
+    }
+  },
+
+  onHttpResponse: function(aSubject) {
+    let channel = aSubject;
+    channel.QueryInterface(Ci.nsIHttpChannel);
+    let uri = channel.originalURI;
+
+    switch (uri.asciiSpec) {
+      case mozCNSafeBrowsing.updateURL:
+        if (channel.responseStatus == 200) {
+          mozCNSafeBrowsing.latestUpdate = Date.now();
+        }
+        break;
+      default:
         break;
     }
   },
@@ -310,6 +326,8 @@ mozCNGuard.prototype = {
         safeBrowsingHack.onHttpRequest(aSubject);
         break;
       case "http-on-examine-response":
+        safeBrowsingHack.onHttpResponse(aSubject);
+        // intentionally no break
       case "http-on-examine-cached-response":
       case "http-on-examine-merged-response":
         this.dropRogueRedirect(aSubject);
