@@ -12,6 +12,9 @@
   XPCOMUtils.defineLazyGetter(ns, "popupFx4A", function() {
     return document.getElementById("mo-url2qr-fx4a");
   });
+  XPCOMUtils.defineLazyGetter(ns, "CETracking", function() {
+    return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+  });
 
   let PREF_KEY = "extensions.cmimprove.url2qr.enabled";
 
@@ -97,7 +100,7 @@
     }[text] || text;
     let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text);
     ns.popupImage.src = datauri;
-    ce_tracking.track("url2qr-qrshown");
+    ns.CETracking.track("url2qr-qrshown");
   };
 
   window.addEventListener("load", function() {
