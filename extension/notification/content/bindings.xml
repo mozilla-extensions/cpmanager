@@ -9,14 +9,24 @@
    xmlns:xbl="http://www.mozilla.org/xbl"
    xmlns:html="http://www.w3.org/1999/xhtml">
   <binding id="addon-notification-popup" extends="chrome://global/content/bindings/notification.xml#popup-notification">
-    <content align="start">
-      <xul:image class="popup-notification-icon"
+    <content>
+      <xul:vbox>
+        <xul:image class="popup-notification-icon"
                    xbl:inherits="popupid"/>
-      <xul:vbox flex="1">
-        <xul:label anonid="title" class="popup-notification-label"/>
-        <xul:description anonid="parentofa"
-                         class="popup-notification-description"
-                         xbl:inherits="xbl:text=label"/>
+      </xul:vbox>
+      <xul:vbox class="popup-notification-body" xbl:inherits="popupid">
+        <xul:hbox align="start">
+          <xul:vbox flex="1">
+            <xul:label anonid="title" class="popup-notification-label"/>
+            <xul:description anonid="parentofa"
+                             class="popup-notification-description"
+                             xbl:inherits="xbl:text=label,popupid"/>
+          </xul:vbox>
+          <xul:toolbarbutton anonid="closebutton"
+                             class="messageCloseButton close-icon popup-notification-closebutton tabbable"
+                             xbl:inherits="oncommand=closebuttoncommand"
+                             tooltiptext="&closeNotification.tooltip;"/>
+        </xul:hbox>
         <xul:spacer flex="1"/>
         <xul:hbox class="popup-notification-button-container"
                   pack="end" align="center">
@@ -31,12 +41,6 @@
           <xul:label anonid="close" class="text-link text-link-gray" hidden="true"/>
           <xul:label anonid="nexttip" class="text-link" hidden="true"/>
         </xul:hbox>
-      </xul:vbox>
-      <xul:vbox pack="start">
-        <xul:toolbarbutton anonid="closebutton"
-                           class="messageCloseButton popup-notification-closebutton tabbable"
-                           xbl:inherits="oncommand=closebuttoncommand"
-                           tooltiptext="&closeNotification.tooltip;"/>
       </xul:vbox>
     </content>
     <implementation>

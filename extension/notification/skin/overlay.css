@@ -1,6 +1,6 @@
 @namespace html url(http://www.w3.org/1999/xhtml);
 
-#addon-notification-popup .popup-notification-description {
+#addon-notification-popup .popup-notification-body {
   max-width: 24em;
   height: 3em;
 }
