@@ -62,7 +62,8 @@
 
     // Hack `BrowserOnClick` to navigate user to customized reportURL page.
     _onAboutBlocked = BrowserOnClick.onAboutBlocked.bind(BrowserOnClick);
-    BrowserOnClick.onAboutBlocked = function(elementId, isMalware, isTopFrame, location) {
+    BrowserOnClick.onAboutBlocked = function(elementId, reasonOrIsMalware, isTopFrame, location) {
+      // reasonOrIsMalware: for <https://bugzil.la/1147212>
 
       // The parameters are changed after <https://bugzil.la/989875> was landed,
       // for the sake of simplicity, let's just change the id of report button
@@ -73,9 +74,14 @@
 
       _onAboutBlocked.apply(null, arguments);
 
-      // Depending on what page we are displaying here (malware/phishing)
+      // Depending on what page we are displaying here (malware/phishing/unwanted)
       // use the right strings and links for each.
-      let bucketName = isMalware ? "WARNING_MALWARE_PAGE_":"WARNING_PHISHING_PAGE_";
+      let bucketName = "WARNING_PHISHING_PAGE_";
+      if (reasonOrIsMalware === "malware" || reasonOrIsMalware === true) {
+        bucketName = "WARNING_MALWARE_PAGE_";
+      } else if (reasonOrIsMalware === "unwanted") {
+        bucketName = "WARNING_UNWANTED_PAGE_";
+      }
       let secHistogram = Services.telemetry.getHistogramById("SECURITY_UI");
       let nsISecTel = Ci.nsISecurityUITelemetry;
       bucketName += isTopFrame ? "TOP_" : "FRAME_";
@@ -89,7 +95,7 @@
           // the measurement is for how many users clicked the WHY BLOCKED button
           secHistogram.add(nsISecTel[bucketName + "WHY_BLOCKED"]);
 
-          if (isMalware) {
+          if (reasonOrIsMalware === true) {
             // Get the stop badware "why is this blocked" report url,
             // append the current url, and go there.
             try {
@@ -99,13 +105,15 @@
             } catch (e) {
               Components.utils.reportError("Couldn't get malware report URL: " + e);
             }
-          } else { // It's a phishing site, not malware
+          } else if (reasonOrIsMalware === "phishing" || reasonOrIsMalware === false) { // It's a phishing site, not malware
             jsm.safeflag.lookup(location, function(aResult) {
               gBrowser.loadURI(
                 Services.prefs.getCharPref('extensions.cpmanager.safeflag.reportURL').
                   replace('{LIST}', encodeURIComponent(aResult.tableNames)).
                   replace('{URL}', encodeURIComponent(location)));
             });
+          } else {
+            openHelpLink("phishing-malware", false, "current");
           }
           break;
       }
