@@ -52,7 +52,7 @@
     var isSafeBackground = MOA.SafeFlag.Utils.getPrefs().getBoolPref("background.safe");
     var isUnsafeBackground = MOA.SafeFlag.Utils.getPrefs().getBoolPref("background.unsafe");
 
-    if (current_tab_safeflag.isMalware || current_tab_safeflag.isPhishing) {
+    if (current_tab_safeflag.isMalware || current_tab_safeflag.isPhishing || current_tab_safeflag.isUnwanted) {
       icon.classList.add('safeflag-unsafe');
       if (isUnsafeBackground) {
         MOA.debug('Set background color for unsafe sites.');
@@ -113,7 +113,7 @@
 
     _popup_timer_ = window.setTimeout(function() {
       var popup = safeGetElementById('safeflag-popup');
-      if (current_tab_safeflag.isMalware || current_tab_safeflag.isPhishing) {
+      if (current_tab_safeflag.isMalware || current_tab_safeflag.isPhishing || current_tab_safeflag.isUnwanted) {
         safeGetElementById('safeflag-popup-safe').hidden = true;
         safeGetElementById('safeflag-popup-risk').hidden = false;
         popup.className = 'safeflag-popup-risk';

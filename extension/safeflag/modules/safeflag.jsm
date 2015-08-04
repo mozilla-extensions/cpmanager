@@ -17,9 +17,10 @@ var _ucdbSvc = Cc["@mozilla.org/url-classifier/dbservice;1"].
                  getService(Ci.nsIUrlClassifierDBService);
 
 const MALWARE_LIST_TYPES = ['goog-malware-shavar', 'googpub-malware-shavar'];
+const UNWANTED_LIST_TYPES = ['goog-unwanted-shavar'];
 const GOOG_PHISH_LIST_TYPES = ['goog-phish-shavar', 'googpub-phish-shavar'];
 const CN_PHISH_LIST_TYPES = ['utnpnb-phish-shavar', 'aqksb-phish-shavar'];
-const GOOG_LIST_TYPES = MALWARE_LIST_TYPES.concat(GOOG_PHISH_LIST_TYPES);
+const GOOG_LIST_TYPES = MALWARE_LIST_TYPES.concat(UNWANTED_LIST_TYPES).concat(GOOG_PHISH_LIST_TYPES);
 const PHISH_LIST_TYPES = GOOG_PHISH_LIST_TYPES.concat(CN_PHISH_LIST_TYPES);
 const LOOKUP_TABLE = MALWARE_LIST_TYPES.concat(GOOG_PHISH_LIST_TYPES).
  concat(CN_PHISH_LIST_TYPES).join(',')
@@ -43,6 +44,7 @@ function doLookup(aUrl, aTables, aCallback) {
 var safeflag = {
   PHISH_LIST_TYPES: PHISH_LIST_TYPES,
   MALWARE_LIST_TYPES: MALWARE_LIST_TYPES,
+  UNWANTED_LIST_TYPES: UNWANTED_LIST_TYPES,
 
   lookup: function(url, callback) {
     doLookup(url, LOOKUP_TABLE, (aTableNames) => {
@@ -51,6 +53,7 @@ var safeflag = {
         callback({
           isMalware: nameArray.some(t => { return MALWARE_LIST_TYPES.indexOf(t) > -1; }),
           isPhishing: nameArray.some(t => { return PHISH_LIST_TYPES.indexOf(t) > -1; }),
+          isUnwanted: nameArray.some(t => { return UNWANTED_LIST_TYPES.indexOf(t) > -1; }),
           tableNames: aTableNames
         });
       }
@@ -75,11 +78,16 @@ var safeflag = {
         return PHISH_LIST_TYPES.indexOf(t) > -1;
       });
 
-      if (!isMalware && !isPhishing) {
+      let isUnwanted = nameArray.some(t => {
+        return UNWANTED_LIST_TYPES.indexOf(t) > -1;
+      });
+
+      if (!isMalware && !isPhishing && !isUnwanted) {
         if (lookupCount == 0) {
           callback({
             isMalware: false,
-            isPhishing: false
+            isPhishing: false,
+            isUnwanted: false
           });
         }
         return;
@@ -91,6 +99,7 @@ var safeflag = {
       doCallback({
         isMalware: isMalware,
         isPhishing: isPhishing,
+        isUnwanted: isUnwanted,
         tableNames: aTableNames
       });
     }

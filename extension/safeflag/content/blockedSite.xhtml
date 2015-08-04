@@ -91,11 +91,12 @@
         padding: 0 2.4rem;
       }
 
-      #container.phishingBlocked .malware {
-        display: none;
-      }
-
-      #container.malwareBlocked .phishing {
+      #container.phishingBlocked .malware,
+      #container.phishingBlocked .unwanted,
+      #container.malwareBlocked .phishing,
+      #container.malwareBlocked .unwanted,
+      #container.unwantedBlocked .phishing,
+      #container.unwantedBlocked .malware {
         display: none;
       }
 
@@ -106,6 +107,9 @@
         text-align: center;
         height: 16rem;
         line-height: 16rem;
+      }
+      #container.unwantedBlocked > .header {
+        background-image: none;
       }
 
       .header .type {
@@ -190,6 +194,7 @@
       <div class="description">
         <div class="content phishing">&safeflag.aboutBlocked.contentPhishing;</div>
         <div class="content malware">&safeflag.aboutBlocked.contentMalware;</div>
+        <div class="content unwanted">&safeflag.aboutBlocked.contentUnwanted;</div>
       </div>
       <div class="ops">
         <div href="#" id="getMeOutButton">&safeflag.aboutBlocked.getMeOutButton;</div>

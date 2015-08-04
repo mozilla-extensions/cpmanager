@@ -21,10 +21,11 @@ XPCOMUtils.defineLazyModuleGetter(this, 'Services',
 
 let classifyResult = null;
 
-function updateClassifyResult(aIsMalware, aIsPhishing) {
+function updateClassifyResult(aIsMalware, aIsPhishing, aIsUnwanted) {
   classifyResult = {
     isMalware: aIsMalware,
-    isPhishing: aIsPhishing
+    isPhishing: aIsPhishing,
+    isUnwanted: aIsUnwanted
   };
 
   log('Set classify result to: ' + JSON.stringify(classifyResult));
@@ -40,7 +41,8 @@ function classifyDocument(aDocument) {
   if (docURI.indexOf('about:blocked') == 0) {
     updateClassifyResult(
       /* aIsMalware  =*/ docURI.indexOf('malwareBlocked') > 0,
-      /* aIsPhishing =*/ docURI.indexOf('phishingBlocked') > 0);
+      /* aIsPhishing =*/ docURI.indexOf('phishingBlocked') > 0,
+      /* aIsUnwanted =*/ docURI.indexOf('unwantedBlocked') > 0);
   } else {
     let uri = aDocument.location.href;
     if (uri.indexOf('about:') == 0 ||
@@ -54,7 +56,7 @@ function classifyDocument(aDocument) {
       // internal classifier, wee need to double check it.
       safeflag.lookup_some(uri, (aResult) => {
         log("We double checked safe flag for uri: " + uri);
-        updateClassifyResult(aResult.isMalware, aResult.isPhishing);
+        updateClassifyResult(aResult.isMalware, aResult.isPhishing, aResult.isUnwanted);
       });
     }
   }
