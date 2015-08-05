@@ -112,6 +112,5 @@ contract @mozillaonline.com/fxa-switcher;1 {9a52065c-1cdc-4605-bf36-1ac1f0129bf7
 category profile-after-change mozCNFxaSwitcher @mozillaonline.com/fxa-switcher;1
 
 content copygif copygif/content/ contentaccessible=yes
-resource copygif-binary copygif/binary/CopyGif.dll os=WINNT
 overlay chrome://browser/content/browser.xul chrome://copygif/content/overlay.xul
 
