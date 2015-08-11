@@ -114,3 +114,19 @@ category profile-after-change mozCNFxaSwitcher @mozillaonline.com/fxa-switcher;1
 content copygif copygif/content/ contentaccessible=yes
 overlay chrome://browser/content/browser.xul chrome://copygif/content/overlay.xul
 
+content  cmaddoninstaller                 addon-installer/content/
+skin     cmaddoninstaller     classic/1.0 addon-installer/skin/all/
+locale   cmaddoninstaller     en-US       addon-installer/locale/en-US/
+locale   cmaddoninstaller     zh-CN       addon-installer/locale/zh-CN/
+locale   cmaddoninstaller     zh-TW       addon-installer/locale/zh-TW/
+
+# OS-specific.
+skin     cmaddoninstaller-os  classic/1.0  addon-installer/skin/unix/
+skin     cmaddoninstaller-os  classic/1.0  addon-installer/skin/winxp/     os=WINNT
+skin     cmaddoninstaller-os  classic/1.0  addon-installer/skin/winvista/  os=WINNT osversion>=6
+skin     cmaddoninstaller-os  classic/1.0  addon-installer/skin/mac/       os=Darwin
+
+# Resources.
+resource cmaddoninstaller     addon-installer/resources/
+
+overlay chrome://browser/content/browser.xul  chrome://cmaddoninstaller/content/overlay.xul
