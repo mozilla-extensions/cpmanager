@@ -1,0 +1,3 @@
+.popup-notification-icon[popupid="addoninstaller-popup"] {
+  list-style-image: url("chrome://cmaddoninstaller/skin/logo.png");
+}
