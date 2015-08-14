@@ -5,7 +5,9 @@ var placeholder = {
   handleEvent: function placeholder__handleEvent(aEvent) {
     switch (aEvent.type) {
       case "load":
-        setTimeout(this.init.bind(this), 500);
+        setTimeout(() => {
+	  this.init();
+	}, 500);
         break;
     }
   },

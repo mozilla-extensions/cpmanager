@@ -208,7 +208,9 @@
 
   window.addEventListener('load', function onload() {
     window.removeEventListener('load', onload);
-    setTimeout(init, 100);
+    setTimeout(() => {
+      init();
+    }, 100);
   });
 
   window.addEventListener('unload', uninit);

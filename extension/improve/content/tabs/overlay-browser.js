@@ -280,7 +280,9 @@ var undoclose = {
         "cpmanager@mozillaonline.com");
     } catch(e) {};
 
-    setTimeout(this.toggleRecentlyClosedTabs, 200);
+    setTimeout(() => {
+      this.toggleRecentlyClosedTabs();
+    }, 200);
   },
   uninit: function UC_uninit() {
     gBrowser.tabContainer.removeEventListener("TabClose", this, false);

@@ -159,7 +159,9 @@
 				$this.option.onCounting($this.current);
 				if ($this.option) {
 					$this.current--;
-					$this._count_down_timeout = window.setTimeout(ct, 1000)
+					$this._count_down_timeout = window.setTimeout(() => {
+						ct();
+					}, 1000)
 				}
 			}
 			ct();

@@ -184,7 +184,7 @@
             notificationPanel.setAttribute("oldorigin", oldOrigin);
 
             notificationPanel.hidden = false;
-            setTimeout(function () {
+            setTimeout(() => {
                 notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
             }, 0);
         }
@@ -265,7 +265,9 @@
             accessKey: 'O',
             callback: function() {
                 _track_addon_noti('install', tabId);
-                setTimeout(installAddon, 25, tabId);
+                setTimeout((tabId) => {
+		    installAddon(tabId);
+		}, 25, tabId);
             }
         };
         var reminderName = reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title || reminder.provider_name;
@@ -278,7 +280,9 @@
                         _notify_countdown.reset();
                         break;
                     case "removed":
-                        setTimeout(reminderMeLater, 50, tabId);
+                        setTimeout((tabId) => {
+			    reminderMeLater(tabId);
+			}, 50, tabId);
                         _notify_countdown.destroy();
                         break;
                     case "shown":
@@ -545,7 +549,7 @@
         MOA.AN.Lib.get('addon-notification-popup').hidePopup();
         // set a interval to show next tip
         // make that popup's position will be refreshed.
-        window.setTimeout(function() {
+        window.setTimeout(() => {
             _current_day_tip_reminder = _daytipreminders.shift();
             MOA.AN.RuleCenter.clickOnNoMore(MOA.AN.RuleCenter.getRID(_current_day_tip_reminder));
             _show_day_tips(_current_day_tip_reminder);

@@ -4,7 +4,9 @@
     handleEvent: function Improve_CE__handleEvent(aEvent) {
       switch (aEvent.type) {
         case "load":
-          setTimeout(this.init.bind(this), 1000);
+          setTimeout(() => {
+	    this.init();
+	  }, 1000);
           break;
       }
     },

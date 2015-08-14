@@ -159,6 +159,8 @@
 
   window.addEventListener('load', function wnd_onload(e) {
     window.removeEventListener('load', wnd_onload);
-    window.setTimeout(init, 1000);
+    window.setTimeout(() => {
+      init();
+    }, 1000);
   });
 })();
