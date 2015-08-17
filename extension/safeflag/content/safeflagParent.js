@@ -87,30 +87,31 @@
       bucketName += isTopFrame ? "TOP_" : "FRAME_";
       switch (elementId) {
         case 'cnReportButton':
-          // This is the "Why is this site blocked" button.  For malware,
-          // we can fetch a site-specific report, for phishing, we redirect
-          // to the generic page describing phishing protection.
-
-          // We log even if malware/phishing info URL couldn't be found:
-          // the measurement is for how many users clicked the WHY BLOCKED button
           secHistogram.add(nsISecTel[bucketName + "WHY_BLOCKED"]);
 
-          if (reasonOrIsMalware === true) {
-            // Get the stop badware "why is this blocked" report url,
-            // append the current url, and go there.
-            try {
-              let reportURL = formatURL("browser.safebrowsing.malware.reportURL", true);
-              reportURL += location;
-              gBrowser.loadURI(reportURL);
-            } catch (e) {
-              Components.utils.reportError("Couldn't get malware report URL: " + e);
-            }
-          } else if (reasonOrIsMalware === "phishing" || reasonOrIsMalware === false) { // It's a phishing site, not malware
+          if (reasonOrIsMalware !== "unwanted") {
             jsm.safeflag.lookup(location, function(aResult) {
-              gBrowser.loadURI(
-                Services.prefs.getCharPref('extensions.cpmanager.safeflag.reportURL').
-                  replace('{LIST}', encodeURIComponent(aResult.tableNames)).
-                  replace('{URL}', encodeURIComponent(location)));
+              if (aResult.tableNames.indexOf("aqksb-") > -1 ||
+                  aResult.tableNames.indexOf("baidu-") > -1 ||
+                  aResult.tableNames.indexOf("utnpnb-") > -1) {
+                let reportURLPref= 'extensions.cpmanager.safeflag.reportURL';
+                gBrowser.loadURI(
+                  Services.prefs.getCharPref(reportURLPref).
+                    replace('{LIST}', encodeURIComponent(aResult.tableNames)).
+                    replace('{URL}', encodeURIComponent(location)));
+              } else {
+                if (reasonOrIsMalware === true) {
+                  try {
+                    let reportURL = formatURL("browser.safebrowsing.malware.reportURL", true);
+                    reportURL += location;
+                    gBrowser.loadURI(reportURL);
+                  } catch (e) {
+                    Cu.reportError("Couldn't get malware report URL: " + e);
+                  }
+                } else {
+                  openHelpLink("phishing-malware", false, "current");
+                }
+              }
             });
           } else {
             openHelpLink("phishing-malware", false, "current");
@@ -157,4 +158,3 @@
     }, 1000);
   });
 })();
-

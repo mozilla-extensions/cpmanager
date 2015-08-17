@@ -6,24 +6,44 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
-var EXPORTED_SYMBOLS = ['safeflag'];
+var EXPORTED_SYMBOLS = ["safeflag"];
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, 'Services',
+XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyServiceGetter(this, "_ucdbSvc",
+  "@mozilla.org/url-classifier/dbservice;1", "nsIUrlClassifierDBService");
 
-var _ucdbSvc = Cc["@mozilla.org/url-classifier/dbservice;1"].
-                 getService(Ci.nsIUrlClassifierDBService);
-
-const MALWARE_LIST_TYPES = ['goog-malware-shavar', 'googpub-malware-shavar'];
-const UNWANTED_LIST_TYPES = ['goog-unwanted-shavar'];
-const GOOG_PHISH_LIST_TYPES = ['goog-phish-shavar', 'googpub-phish-shavar'];
-const CN_PHISH_LIST_TYPES = ['utnpnb-phish-shavar', 'aqksb-phish-shavar'];
-const GOOG_LIST_TYPES = MALWARE_LIST_TYPES.concat(UNWANTED_LIST_TYPES).concat(GOOG_PHISH_LIST_TYPES);
-const PHISH_LIST_TYPES = GOOG_PHISH_LIST_TYPES.concat(CN_PHISH_LIST_TYPES);
-const LOOKUP_TABLE = MALWARE_LIST_TYPES.concat(GOOG_PHISH_LIST_TYPES).
- concat(CN_PHISH_LIST_TYPES).join(',')
+XPCOMUtils.defineLazyGetter(this, "lookupTables", function() {
+  let prefs = Services.prefs.getBranch("urlclassifier.");
+  let keys = ["malwareTable", "phishTable"];
+  let getTables = function() {
+    let ret = [];
+    for (let key of keys) {
+      ret.push(prefs.getCharPref(key));
+    }
+    let allTables = ret.join(",");
+    let googTables = allTables.split(",").filter((table) => {
+      return table.startsWith("goog-");
+    }).join(",");
+    let otherTables = allTables.split(",").filter((table) => {
+      return !table.startsWith("goog-") && !table.startsWith("test-");
+    }).join(",");
+    return {
+      all: allTables,
+      goog: googTables,
+      other: otherTables
+    }
+  };
+  let update = function() {
+    lookupTables = getTables();
+  };
+  for (let key of keys) {
+    prefs.addObserver(key, update, false);  
+  }
+  return getTables();
+});
 
 function doLookup(aUrl, aTables, aCallback) {
   let principal = Services.scriptSecurityManager.
@@ -36,24 +56,20 @@ function doLookup(aUrl, aTables, aCallback) {
     try {
       _ucdbSvc.lookup(principal, aCallback);
     } catch(_e) {
-      aCallback('');
+      aCallback("");
     }
   }
 }
 
 var safeflag = {
-  PHISH_LIST_TYPES: PHISH_LIST_TYPES,
-  MALWARE_LIST_TYPES: MALWARE_LIST_TYPES,
-  UNWANTED_LIST_TYPES: UNWANTED_LIST_TYPES,
-
   lookup: function(url, callback) {
-    doLookup(url, LOOKUP_TABLE, (aTableNames) => {
-      if (typeof callback == 'function') {
-        nameArray = aTableNames.split(',');
+    doLookup(url, lookupTables.all, (aTableNames) => {
+      if (typeof callback == "function") {
+        nameArray = aTableNames.split(",");
         callback({
-          isMalware: nameArray.some(t => { return MALWARE_LIST_TYPES.indexOf(t) > -1; }),
-          isPhishing: nameArray.some(t => { return PHISH_LIST_TYPES.indexOf(t) > -1; }),
-          isUnwanted: nameArray.some(t => { return UNWANTED_LIST_TYPES.indexOf(t) > -1; }),
+          isMalware: nameArray.some(t => { return t.split("-")[1] == "malware"; }),
+          isPhishing: nameArray.some(t => { return t.split("-")[1] == "phish"; }),
+          isUnwanted: nameArray.some(t => { return t.split("-")[1] == "unwanted"; }),
           tableNames: aTableNames
         });
       }
@@ -65,21 +81,21 @@ var safeflag = {
     let lookupCount = 0;
     function lookupCallback(aTableNames) {
       lookupCount--;
-      if (typeof callback != 'function') {
+      if (typeof callback != "function") {
         return;
       }
 
-      nameArray = aTableNames.split(',');
+      nameArray = aTableNames.split(",");
       let isMalware = nameArray.some(t => {
-        return MALWARE_LIST_TYPES.indexOf(t) > -1;
+        return t.split("-")[1] == "malware";
       });
 
       let isPhishing = nameArray.some(t => {
-        return PHISH_LIST_TYPES.indexOf(t) > -1;
+        return t.split("-")[1] == "phish";
       });
 
       let isUnwanted = nameArray.some(t => {
-        return UNWANTED_LIST_TYPES.indexOf(t) > -1;
+        return t.split("-")[1] == "unwanted";
       });
 
       if (!isMalware && !isPhishing && !isUnwanted) {
@@ -105,9 +121,8 @@ var safeflag = {
     }
 
     ++lookupCount;
+    doLookup(url, lookupTables.goog, lookupCallback);
     ++lookupCount;
-    doLookup(url, GOOG_LIST_TYPES.join(','), lookupCallback);
-    doLookup(url, CN_PHISH_LIST_TYPES.join(','), lookupCallback);
+    doLookup(url, lookupTables.other, lookupCallback);
   }
 };
-

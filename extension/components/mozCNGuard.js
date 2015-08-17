@@ -87,27 +87,8 @@ let safeBrowsingHack = {
       case this.appRepURL:
         this.maybeCancelOnTimeout(channel, "apprep");
         break;
-      case mozCNSafeBrowsing.gethashURL:
-        CETracking.track("sb-gethash-mozcn");
-        break;
       default:
         this.skipFalsePositiveSB(channel, uri);
-        break;
-    }
-  },
-
-  onHttpResponse: function(aSubject) {
-    let channel = aSubject;
-    channel.QueryInterface(Ci.nsIHttpChannel);
-    let uri = channel.originalURI;
-
-    switch (uri.asciiSpec) {
-      case mozCNSafeBrowsing.updateURL:
-        if (channel.responseStatus == 200) {
-          mozCNSafeBrowsing.latestUpdate = Date.now();
-        }
-        break;
-      default:
         break;
     }
   },
@@ -324,9 +305,10 @@ mozCNGuard.prototype = {
         break;
       case "http-on-modify-request":
         safeBrowsingHack.onHttpRequest(aSubject);
+        mozCNSafeBrowsing.onHttpRequest(aSubject);
         break;
       case "http-on-examine-response":
-        safeBrowsingHack.onHttpResponse(aSubject);
+        mozCNSafeBrowsing.onHttpResponse(aSubject);
         // intentionally no break
       case "http-on-examine-cached-response":
       case "http-on-examine-merged-response":
