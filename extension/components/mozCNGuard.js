@@ -489,17 +489,6 @@ mozCNGuard.prototype = {
         if (aFlags & Ci.nsIWebProgressListener.LOCATION_CHANGE_ERROR_PAGE) {
           if (aRequest.status & this.NS_ERROR_PHISHING_URI) {
             CETracking.track("sb-blocked-phish");
-          } else {
-            let baseDomain = Services.eTLD.getBaseDomain(aLocation, 0);
-            if (baseDomain == "taobao.com" &&
-                aRequest.status == Cr.NS_ERROR_NET_RESET) {
-              let urlTemplate = "http://addons.g-fox.cn/taobaoReset.gif?" +
-                                "r=%RANDOM%&spec=%SPEC%";
-              let url = urlTemplate.
-                replace("%SPEC%", encodeURIComponent(aLocation.asciiSpec)).
-                replace("%RANDOM%", Math.random());
-              CETracking.send(url);
-            }
           }
         }
       }
