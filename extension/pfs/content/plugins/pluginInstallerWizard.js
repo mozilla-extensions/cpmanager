@@ -110,7 +110,9 @@ nsPluginInstallerWizard.prototype.showPluginList = function (){
     // create the checkbox
     var myCheckbox = document.createElement("checkbox");
     myCheckbox.setAttribute("checked", "true");
-    myCheckbox.setAttribute("oncommand", "gPluginInstaller.toggleInstallPlugin('" + pluginInfo.pid + "', this)");
+    myCheckbox.addEventListener("command", (evt) => {
+      gPluginInstaller.toggleInstallPlugin(pluginInfo.pid, evt.target);
+    });
     // XXXlocalize (nit)
     myCheckbox.setAttribute("label", pluginInfo.name + " " + (pluginInfo.version ? pluginInfo.version : ""));
     myCheckbox.setAttribute("src", pluginInfo.IconUrl);

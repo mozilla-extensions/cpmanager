@@ -211,7 +211,9 @@ var undoclose = {
     var clearAll = doc.createElement(restoreAll.tagName);
     clearAll.className = restoreAll.className;
     clearAll.setAttribute("label", getString("ce.menuClearAllTabs.label"));
-    clearAll.setAttribute("oncommand", "MOA.Improve.Tabs.clearUndo()");
+    clearAll.addEventListener("command", (evt) => {
+      win.MOA.Improve.Tabs.clearUndo();
+    }, false);
     tabsFragment.insertBefore(clearAll, restoreAll);
 
     recentlyClosedTabs.appendChild(tabsFragment);
