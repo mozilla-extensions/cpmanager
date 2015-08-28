@@ -274,12 +274,6 @@ var undoclose = {
     toolbox.addEventListener("aftercustomization", this, false)
     this.createButton();
 
-    try {
-      Cu.import("resource://cmtracking/ExtensionUsage.jsm", this);
-      this.ExtensionUsage.register("ce-undo-close-toolbar-button", "window:button",
-        "cpmanager@mozillaonline.com");
-    } catch(e) {};
-
     setTimeout(() => {
       this.toggleRecentlyClosedTabs();
     }, 200);

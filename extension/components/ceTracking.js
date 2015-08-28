@@ -19,9 +19,6 @@ const DISTRIBUTION_PREF = "distribution.version"
 const ONEDAY = 24 * 60 * 60 * 1000;
 const ADU_INTERVAL = 24 * 60 * 60 * 1000;
 
-// Don't use lazy getter here, we need it be initialized.
-Cu.import("resource://cmtracking/ExtensionUsage.jsm");
-
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 
