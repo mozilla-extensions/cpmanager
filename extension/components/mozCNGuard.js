@@ -29,8 +29,7 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
 
 var safeBrowsingHack = {
   _shouldCancel: {
-    "apprep": false,
-    "gethash": false,
+    "apprep": false
   },
   _skipSBData: null,
 
@@ -46,31 +45,15 @@ var safeBrowsingHack = {
   get prefs() {
     delete this.prefs;
     return this.prefs = {
-      "apprep": Services.prefs.getDefaultBranch("browser.safebrowsing."),
-      "gethash": Services.prefs.getDefaultBranch("urlclassifier.gethash.")
+      "apprep": Services.prefs.getDefaultBranch("browser.safebrowsing.")
     };
   },
 
   init: function() {
-    // introduced in https://bugzil.la/1024555
-    if (this.prefs["gethash"].getPrefType("timeout_ms") ==
-        Services.prefs.PREF_INVALID) {
-      this._shouldCancel["gethash"] = true;
-    }
     // introduced in https://bugzil.la/1165816
     if (this.prefs["apprep"].getPrefType("downloads.remote.timeout_ms") ==
         Services.prefs.PREF_INVALID) {
       this._shouldCancel["apprep"] = true;
-    }
-
-    this.defaultPrefTweak();
-  },
-
-  defaultPrefTweak: function() {
-    // introduced in https://bugzil.la/1024555
-    if (this.prefs["gethash"].getPrefType("timeout_ms") !=
-        Services.prefs.PREF_INVALID) {
-      this.prefs["gethash"].setIntPref("timeout_ms", 10e3);
     }
   },
 
@@ -81,7 +64,6 @@ var safeBrowsingHack = {
 
     switch (uri.asciiSpec) {
       case SafeBrowsing.gethashURL:
-        this.maybeCancelOnTimeout(channel, "gethash");
         CETracking.track("sb-gethash-google");
         break;
       case this.appRepURL:
@@ -332,7 +314,6 @@ mozCNGuard.prototype = {
         this.dropRogueRedirect(aSubject);
         break;
       case "prefservice:after-app-defaults":
-        safeBrowsingHack.defaultPrefTweak();
         mozCNSafeBrowsing.defaultPrefTweak();
         pocketButtonRemoval.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
