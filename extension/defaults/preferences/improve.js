@@ -29,5 +29,4 @@ pref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", -4);
 // whether to show url2qr icon in urlbar
 pref("extensions.cmimprove.url2qr.enabled", true);
 
-pref("security.tls.insecure_fallback_hosts", "bgw.wangyin.com,bj.ac.10086.cn,cashier.wangyin.com,xyk.cebbank.com");
-pref("toolkit.asyncshutdown.crash_timeout", 90000);
+pref("security.tls.insecure_fallback_hosts", "bj.ac.10086.cn");
