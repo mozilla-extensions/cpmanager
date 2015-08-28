@@ -86,13 +86,6 @@
                     }, "application/x-xpinstall", null, reminder.addon_name);
                 } else if (reminder.type == 'text') {
                     gBrowser.selectedTab = gBrowser.addTab(reminder.learnmore_url);
-                } else if (reminder.type == 'socialapi') {
-                    let providerOrigin = JSON.parse(reminder.provider_value).origin;
-                    let oldOrigin = Social.provider ? Social.provider.origin : "";
-
-                    let provider = Social.activateFromOrigin(providerOrigin, socialActiveNotification(oldOrigin));
-
-                    socialActiveNotification(oldOrigini)(provider);
                 } else if (reminder.type.startsWith('plugin_')) {
                     var privacyContext = null;
                     var windowPrivate = false;
@@ -164,29 +157,6 @@
             MOA.AN.RuleCenter.clickOnInstall(notification.reminder_id);
         } else {
             _closeInstallNoti(tabId);
-        }
-    };
-
-    function socialActiveNotification(oldOrigin) {
-        return function(provider) {
-            if (!provider) {
-                return;
-            }
-
-            let description = document.getElementById("social-activation-message");
-            let brandShortName = document.getElementById("bundle_brand").getString("brandShortName");
-            let message = gNavigatorBundle.getFormattedString("social.activated.description",
-                                                              [provider.name, brandShortName]);
-            description.value = message;
-
-            let notificationPanel = SocialUI.notificationPanel;
-            notificationPanel.setAttribute("origin", provider.origin);
-            notificationPanel.setAttribute("oldorigin", oldOrigin);
-
-            notificationPanel.hidden = false;
-            setTimeout(() => {
-                notificationPanel.openPopup(SocialToolbar.button, "bottomcenter topright");
-            }, 0);
         }
     };
 
@@ -270,7 +240,7 @@
 		}, 25, tabId);
             }
         };
-        var reminderName = reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title || reminder.provider_name;
+        var reminderName = reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title;
         var popupOption = {
             timeout: Date.now() + 15000,
             eventCallback: function(state) {
@@ -401,7 +371,7 @@
         var notification = tabNotiQueue[tabId];
         var reminder = MOA.AN.RuleCenter.getReminderById(notification.reminder_id);
 
-        if (['addon', 'plugin_install', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
+        if (['addon', 'plugin_install', 'plugin_update', 'text'].indexOf(reminder.type) > -1) {
             _show_install_notification(tabId);
         }
         MOA.AN.RuleCenter.notificationShown()

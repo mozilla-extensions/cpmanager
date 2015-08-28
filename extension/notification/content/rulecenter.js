@@ -2,9 +2,6 @@
     var ns = MOA.ns('AN.RuleCenter');
 
     var jsm = {};
-    try {
-        Cu.import("resource://gre/modules/SocialService.jsm", jsm);
-    } catch(e) {}
     /**
      * _reminders, _rules & _regexps generated from lists in rules.json
      * _*_avail is also generated for display in option window
@@ -45,7 +42,6 @@
     var _reminders_plugin_install = {};
     var _reminders_plugin_update = {};
     var _reminders_text = {};
-    var _reminders_socialapi = {};
     var _rules = {};
     var _regexps = {};                // for rules which have trigger type: window
 
@@ -121,8 +117,6 @@
                 return reminder.mime_type + '__' + reminder.type;
             case 'text':
                 return reminder.short_name;
-            case 'socialapi':
-                return reminder.provider_slug + '__' + reminder.type;
             case 'tip':
                 return reminder.addon_id + '__' + reminder.btn_id;
         }
@@ -211,7 +205,6 @@
         _reminders_plugin_install = {};
         _reminders_plugin_update = {};
         _reminders_text = {};
-        _reminders_socialapi = {};
         _regexps = {};
         _rules = {};
         _daytips_avail = [];
@@ -263,30 +256,6 @@
         return reminder_rules;
     }
 
-    function ensureProvider(reminder_id, provider_slug, provider_value) {
-        var provider = JSON.parse(provider_value);
-        jsm.SocialService.getProvider(provider.origin, function(existedProvider) {
-            var prefBranch = gPrefService.getBranch('social.manifest.');
-            if (!existedProvider) {
-                var string = Cc["@mozilla.org/supports-string;1"]
-                               .createInstance(Ci.nsISupportsString);
-                string.data = provider_value;
-                prefBranch.setComplexValue(provider_slug, Ci.nsISupportsString, string);
-                if (!jsm.SocialService.canActivateOrigin &&
-                    !jsm.SocialService.getOriginActivationType) {
-                    jsm.SocialService.addProvider(provider, function() {});
-                }
-            } else {
-                if (existedProvider.active ||
-                    jsm.SocialService.canActivateOrigin ||
-                    jsm.SocialService.getOriginActivationType) {
-                    delete _reminders_socialapi[reminder_id];
-                }
-                prefBranch.clearUserPref('facebook');
-            }
-        });
-    }
-
     function init() {
         var defaultRules = _getAvailableRules();
         defaultRules = MOA.AN.Lib.extend(defaultRules, {
@@ -323,7 +292,7 @@
                     continue;
 
                 _daytips.push(reminder)
-            } else if (['addon', 'plugin_install', 'plugin_update', 'text', 'socialapi'].indexOf(reminder.type) > -1) {
+            } else if (['addon', 'plugin_install', 'plugin_update', 'text'].indexOf(reminder.type) > -1) {
                 _reminders_avail[reminder_id] = reminder;
 
                 if (max_daily_addon <= 0) {
@@ -344,8 +313,6 @@
                     _reminders_plugin_update[reminder_id] = reminder;
                 } else if (reminder.type == 'text') {
                     _reminders_text[reminder_id] = reminder;
-                } else if (reminder.type == 'socialapi') {
-                    _reminders_socialapi[reminder_id] = reminder;
                 }
                 _hit_times[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__hits', 0);
                 _samplePercent[reminder_id] = MOA.AN.Lib.getFilePref(reminder_id+'__samplePercent', Math.random());
@@ -373,15 +340,6 @@
             }
         }
 
-        if (!(window.Social && Social.activateFromOrigin)) {
-            _reminders_socialapi = {}
-        } else {
-            for (var socialapi in _reminders_socialapi) {
-                var provider = _reminders_socialapi[socialapi];
-                ensureProvider(socialapi, provider.provider_slug, provider.provider_value);
-            }
-        }
-
         MOA.AN.Lib.filterInstalledAddons(Object.keys(_reminders), function(addons) {
             for (var i in addons) {
                 delete _reminders[addons[i]]
@@ -389,7 +347,6 @@
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_install);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_plugin_update);
             _reminders = MOA.AN.Lib.extend(_reminders, _reminders_text);
-            _reminders = MOA.AN.Lib.extend(_reminders, _reminders_socialapi);
 
             for (var i in _reminders) {
                 var reminder = _reminders[i];

@@ -14,7 +14,6 @@
   </stringbundleset>
  <box id="notification-popup-box">
     <image id="texts-notification-icon" class="notification-anchor-icon" role="button"/>
-    <image id="socialapis-notification-icon" class="notification-anchor-icon" role="button"/>
  </box>
  <popupset id="mainPopupSet">
     <panel id="addon-notification-popup"
