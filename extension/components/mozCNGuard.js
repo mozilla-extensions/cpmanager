@@ -209,6 +209,17 @@ let userJSDetection = {
   }
 };
 
+let pocketButtonRemoval = {
+  init: function() {
+    if (Services.prefs.getChildList("browser.pocket.settings.").length) {
+      return;
+    }
+
+    let defaultBranch = Services.prefs.getDefaultBranch("browser.pocket.");
+    defaultBranch.setBoolPref("enabled", false);
+  }
+};
+
 let socialShareRemoval = {
   id: "social-share-button",
   prefKey: "extensions.cpmanager@mozillaonline.com.socialShareRemoved",
@@ -293,6 +304,7 @@ mozCNGuard.prototype = {
         safeBrowsingHack.init();
         userJSDetection.detect();
         userJSDetection.removeHomepage();
+        pocketButtonRemoval.init();
         socialShareRemoval.init();
         defaultFontHack.init();
         break;
