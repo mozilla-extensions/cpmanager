@@ -211,6 +211,10 @@ let userJSDetection = {
 
 let pocketButtonRemoval = {
   init: function() {
+    this.defaultPrefTweak();
+  },
+
+  defaultPrefTweak: function() {
     if (Services.prefs.getChildList("browser.pocket.settings.").length) {
       return;
     }
@@ -328,6 +332,7 @@ mozCNGuard.prototype = {
         break;
       case "prefservice:after-app-defaults":
         safeBrowsingHack.defaultPrefTweak();
+        pocketButtonRemoval.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
         break;
     }
