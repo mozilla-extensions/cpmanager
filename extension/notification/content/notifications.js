@@ -7,7 +7,7 @@
      * One notification can be attached to sevral tabs.
      * tabNotiQueue = {
      *     tab1_id: reminder1_id,
-     *  tab2_id: reminder1_id
+     *     tab2_id: reminder1_id
      *     ...
      * };
      *
@@ -15,7 +15,7 @@
      *
      * notiTabQueue = {
      *     reminder1_id: [tab1_id, tab2_id]
-     *  ...
+     *     ...
      * }
      */
     var tabNotiQueue = {};
@@ -70,17 +70,24 @@
                         try {
                             AddonManager.installAddonsFromWebpage("application/x-xpinstall",
                                 browser.contentWindow,
-                                Services.io.newURI(reminder.xpi_url, null, null),
+                                browser.currentURI,
                                 [addonInstall]);
                         } catch(e) {
                             // second param changed to browser since Fx 36 <https://bugzil.la/1084558>
                             if (e.result == Cr.NS_ERROR_ILLEGAL_VALUE) {
-                                AddonManager.installAddonsFromWebpage("application/x-xpinstall",
-                                    browser,
-                                    Services.io.newURI(reminder.xpi_url, null, null),
-                                    [addonInstall]);
+                                if (webInstallListener instanceof Ci.amIWebInstallListener2) {
+                                    AddonManager.installAddonsFromWebpage("application/x-xpinstall",
+                                        browser,
+                                        Services.scriptSecurityManager.getNoAppCodebasePrincipal(browser.currentURI),
+                                        [addonInstall]);
+                                } else {
+                                    AddonManager.installAddonsFromWebpage("application/x-xpinstall",
+                                        browser,
+                                        browser.currentURI,
+                                        [addonInstall]);
+                                }
                             } else {
-                              throw e;
+                                throw e;
                             }
                         }
                     }, "application/x-xpinstall", null, reminder.addon_name);
@@ -236,8 +243,8 @@
             callback: function() {
                 _track_addon_noti('install', tabId);
                 setTimeout((tabId) => {
-		    installAddon(tabId);
-		}, 25, tabId);
+                    installAddon(tabId);
+                }, 25, tabId);
             }
         };
         var reminderName = reminder.addon_name || reminder.app_name || reminder.plugin_name || reminder.title;
@@ -251,8 +258,8 @@
                         break;
                     case "removed":
                         setTimeout((tabId) => {
-			    reminderMeLater(tabId);
-			}, 50, tabId);
+                            reminderMeLater(tabId);
+                        }, 50, tabId);
                         _notify_countdown.destroy();
                         break;
                     case "shown":
