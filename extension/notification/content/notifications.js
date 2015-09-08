@@ -75,7 +75,7 @@
                         } catch(e) {
                             // second param changed to browser since Fx 36 <https://bugzil.la/1084558>
                             if (e.result == Cr.NS_ERROR_ILLEGAL_VALUE) {
-                                if (webInstallListener instanceof Ci.amIWebInstallListener2) {
+                                if (Ci.amIWebInstallListener2) {
                                     AddonManager.installAddonsFromWebpage("application/x-xpinstall",
                                         browser,
                                         Services.scriptSecurityManager.getNoAppCodebasePrincipal(browser.currentURI),
