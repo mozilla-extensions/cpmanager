@@ -36,6 +36,7 @@ const PROFILE_URI      = PROFILE_SERVER     + '/v1';
 const SIGHIN_URI       = ACCOUNTS_SERVER    + '/signin?service=sync&context=fx_desktop_v1';
 const SIGHUP_URI       = ACCOUNTS_SERVER    + '/signup?service=sync&context=fx_desktop_v1';
 const REMOTE_URI       = ACCOUNTS_SERVER    + '/?service=sync&context=fx_desktop_v1';
+const WEBCHANNEL_URI   = ACCOUNTS_SERVER    + '/';
 const SETTINGS_URI     = ACCOUNTS_SERVER    + '/settings';
 const READINGLIST_URI  = READINGLIST_SERVER + '/v1';
 const STATUS_URL       = ACCOUNTS_SERVER    + '/status/';
@@ -54,6 +55,7 @@ const SERVICE_PREFS = {
   'identity.fxaccounts.remote.signin.uri': SIGHIN_URI,
   'identity.fxaccounts.remote.signup.uri': SIGHUP_URI,
   'identity.fxaccounts.remote.uri': REMOTE_URI,
+  'identity.fxaccounts.remote.webchannel.uri': WEBCHANNEL_URI,
   'identity.fxaccounts.settings.uri': SETTINGS_URI,
   // 'readinglist.server': READINGLIST_URI,
   'services.sync.statusURL': STATUS_URL,
@@ -255,14 +257,29 @@ function repairPrefs() {
       return false;
     }
   });
+  var hasLocalNonSyncPref = Object.keys(SERVICE_PREFS).some(function(key) {
+    if (key.startsWith('services.sync.')) {
+      return false;
+    }
+    try {
+      if (typeof SERVICE_PREFS[key] == 'string') {
+        return Services.prefs.getCharPref(key) == SERVICE_PREFS[key];
+      } else if (typeof SERVICE_PREFS[key] == 'boolean') {
+        return Services.prefs.getBoolPref(key) == SERVICE_PREFS[key];
+      }
+    } catch (e) {
+      return false;
+    }
+  });
 
   if (hasLocalPref) {
     debug('change it back.');
     // For some unknown reason, we have hundreds of global users who are using
     // our sync server, we haven't decide how to deal with it (bug 1645). To
-    // prevent impacting those unexpected users, let's just change prefs with
-    // prefix services.sync.*
-    switchToLocalService(/* aOnlyForSyncPrefs =*/ true);
+    // prevent impacting those unexpected users, if an user has no pref out of
+    // services.sync.* branch set to local values, we'll limit the fixup to
+    // services.sync.* ones.
+    switchToLocalService(!hasLocalNonSyncPref);
   }
 }
 
@@ -404,4 +421,3 @@ let FxaSwitcher = {
 };
 
 init();
-
