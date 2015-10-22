@@ -8,6 +8,17 @@ const Ci = Components.interfaces;
 const Cu = Components.utils;
 const Cc = Components.classes;
 
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this,
+  'fxAccounts', 'resource://gre/modules/FxAccounts.jsm');
+XPCOMUtils.defineLazyModuleGetter(this,
+  'Promise', 'resource://gre/modules/Promise.jsm');
+XPCOMUtils.defineLazyModuleGetter(this,
+  'Services', 'resource://gre/modules/Services.jsm');
+XPCOMUtils.defineLazyModuleGetter(this,
+  'Weave', 'resource://services-sync/main.js');
+
 let TOKEN_SERVER        = 'https://sync.firefox.com.cn';
 let AUTH_SERVER         = 'https://api-accounts.firefox.com.cn';
 let ACCOUNTS_SERVER     = 'https://accounts.firefox.com.cn';
@@ -16,17 +27,6 @@ let PROFILE_SERVER      = 'https://profile.firefox.com.cn';
 let READINGLIST_SERVER  = 'https://readinglist.firefox.com.cn';
 
 const DEBUG = 0;
-
-/* Only for test */
-const useTestDomain = 0;
-if (useTestDomain) {
-  TOKEN_SERVER       = 'https://sync.testfirefox.com.cn';
-  AUTH_SERVER        = 'https://api-accounts.testfirefox.com.cn';
-  ACCOUNTS_SERVER    = 'https://accounts.testfirefox.com.cn';
-  OAUTH_SERVER       = 'https://oauth.testfirefox.com.cn';
-  PROFILE_SERVER     = 'https://profile.testfirefox.com.cn';
-  READINGLIST_SERVER = 'https://readinglist.testfirefox.com.cn';
-}
 
 const TOKEN_SERVER_URI = TOKEN_SERVER       + '/token/1.0/sync/1.5';
 const AUTH_URI         = AUTH_SERVER        + '/v1';
@@ -43,7 +43,8 @@ const STATUS_URL       = ACCOUNTS_SERVER    + '/status/';
 const PRIVACY_URL      = ACCOUNTS_SERVER    + '/legal/privacy';
 const TERMS_URL        = ACCOUNTS_SERVER    + '/legal/terms';
 
-const PREF_SYNC_TOKENSERVER = 'services.sync.tokenServerURI';
+const PREF_SYNC_TOKENSERVER_LEGACY = 'services.sync.tokenServerURI';
+const PREF_SYNC_TOKENSERVER = 'identity.sync.tokenserver.uri';
 
 const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
 
@@ -65,7 +66,11 @@ const SERVICE_PREFS = {
 
 };
 
-SERVICE_PREFS[PREF_SYNC_TOKENSERVER] = TOKEN_SERVER_URI;
+SERVICE_PREFS[PREF_SYNC_TOKENSERVER_LEGACY] = TOKEN_SERVER_URI;
+let defaultPrefs = Services.prefs.getDefaultBranch('');
+if (defaultPrefs.getPrefType(PREF_SYNC_TOKENSERVER) !== Services.prefs.PREF_INVALID) {
+  SERVICE_PREFS[PREF_SYNC_TOKENSERVER] = TOKEN_SERVER_URI;
+}
 
 const WEAVE_STARTOVER_FINISH = 'weave:service:start-over:finish';
 
@@ -74,20 +79,6 @@ const UT_FXA_USED        = 'ut_fxaccount_used';
 const UT_WEAVE_USED      = 'ut_weave_used';
 const UT_CN_FXA_SWITCHED = 'ut_cn_fxa_switched';
 const ONE_CHECK_PREF = 'cpmanager@mozillaonline.com.switch_fxa_pref.checked';
-
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-
-XPCOMUtils.defineLazyModuleGetter(this,
-  'Weave', 'resource://services-sync/main.js');
-
-XPCOMUtils.defineLazyModuleGetter(this,
-  'fxAccounts', 'resource://gre/modules/FxAccounts.jsm');
-
-XPCOMUtils.defineLazyModuleGetter(this,
-  'Promise', 'resource://gre/modules/Promise.jsm');
-
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
 
 let _bundles = null;
 function _(key) {
@@ -99,8 +90,16 @@ function _(key) {
 }
 
 function localServiceEnabled() {
-  return Services.prefs.getCharPref(PREF_SYNC_TOKENSERVER) ==
-           TOKEN_SERVER_URI;
+  let tokenServerURI;
+  try {
+    tokenServerURI = Services.prefs.getCharPref(PREF_SYNC_TOKENSERVER_LEGACY);
+  } catch(e) {
+    try {
+      tokenServerURI = Services.prefs.getCharPref(PREF_SYNC_TOKENSERVER);
+    } catch(e) {};
+  };
+
+  return tokenServerURI === TOKEN_SERVER_URI;
 }
 
 PrefWatchDog = {
@@ -116,9 +115,13 @@ PrefWatchDog = {
 /**
  * services.sync.* prefs are reset after user disconnected, we need to
  * observe WEAVE_STARTOVER_FINISH topic and change some of them back.
+ *
+ * only necessary before Fx 42
  */
 function startPrefWatchDog() {
-  Services.obs.addObserver(PrefWatchDog, WEAVE_STARTOVER_FINISH, false);
+  if (defaultPrefs.getPrefType(PREF_SYNC_TOKENSERVER) === Services.prefs.PREF_INVALID) {
+    Services.obs.addObserver(PrefWatchDog, WEAVE_STARTOVER_FINISH, false);
+  }
 }
 
 function debug(msg) {
@@ -210,9 +213,9 @@ function repairOnlySyncBookmark() {
   });
 }
 
-function switchToLocalService(aOnlyForSyncPrefs) {
+function switchToLocalService(aExcludeFxAPrefs) {
   Object.keys(SERVICE_PREFS).forEach(function(key) {
-    if (aOnlyForSyncPrefs && !key.startsWith('services.sync.')) {
+    if (aExcludeFxAPrefs && key.startsWith('identity.fxaccounts.')) {
       return;
     }
 
@@ -237,49 +240,37 @@ function markChecked() {
 }
 
 function repairPrefs() {
-  // In such a case, the prefs will be messy:
-  //   - User upgraded passport addon but without the latest cpmanager.
-  //   - User finished the migration process, then the passport addon
-  //     uninstalled itself.
-  //   - User logged out fxa account.
-  //   - User tried to login again, it failed, because the tokenServerURI
-  //     pref is reset without pref-watchdog protection.
-  //
-  // we try to clean the mess here.
-  var hasLocalPref = Object.keys(SERVICE_PREFS).some(function(key) {
+  // Fix the potential mismatch between fxa and sync prefs
+  var hasLocalPref = false,
+      hasLocalFxAPref = false;
+
+  for (let key in SERVICE_PREFS) {
+    if (hasLocalPref && hasLocalFxAPref) {
+      break;
+    }
+
+    let isLocalValue = false;
     try {
       if (typeof SERVICE_PREFS[key] == 'string') {
-        return Services.prefs.getCharPref(key) == SERVICE_PREFS[key];
+        isLocalValue = Services.prefs.getCharPref(key) === SERVICE_PREFS[key];
       } else if (typeof SERVICE_PREFS[key] == 'boolean') {
-        return Services.prefs.getBoolPref(key) == SERVICE_PREFS[key];
+        isLocalValue = Services.prefs.getBoolPref(key) === SERVICE_PREFS[key];
       }
-    } catch (e) {
-      return false;
-    }
-  });
-  var hasLocalNonSyncPref = Object.keys(SERVICE_PREFS).some(function(key) {
-    if (key.startsWith('services.sync.')) {
-      return false;
-    }
-    try {
-      if (typeof SERVICE_PREFS[key] == 'string') {
-        return Services.prefs.getCharPref(key) == SERVICE_PREFS[key];
-      } else if (typeof SERVICE_PREFS[key] == 'boolean') {
-        return Services.prefs.getBoolPref(key) == SERVICE_PREFS[key];
+    } catch(e) {};
+
+    if (isLocalValue) {
+      hasLocalPref = true;
+      if (key.startsWith('identity.fxaccounts.')) {
+        hasLocalFxAPref = true;
       }
-    } catch (e) {
-      return false;
     }
-  });
+  }
 
   if (hasLocalPref) {
     debug('change it back.');
-    // For some unknown reason, we have hundreds of global users who are using
-    // our sync server, we haven't decide how to deal with it (bug 1645). To
-    // prevent impacting those unexpected users, if an user has no pref out of
-    // services.sync.* branch set to local values, we'll limit the fixup to
-    // services.sync.* ones.
-    switchToLocalService(!hasLocalNonSyncPref);
+    // One case of the mismatch, global fxa + local sync, is actually usable.
+    // We'll keep it as is for now, pending a decision from bug 1645.
+    switchToLocalService(!hasLocalFxAPref);
   }
 }
 
