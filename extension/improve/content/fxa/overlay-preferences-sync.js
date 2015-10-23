@@ -60,7 +60,11 @@ var mozCNSyncHack = (function() {
       if (aLabel.getAttribute('onclick').contains('openOldSyncSupportPage()')) {
         aLabel.style.color = '#999';
       }
-    })
+    });
+
+    [].forEach.call(document.querySelectorAll('label.androidLink.text-link'), aLabel => {
+      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#mobile');
+    });
 
     let selector = 'checkbox[preference^="engine."]';
     [].filter.call(document.querySelectorAll(selector), checkbox => {
@@ -107,4 +111,3 @@ var mozCNSyncHack = (function() {
 
   return { onSyncToEnablePref: onSyncToEnablePref };
 })();
-
