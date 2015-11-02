@@ -6,6 +6,8 @@ pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
 pref("loop.fxa.enabled", false);
 pref("plugin.default.state", 2);
+pref("privacy.trackingprotection.pbmode.enabled", false);
+pref("startup.homepage_welcome_url.additional", "");
 
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
