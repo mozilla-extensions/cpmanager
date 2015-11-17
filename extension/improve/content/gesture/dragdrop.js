@@ -378,7 +378,11 @@
     },
 
     openLink: function(link, loadInBackground) {
-      this.mainWindow.getBrowser().loadOneTab(link, null, null, null, loadInBackground, false, true);
+      this.mainWindow.getBrowser().loadOneTab(link, {
+        inBackground: loadInBackground,
+        allowThirdPartyFixup: false,
+        relatedToCurrent: true
+      });
     },
 
     onDragGesture: function(event) {
@@ -460,4 +464,3 @@
     }, 1000);
   }, false);
 })();
-
