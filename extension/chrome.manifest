@@ -87,7 +87,13 @@ overlay  chrome://browser/content/preferences/advanced.xul  chrome://cmtracking/
 overlay  chrome://browser/content/preferences/sync.xul      chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
 overlay  about:preferences  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
-overlay  about:preferences  chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+
+overlay  about:preferences                       chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=abouthome  chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=menubar    chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=menupanel  chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=syncbutton chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=uitour     chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
 style  about:addons  chrome://cmimprove/skin/hiddenWarning.css  appversion<41.0
 
@@ -113,4 +119,3 @@ category profile-after-change mozCNFxaSwitcher @mozillaonline.com/fxa-switcher;1
 
 content copygif copygif/content/ contentaccessible=yes
 overlay chrome://browser/content/browser.xul chrome://copygif/content/overlay.xul
-
