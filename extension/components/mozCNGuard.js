@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-let Cu = Components.utils;
-let Cr = Components.results;
-let Ci = Components.interfaces;
-let Cc = Components.classes;
+var Cu = Components.utils;
+var Cr = Components.results;
+var Ci = Components.interfaces;
+var Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
@@ -27,7 +27,7 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
-let safeBrowsingHack = {
+var safeBrowsingHack = {
   _shouldCancel: {
     "apprep": false,
     "gethash": false,
@@ -128,7 +128,7 @@ let safeBrowsingHack = {
   }
 }
 
-let userJSDetection = {
+var userJSDetection = {
   get sandbox() {
     let nullprincipal = Cc["@mozilla.org/nullprincipal;1"].
       createInstance(Ci.nsIPrincipal);
@@ -209,7 +209,7 @@ let userJSDetection = {
   }
 };
 
-let pocketButtonRemoval = {
+var pocketButtonRemoval = {
   init: function() {
     this.defaultPrefTweak();
   },
@@ -224,7 +224,7 @@ let pocketButtonRemoval = {
   }
 };
 
-let socialShareRemoval = {
+var socialShareRemoval = {
   id: "social-share-button",
   prefKey: "extensions.cpmanager@mozillaonline.com.socialShareRemoved",
 
@@ -263,7 +263,7 @@ let socialShareRemoval = {
   }
 };
 
-let defaultFontHack = {
+var defaultFontHack = {
   get prefs() {
     delete this.prefs;
     return this.prefs = Services.prefs.getDefaultBranch("font.");

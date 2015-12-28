@@ -85,11 +85,10 @@ function getUK() {
       let cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
           createInstance(Ci.nsIConverterInputStream);
       cstream.init(fstream, "UTF-8", 0, 0);
-      let str = "";
-      let (data = {}) {
-        // read the whole file
-        while (cstream.readString(-1, data))
-          str += data.value;
+      let str = "", data = {};
+      // read the whole file
+      while (cstream.readString(-1, data)) {
+        str += data.value;
       }
       cstream.close(); // this also closes fstream
       let obj = JSON.parse(str)
