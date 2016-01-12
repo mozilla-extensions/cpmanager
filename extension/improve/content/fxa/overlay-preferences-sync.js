@@ -63,7 +63,10 @@ var mozCNSyncHack = (function() {
     });
 
     [].forEach.call(document.querySelectorAll('label.androidLink.text-link'), aLabel => {
-      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#mobile');
+      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#android');
+    });
+    [].forEach.call(document.querySelectorAll('label.iOSLink.text-link'), aLabel => {
+      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#ios');
     });
 
     let selector = 'checkbox[preference^="engine."]';
