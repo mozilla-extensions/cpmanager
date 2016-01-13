@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { classes: Cc, interfaces: Ci, utils: Cu } = Components;
+const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
 
 var EXPORTED_SYMBOLS = ["mozCNSafeBrowsing"];
 
@@ -34,6 +34,15 @@ let mozCNSafeBrowsing = {
   percentPref: "extensions.cpmanager.safeflag.percent.",
   slugPref: "extensions.cpmanager.safeflag.slug.",
   urlPref: "extensions.cpmanager.safeflag.provider.",
+
+  cachedLookupTables: {},
+  get lookupBranch() {
+    let prefix = "urlclassifier.";
+
+    // use default branch so we don't have to clear it on next startup
+    delete this.lookupBranch;
+    return this.lookupBranch = Services.prefs.getDefaultBranch(prefix);
+  },
 
   latestUpdateKey: "extensions.cpmanager.safeflag.latestUpdate",
   delayTimeout: undefined,
@@ -92,6 +101,28 @@ let mozCNSafeBrowsing = {
     });
   },
 
+  defaultPrefTweak: function() {
+    for (let tablePref in this.cachedLookupTables) {
+      let tables = this.cachedLookupTables[tablePref];
+      this.lookupBranch.setCharPref(tablePref, tables);
+    }
+  },
+
+  addListsToLookup: function(aListsToLookup) {
+    // Enable lookup of additional list types.
+    let tableForTypes = {
+      "malware": "malwareTable",
+      "phish": "phishTable"
+    }
+    for (let type in aListsToLookup) {
+      let tablePref = tableForTypes[type];
+      let originalTables = this.lookupBranch.getCharPref(tablePref);
+      let tables = originalTables + "," + aListsToLookup[type].join(",");
+      this.cachedLookupTables[tablePref] = tables;
+      this.lookupBranch.setCharPref(tablePref, tables);
+    }
+  },
+
   init: function() {
     // user pref set in previous versions
     if (Services.prefs.prefHasUserValue("urlclassifier.phishTable")) {
@@ -99,6 +130,7 @@ let mozCNSafeBrowsing = {
     }
 
     let urlPrefs = Services.prefs.getChildList(this.urlPref);
+    let listsToLookup = {};
     for (let urlPref of urlPrefs) {
       let id = urlPref.slice(this.urlPref.length);
 
@@ -108,17 +140,39 @@ let mozCNSafeBrowsing = {
       let slug = Services.prefs.getCharPref(this.slugPref + id);
       let url = Services.prefs.getCharPref(urlPref);
 
-      this.providers.push({
+      let provider = {
         delayed: delayed,
         gethashURL: url.replace("%PATH%", "gethash"),
         listTypes: listTypes.split(","),
         ratio: (percent / 100),
         slug: slug,
         updateURL: url.replace("%PATH%", "downloads")
-      });
+      };
+
+      // Existence of "...provider.{slug}.{last,next}updatetime" prefs will
+      // make Fx try to register the relevant providers.
+      let prefix = "browser.safebrowsing.provider." + slug + ".";
+      if (Services.prefs.getChildList(prefix, {}).length > 0) {
+        let providerBranch = Services.prefs.getDefaultBranch(prefix);
+        providerBranch.setCharPref("gethashURL", provider.gethashURL);
+        providerBranch.setCharPref("lists", provider.listTypes.join(","));
+        providerBranch.setCharPref("updateURL", provider.updateURL);
+
+        for (let listType of provider.listTypes) {
+          let type = listType.split("-")[1];
+          listsToLookup[type] = listsToLookup[type] || [];
+          listsToLookup[type].push(listType);
+        }
+      } else {
+        this.providers.push(provider);
+      }
     }
 
-    this.maybeRegister();
+    this.addListsToLookup(listsToLookup);
+
+    if (this.providers.length) {
+      this.maybeRegister();
+    }
   },
 
   maybeRegister: function() {
@@ -136,8 +190,6 @@ let mozCNSafeBrowsing = {
     dbService.getTables((tables) => {
       let listsToLookup = {};
       let listsToDelayUpdate = [];
-      // use default branch so we don't have to clear it on next startup
-      let lookupBranch = Services.prefs.getDefaultBranch("urlclassifier.");
 
       for (let provider of this.providers) {
         let enableIfNotAlready = Math.random() <= provider.ratio;
@@ -153,8 +205,16 @@ let mozCNSafeBrowsing = {
           listsToLookup[type] = listsToLookup[type] || [];
           listsToLookup[type].push(listType);
 
-          listManager.registerTable(listType,
-            provider.updateURL, provider.gethashURL);
+          try {
+            listManager.registerTable(listType,
+              provider.updateURL, provider.gethashURL);
+          } catch(ex) {
+            // Extra providerName required since Fx 44 <https://bugzil.la/1175562>
+            if (ex.result == Cr.NS_ERROR_XPC_NOT_ENOUGH_ARGS) {
+              listManager.registerTable(listType, provider.slug,
+                provider.updateURL, provider.gethashURL);
+            }
+          }
           if (!provider.delayed) {
             listManager.enableUpdate(listType);
           } else {
@@ -167,17 +227,7 @@ let mozCNSafeBrowsing = {
         listManager.maybeToggleUpdateChecking();
       }
 
-      // Enable lookup of enabled list types.
-      let tableForTypes = {
-        "malware": "malwareTable",
-        "phish": "phishTable"
-      }
-      for (let type in listsToLookup) {
-        let tablePref = tableForTypes[type];
-        let originalTables = lookupBranch.getCharPref(tablePref);
-        let tables = originalTables + "," + listsToLookup[type].join(",");
-        lookupBranch.setCharPref(tablePref, tables);
-      }
+      this.addListsToLookup(listsToLookup);
 
       this.delayTimeout = setTimeout(() => {
         listsToDelayUpdate.forEach(aListType => {
@@ -192,5 +242,3 @@ let mozCNSafeBrowsing = {
     });
   }
 };
-
-mozCNSafeBrowsing.init();

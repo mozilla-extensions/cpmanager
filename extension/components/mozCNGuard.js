@@ -306,6 +306,7 @@ mozCNGuard.prototype = {
         Services.obs.addObserver(this, "http-on-examine-merged-response", false);
         Services.obs.addObserver(this, "prefservice:after-app-defaults", false);
         safeBrowsingHack.init();
+        mozCNSafeBrowsing.init();
         userJSDetection.detect();
         userJSDetection.removeHomepage();
         pocketButtonRemoval.init();
@@ -332,6 +333,7 @@ mozCNGuard.prototype = {
         break;
       case "prefservice:after-app-defaults":
         safeBrowsingHack.defaultPrefTweak();
+        mozCNSafeBrowsing.defaultPrefTweak();
         pocketButtonRemoval.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
         break;
