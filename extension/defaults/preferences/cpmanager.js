@@ -5,9 +5,20 @@ pref("startup.homepage_override_url", "http://firefox.com.cn/whatsnew/");
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
 pref("loop.fxa.enabled", false);
-pref("plugin.default.state", 2);
 pref("privacy.trackingprotection.pbmode.enabled", false);
 pref("startup.homepage_welcome_url.additional", "");
+
+pref("plugin.state.npalicdo", 2);
+pref("plugin.state.npalidcp", 2);
+pref("plugin.state.npaliedit", 2);
+pref("plugin.state.npalisecctrl", 2);
+pref("plugin.state.npalissologin", 2);
+pref("plugin.state.npqqmailwebkit", 2);
+pref("plugin.state.npqqwebgame", 2);
+pref("plugin.state.npqzonemusic", 2);
+pref("plugin.state.npssoaxctrlforptlogin", 2);
+pref("plugin.state.npwangwang", 2);
+pref("plugin.state.npyunwebdetect", 2);
 
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
