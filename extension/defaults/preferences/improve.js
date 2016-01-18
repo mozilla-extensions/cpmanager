@@ -29,4 +29,4 @@ pref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", -4);
 // whether to show url2qr icon in urlbar
 pref("extensions.cmimprove.url2qr.enabled", true);
 
-pref("security.tls.insecure_fallback_hosts", "bj.ac.10086.cn,dlsev.boc.cn,ebspay.boc.cn");
+pref("security.tls.insecure_fallback_hosts", "bj.ac.10086.cn,dlsev.boc.cn,ebspay.boc.cn,wszg.nbcs.gov.cn,www.hx168.com.cn");
