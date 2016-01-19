@@ -12,6 +12,19 @@
   XPCOMUtils.defineLazyGetter(ns, "popupFx4A", function() {
     return document.getElementById("mo-url2qr-fx4a");
   });
+  XPCOMUtils.defineLazyGetter(ns, "CEHomepage", function() {
+    try {
+      let tmp = {};
+      Cu.import("resource://ntab/mozCNUtils.jsm", tmp);
+      if (tmp.Homepage && tmp.Homepage.aboutpage) {
+        return tmp.Homepage;
+      }
+    } catch(ex) {};
+
+    return {
+      aboutpage: "http://i.firefoxchina.cn/"
+    }
+  });
   XPCOMUtils.defineLazyGetter(ns, "CETracking", function() {
     return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
   });
@@ -96,7 +109,7 @@
 
     let text = uri.asciiSpec;
     text = {
-      "about:cehome": "http://i.firefoxchina.cn/?from=url2qr"
+      "about:cehome": (ns.CEHomepage.aboutpage.split("?")[0] + "?from=url2qr")
     }[text] || text;
     let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text);
     ns.popupImage.src = datauri;

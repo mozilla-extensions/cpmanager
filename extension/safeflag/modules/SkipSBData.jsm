@@ -37,7 +37,7 @@ let SkipSBData = {
     return this.key = key;
   },
 
-  updateUrl: "http://i.firefoxchina.cn/skipsb/v1/urls.json",
+  updateUrl: "http://n.firefoxchina.cn/skipsb/v1/urls.json",
 
   get _bundleData() {
     let uri = Services.io.newURI("resource://cmsafeflag/skipsburls.json",
