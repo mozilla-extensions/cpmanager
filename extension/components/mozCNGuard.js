@@ -23,19 +23,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "CEHomepage", function() {
-  try {
-    let tmp = {};
-    Cu.import("resource://ntab/mozCNUtils.jsm", tmp);
-    if (tmp.Homepage && tmp.Homepage.aboutpage) {
-      return tmp.Homepage;
-    }
-  } catch(ex) {};
-
-  return {
-    aboutpage: "http://i.firefoxchina.cn/"
-  }
-});
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
@@ -163,7 +150,7 @@ var userJSDetection = {
 
     return [
       /^about:cehome$/,
-      /^http:\/\/[in]\.firefoxchina\.cn\/?$/
+      /^http:\/\/i\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(spec);
     });
@@ -353,7 +340,7 @@ mozCNGuard.prototype = {
   isCEHome: function MCG_isCEHome(aSpec) {
     return [
       /^about:cehome$/,
-      /^http:\/\/[in]\.firefoxchina\.cn\/?$/
+      /^http:\/\/i\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(aSpec);
     });
@@ -464,12 +451,8 @@ mozCNGuard.prototype = {
         let title;
 
         // Don't open if already in commandline argument.
-        let page = {
-          "about:cehome": CEHomepage.aboutpage
-        }[uri.asciiSpec] || uri.asciiSpec;
-        if (externalURLs.some(function(externalURL) {
-          return externalURL.split("?")[0] == page.split("?")[0];
-        })) {
+        let page = {"about:cehome": "http://i.firefoxchina.cn/"}[uri.asciiSpec] || uri.asciiSpec;
+        if (externalURLs.indexOf(page) >= 0) {
           return;
         }
 
@@ -523,13 +506,11 @@ mozCNGuard.prototype = {
     let restrictedHosts = {
       "huohu123.com": "h.17huohu.com",
       "i.firefoxchina.cn": "i.17huohu.com",
-      "n.firefoxchina.cn": "n.17huohu.com",
       "i.g-fox.cn": "g.17huohu.com",
       "www.huohu123.com": "h.17huohu.com",
       "i.17huohu.com": "",
       "g.17huohu.com": "",
-      "h.17huohu.com": "",
-      "n.17huohu.com": ""
+      "h.17huohu.com": ""
     };
 
     if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
