@@ -62,11 +62,43 @@ var mozCNSyncHack = (function() {
       }
     });
 
+    let observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        let altHref = mutation.target.getAttribute('delayed-mozcn-href');
+        if (!altHref ||
+            mutation.type != 'attributes' ||
+            mutation.attributeName != 'href' ||
+            mutation.target.getAttribute(mutation.attributeName) == altHref) {
+          return;
+        }
+
+        mutation.target.setAttribute(mutation.attributeName, altHref);
+        mutation.target.removeAttribute('delayed-mozcn-href');
+        let selector = '[delayed-mozcn-href^="http://www.firefox.com.cn/#"]';
+        if (!document.querySelectorAll(selector).length) {
+          observer.disconnect();
+        }
+      });
+    });
+    let observerConfig = {
+      attributes: true,
+      attributeFilter: ['href']
+    };
     [].forEach.call(document.querySelectorAll('label.androidLink.text-link'), aLabel => {
-      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#android');
+      if (aLabel.getAttribute('href')) {
+        aLabel.setAttribute('href', 'http://www.firefox.com.cn/#android');
+      } else {
+        aLabel.setAttribute('delayed-mozcn-href', 'http://www.firefox.com.cn/#android');
+        observer.observe(aLabel, observerConfig);
+      }
     });
     [].forEach.call(document.querySelectorAll('label.iOSLink.text-link'), aLabel => {
-      aLabel.setAttribute('href', 'http://www.firefox.com.cn/#ios');
+      if (aLabel.getAttribute('href')) {
+        aLabel.setAttribute('href', 'http://www.firefox.com.cn/#ios');
+      } else {
+        aLabel.setAttribute('delayed-mozcn-href', 'http://www.firefox.com.cn/#ios');
+        observer.observe(aLabel, observerConfig);
+      }
     });
 
     let selector = 'checkbox[preference^="engine."]';
