@@ -4,7 +4,6 @@ pref("startup.homepage_override_url", "http://firefox.com.cn/whatsnew/");
 
 pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 
-pref("loop.fxa.enabled", false);
 pref("privacy.trackingprotection.pbmode.enabled", false);
 pref("startup.homepage_welcome_url.additional", "");
 

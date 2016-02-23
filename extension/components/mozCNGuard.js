@@ -204,27 +204,15 @@ var userJSDetection = {
   }
 };
 
-var pocketButtonRemoval = {
-  init: function() {
-    this.defaultPrefTweak();
+var buttonRemoval = {
+  id: "dummy-button-id",
+  prefKey: "dummy-pref-key",
+  earlyReturn: function() {
+    return false;
   },
 
-  defaultPrefTweak: function() {
-    if (Services.prefs.getChildList("browser.pocket.settings.").length) {
-      return;
-    }
-
-    let defaultBranch = Services.prefs.getDefaultBranch("browser.pocket.");
-    defaultBranch.setBoolPref("enabled", false);
-  }
-};
-
-var socialShareRemoval = {
-  id: "social-share-button",
-  prefKey: "extensions.cpmanager@mozillaonline.com.socialShareRemoved",
-
   init: function() {
-    if (Services.vc.compare(Services.appinfo.version, "35.0") < 0) {
+    if (this.earlyReturn()) {
       return;
     }
 
@@ -257,6 +245,52 @@ var socialShareRemoval = {
     CustomizableUI.removeWidgetFromArea(this.id);
   }
 };
+
+var loopButtonRemoval = Object.create(buttonRemoval, {
+  id: {
+    value: "loop-button"
+  },
+  prefKey: {
+    value: "extensions.cpmanager@mozillaonline.com.loopButtonRemoved"
+  },
+  earlyReturn: {
+    value: function() {
+      return Services.vc.compare(Services.appinfo.version, "36.0") < 0 ||
+             Services.prefs.getPrefType("loop.hawk-session-token") ||
+             Services.prefs.getPrefType("loop.hawk-session-token.fxa");
+    }
+  }
+});
+
+var pocketButtonRemoval = Object.create(buttonRemoval, {
+  id: {
+    value: "pocket-button"
+  },
+  prefKey: {
+    value: "extensions.cpmanager@mozillaonline.com.pocketButtonRemoved"
+  },
+  earlyReturn: {
+    value: function() {
+      return Services.vc.compare(Services.appinfo.version, "38.0.5") < 0 ||
+             Services.prefs.getChildList("browser.pocket.settings.").length ||
+             Services.prefs.getChildList("extensions.pocket.settings.").length;
+    }
+  }
+});
+
+var socialShareRemoval = Object.create(buttonRemoval, {
+  id: {
+    value: "social-share-button"
+  },
+  prefKey: {
+    value: "extensions.cpmanager@mozillaonline.com.socialShareRemoved"
+  },
+  earlyReturn: {
+    value: function() {
+      return Services.vc.compare(Services.appinfo.version, "35.0") < 0;
+    }
+  }
+});
 
 var defaultFontHack = {
   get prefs() {
@@ -304,6 +338,7 @@ mozCNGuard.prototype = {
         mozCNSafeBrowsing.init();
         userJSDetection.detect();
         userJSDetection.removeHomepage();
+        loopButtonRemoval.init();
         pocketButtonRemoval.init();
         socialShareRemoval.init();
         defaultFontHack.init();
@@ -328,7 +363,6 @@ mozCNGuard.prototype = {
         break;
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
-        pocketButtonRemoval.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
         break;
     }

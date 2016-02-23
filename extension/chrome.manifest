@@ -26,7 +26,6 @@ style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin
 style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin/mac/overlay.css    os=Darwin
 
 overlay   chrome://cmsafeflag/content/options.xul            chrome://cmnotification/content/optionsOverlay.xul      appversion>=4.0
-overlay   chrome://cmsafeflag/content/generalpane.xul        chrome://cmimprove/content/hello/optionsOverlay.xul     appversion>=34.0
 
 overlay   chrome://browser/content/browser.xul               chrome://cmnotification/content/ff-overlay.xul          appversion>=4.0
 override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotification/content/notification_blank.xul
