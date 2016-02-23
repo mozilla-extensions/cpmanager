@@ -34,23 +34,19 @@
     </groupbox>
   </prefpane>
 
-  <prefpane id="mainPrefPane">
-    <groupbox id="mozCNHistoryGroup" data-category="paneGeneral">
-      <caption label="&cp.history.label;"/>
-
-      <hbox align="center">
-        <label value="&cp.clearHistory.label;" control="browserClearHistory" accesskey="&cp.clearHistory.accesskey;"/>
-        <menulist id="browserClearHistory" preference="browser.history.autoclear">
-          <menupopup>
-            <menuitem value="0" id="ce_sanitizeHistory_none" label="&cp.clearRecentHistory.none.label;"/>
-            <menuitem value="-1" id="ce_sanitizeHistory_daily" label="&cp.clearRecentHistory.daily.label;"/>
-            <menuitem value="-2" id="ce_sanitizeHistory_weekly" label="&cp.clearRecentHistory.weekly.label;"/>
-            <menuitem value="-3" id="ce_sanitizeHistory_monthly" label="&cp.clearRecentHistory.monthly.label;"/>
-            <menuitem value="-4" id="ce_sanitizeHistory_quarterly" label="&cp.clearRecentHistory.querterly.label;"/>
-            <menuitem value="-6" id="ce_sanitizeHistory_yearly" label="&cp.clearRecentHistory.yearly.label;"/>
-          </menupopup>
-        </menulist>
-      </hbox>
-    </groupbox>
-  </prefpane>
+  <vbox id="historyRememberPane">
+    <hbox align="center" flex="1">
+      <label value="&cp.clearHistory.label;" control="browserClearHistory" accesskey="&cp.clearHistory.accesskey;"/>
+      <menulist id="browserClearHistory" preference="browser.history.autoclear">
+        <menupopup>
+          <menuitem value="0" id="ce_sanitizeHistory_none" label="&cp.clearRecentHistory.none.label;"/>
+          <menuitem value="-1" id="ce_sanitizeHistory_daily" label="&cp.clearRecentHistory.daily.label;"/>
+          <menuitem value="-2" id="ce_sanitizeHistory_weekly" label="&cp.clearRecentHistory.weekly.label;"/>
+          <menuitem value="-3" id="ce_sanitizeHistory_monthly" label="&cp.clearRecentHistory.monthly.label;"/>
+          <menuitem value="-4" id="ce_sanitizeHistory_quarterly" label="&cp.clearRecentHistory.querterly.label;"/>
+          <menuitem value="-6" id="ce_sanitizeHistory_yearly" label="&cp.clearRecentHistory.yearly.label;"/>
+        </menupopup>
+      </menulist>
+    </hbox>
+  </vbox>
 </overlay>
