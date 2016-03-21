@@ -163,7 +163,7 @@ var userJSDetection = {
 
     return [
       /^about:cehome$/,
-      /^http:\/\/[in]\.firefoxchina\.cn\/?$/
+      /^http:\/\/[ein]\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(spec);
     });
@@ -387,7 +387,7 @@ mozCNGuard.prototype = {
   isCEHome: function MCG_isCEHome(aSpec) {
     return [
       /^about:cehome$/,
-      /^http:\/\/[in]\.firefoxchina\.cn\/?$/
+      /^http:\/\/[ein]\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(aSpec);
     });
@@ -556,10 +556,12 @@ mozCNGuard.prototype = {
 
     let restrictedHosts = {
       "huohu123.com": "h.17huohu.com",
+      "e.firefoxchina.cn": "e.17huohu.com",
       "i.firefoxchina.cn": "i.17huohu.com",
       "n.firefoxchina.cn": "n.17huohu.com",
       "i.g-fox.cn": "g.17huohu.com",
       "www.huohu123.com": "h.17huohu.com",
+      "e.17huohu.com": "",
       "i.17huohu.com": "",
       "g.17huohu.com": "",
       "h.17huohu.com": "",
