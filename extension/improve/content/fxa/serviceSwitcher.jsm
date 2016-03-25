@@ -19,29 +19,7 @@ XPCOMUtils.defineLazyModuleGetter(this,
 XPCOMUtils.defineLazyModuleGetter(this,
   'Weave', 'resource://services-sync/main.js');
 
-let TOKEN_SERVER        = 'https://sync.firefox.com.cn';
-let AUTH_SERVER         = 'https://api-accounts.firefox.com.cn';
-let ACCOUNTS_SERVER     = 'https://accounts.firefox.com.cn';
-let OAUTH_SERVER        = 'https://oauth.firefox.com.cn';
-let PROFILE_SERVER      = 'https://profile.firefox.com.cn';
-let READINGLIST_SERVER  = 'https://readinglist.firefox.com.cn';
-
 const DEBUG = 0;
-
-const TOKEN_SERVER_URI = TOKEN_SERVER       + '/token/1.0/sync/1.5';
-const AUTH_URI         = AUTH_SERVER        + '/v1';
-const FORCE_AUTH_URI   = ACCOUNTS_SERVER    + '/force_auth?service=sync&context=fx_desktop_v1';
-const OAUTH_URI        = OAUTH_SERVER       + '/v1';
-const PROFILE_URI      = PROFILE_SERVER     + '/v1';
-const SIGHIN_URI       = ACCOUNTS_SERVER    + '/signin?service=sync&context=fx_desktop_v1';
-const SIGHUP_URI       = ACCOUNTS_SERVER    + '/signup?service=sync&context=fx_desktop_v1';
-const REMOTE_URI       = ACCOUNTS_SERVER    + '/?service=sync&context=fx_desktop_v1';
-const WEBCHANNEL_URI   = ACCOUNTS_SERVER    + '/';
-const SETTINGS_URI     = ACCOUNTS_SERVER    + '/settings';
-const READINGLIST_URI  = READINGLIST_SERVER + '/v1';
-const STATUS_URL       = ACCOUNTS_SERVER    + '/status/';
-const PRIVACY_URL      = ACCOUNTS_SERVER    + '/legal/privacy';
-const TERMS_URL        = ACCOUNTS_SERVER    + '/legal/terms';
 
 const PREF_SYNC_TOKENSERVER_LEGACY = 'services.sync.tokenServerURI';
 const PREF_SYNC_TOKENSERVER = 'identity.sync.tokenserver.uri';
@@ -49,28 +27,46 @@ const PREF_SYNC_TOKENSERVER = 'identity.sync.tokenserver.uri';
 const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
 
 const SERVICE_PREFS = {
-  'identity.fxaccounts.auth.uri': AUTH_URI,
-  'identity.fxaccounts.remote.force_auth.uri': FORCE_AUTH_URI,
-  'identity.fxaccounts.remote.oauth.uri': OAUTH_URI,
-  'identity.fxaccounts.remote.profile.uri': PROFILE_URI,
-  'identity.fxaccounts.remote.signin.uri': SIGHIN_URI,
-  'identity.fxaccounts.remote.signup.uri': SIGHUP_URI,
-  'identity.fxaccounts.remote.uri': REMOTE_URI,
-  'identity.fxaccounts.remote.webchannel.uri': WEBCHANNEL_URI,
-  'identity.fxaccounts.settings.uri': SETTINGS_URI,
-  // 'readinglist.server': READINGLIST_URI,
-  'services.sync.statusURL': STATUS_URL,
-  'services.sync.fxa.privacyURL': PRIVACY_URL,
-  'services.sync.fxa.termsURL': TERMS_URL,
   'services.sync.fxaccounts.enabled': true
-
 };
 
-SERVICE_PREFS[PREF_SYNC_TOKENSERVER_LEGACY] = TOKEN_SERVER_URI;
 let defaultPrefs = Services.prefs.getDefaultBranch('');
-if (defaultPrefs.getPrefType(PREF_SYNC_TOKENSERVER) !== Services.prefs.PREF_INVALID) {
-  SERVICE_PREFS[PREF_SYNC_TOKENSERVER] = TOKEN_SERVER_URI;
-}
+[
+  'identity.fxaccounts.auth.uri',
+  'identity.fxaccounts.remote.force_auth.uri',
+  'identity.fxaccounts.remote.oauth.uri',
+  'identity.fxaccounts.remote.profile.uri',
+  'identity.fxaccounts.remote.signin.uri',
+  'identity.fxaccounts.remote.signup.uri',
+  'identity.fxaccounts.remote.uri',
+  'identity.fxaccounts.remote.webchannel.uri',
+  'identity.fxaccounts.settings.uri',
+  PREF_SYNC_TOKENSERVER,
+  'services.sync.statusURL',
+  'services.sync.fxa.privacyURL',
+  'services.sync.fxa.termsURL',
+  PREF_SYNC_TOKENSERVER_LEGACY
+].forEach(function(prefKey) {
+  if (defaultPrefs.getPrefType(prefKey) !== Services.prefs.PREF_INVALID) {
+    try {
+      let defaultVal = defaultPrefs.getCharPref(prefKey);
+      let prefVal = defaultVal.replace('https://api.accounts.firefox.com',
+                                       'https://api-accounts.firefox.com.cn')
+                              .replace('https://accounts.firefox.com',
+                                       'https://accounts.firefox.com.cn')
+                              .replace('https://oauth.accounts.firefox.com',
+                                       'https://oauth.firefox.com.cn')
+                              .replace('https://profile.accounts.firefox.com',
+                                       'https://profile.firefox.com.cn')
+                              .replace('https://token.services.mozilla.com',
+                                       'https://sync.firefox.com.cn/token');
+
+      SERVICE_PREFS[prefKey] = prefVal;
+    } catch(e) {
+      Services.prefs.clearUserPref(prefKey);
+    }
+  }
+});
 
 const WEAVE_STARTOVER_FINISH = 'weave:service:start-over:finish';
 
@@ -90,16 +86,12 @@ function _(key) {
 }
 
 function localServiceEnabled() {
-  let tokenServerURI;
-  try {
-    tokenServerURI = Services.prefs.getCharPref(PREF_SYNC_TOKENSERVER_LEGACY);
-  } catch(e) {
-    try {
-      tokenServerURI = Services.prefs.getCharPref(PREF_SYNC_TOKENSERVER);
-    } catch(e) {};
-  };
+  let prefKey = PREF_SYNC_TOKENSERVER_LEGACY;
+  if (SERVICE_PREFS[prefKey] === undefined) {
+    prefKey = PREF_SYNC_TOKENSERVER;
+  }
 
-  return tokenServerURI === TOKEN_SERVER_URI;
+  return Services.prefs.getCharPref(prefKey) === SERVICE_PREFS[prefKey];
 }
 
 PrefWatchDog = {
