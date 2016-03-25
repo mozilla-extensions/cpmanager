@@ -59,7 +59,9 @@ let defaultPrefs = Services.prefs.getDefaultBranch('');
                               .replace('https://profile.accounts.firefox.com',
                                        'https://profile.firefox.com.cn')
                               .replace('https://token.services.mozilla.com',
-                                       'https://sync.firefox.com.cn/token');
+                                       'https://sync.firefox.com.cn/token')
+                              .replace('https://services.mozilla.com/status/',
+                                       'https://accounts.firefox.com.cn/status/');
 
       SERVICE_PREFS[prefKey] = prefVal;
     } catch(e) {
