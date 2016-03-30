@@ -19,15 +19,8 @@ pref("plugin.state.npssoaxctrlforptlogin", 2);
 pref("plugin.state.npwangwang", 2);
 pref("plugin.state.npyunwebdetect", 2);
 
-pref("plugin.state.np_spdbsafe_nie_v", 2);
-pref("plugin.state.npcgbeditfirefox", 2);
-pref("plugin.state.npcmbccom", 2);
-pref("plugin.state.npcmbcedit", 2);
 pref("plugin.state.npcmbedit", 2);
-pref("plugin.state.npcryptokit.cmbc.u2.x", 2);
-pref("plugin.state.npisecurity-pab", 2);
 pref("plugin.state.npseceditctl.boc.x", 2);
-pref("plugin.state.npupeditor", 2);
 
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
