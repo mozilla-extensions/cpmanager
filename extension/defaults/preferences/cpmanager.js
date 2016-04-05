@@ -22,6 +22,10 @@ pref("plugin.state.npyunwebdetect", 2);
 pref("plugin.state.npcmbedit", 2);
 pref("plugin.state.npseceditctl.boc.x", 2);
 
+pref("plugin.state.npdmccbplugin", 2);
+pref("plugin.state.nphdzb2gsnctrl", 2);
+pref("plugin.state.npwdkctrl", 2);
+
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
 pref("extensions.cpmanager.tracking.enabled", true);
