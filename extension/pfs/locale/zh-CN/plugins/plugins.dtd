@@ -20,7 +20,6 @@
 
 <!ENTITY pluginWizard.finalPage.description.label            "&brandShortName; 已完成安装缺失的插件：">
 
-<!ENTITY pluginWizard.finalPage.moreInfo.label               "查找更多或者手动查找缺失插件。">
 <!ENTITY pluginWizard.finalPage.restart.label                "&brandShortName; 需要重启以启用插件。">
 
 <!ENTITY installPlugin                                       "安装插件…">

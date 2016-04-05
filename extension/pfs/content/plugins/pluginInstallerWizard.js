@@ -426,7 +426,6 @@ nsPluginInstallerWizard.prototype.addPluginResultRow = function (aImgSrc, aName,
 }
 
 nsPluginInstallerWizard.prototype.showPluginResults = function (){
-  var notInstalledList = "?action=missingplugins";
   var myRows = document.getElementById("pluginResultList");
 
   // clear children
@@ -444,12 +443,10 @@ nsPluginInstallerWizard.prototype.showPluginResults = function (){
       if (myPluginItem.error){
         statusMsg = this.getString("pluginInstallationSummary.failed");
         statusTooltip = myPluginItem.error;
-        notInstalledList += "&mimetype=" + pluginInfoItem;
       } else if (!myPluginItem.licenseAccepted) {
         statusMsg = this.getString("pluginInstallationSummary.licenseNotAccepted");
       } else if (!myPluginItem.XPILocation && !myPluginItem.InstallerLocation) {
         statusMsg = this.getString("pluginInstallationSummary.notAvailable");
-        notInstalledList += "&mimetype=" + pluginInfoItem;
       } else {
         this.mSuccessfullPluginInstallation++;
         statusMsg = this.getString("pluginInstallationSummary.success");
@@ -490,8 +487,6 @@ nsPluginInstallerWizard.prototype.showPluginResults = function (){
           null,
           pluginRequest.pluginsPage);
     }
-
-    notInstalledList += "&mimetype=" + pluginInfoItem;
   }
 
   // no plugins were found, so change the description of the final page.
@@ -508,16 +503,6 @@ nsPluginInstallerWizard.prototype.showPluginResults = function (){
 
   var app = Components.classes["@mozilla.org/xre/app-info;1"]
                       .getService(Components.interfaces.nsIXULAppInfo);
-
-  // set the get more info link to contain the mimetypes we couldn't install.
-  notInstalledList +=
-    "&appID=" + app.ID +
-    "&appVersion=" + app.platformBuildID +
-    "&clientOS=" + this.getOS() +
-    "&chromeLocale=" + this.getChromeLocale() +
-    "&appRelease=" + app.version;
-
-  document.getElementById("moreInfoLink").addEventListener("click", function() { gPluginInstaller.loadURL("https://pfs.mozilla.org/plugins/" + notInstalledList) }, false);
 
   if (this.mNeedsRestart) {
     var cancel = document.getElementById("plugin-installer-wizard").getButton("cancel");

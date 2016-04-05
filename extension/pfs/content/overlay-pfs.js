@@ -202,8 +202,8 @@
   }
 
   function uninit() {
-    mm.removeMessageListener(MSG_INSTALL_NOTI, eventHandler);
-    mm.removeMessageListener(MSG_INSTALL_SING, eventHandler);
+    mm.removeMessageListener(MSG_INSTALL_NOTI, pluginHandler);
+    mm.removeMessageListener(MSG_INSTALL_SING, pluginHandler);
   }
 
   window.addEventListener('load', function onload() {
@@ -215,4 +215,3 @@
 
   window.addEventListener('unload', uninit);
 })();
-

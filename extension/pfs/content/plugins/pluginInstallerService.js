@@ -17,8 +17,8 @@ function getLocalizedError(key)
 
 function binaryToHex(input)
 {
-  return [('0' + input.charCodeAt(i).toString(16)).slice(-2)
-          for (i in input)].join('');
+  let toHexString = charCode => ("0" + charCode.toString(16)).slice(-2);
+  return Array.from(input, (c, i) => toHexString(input.charCodeAt(i))).join("");
 }
 
 function verifyHash(aFile, aHash)
@@ -230,8 +230,9 @@ var PluginInstallService = {
     // InstallerObserver may finish immediately so we must initialise the
     // installers after setting the number of installers and xpis pending
     this._installersPending = aInstallerPlugins.length;
-    this._installerPlugins = [new InstallerObserver(plugin)
-                              for each (plugin in aInstallerPlugins)];
+    this._installerPlugins = aInstallerPlugins.map(function(plugin) {
+      return new InstallerObserver(plugin);
+    });
   },
 
   _fireFinishedNotification: function()
