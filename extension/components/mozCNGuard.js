@@ -292,6 +292,47 @@ var socialShareRemoval = Object.create(buttonRemoval, {
   }
 });
 
+var mobilePromoLinksHack = {
+  init: function() {
+    CustomizableUI.addListener(this);
+  },
+  onWidgetBeforeDOMChange: function(node, nextNode, container, isRemoval) {
+    if (isRemoval || node.id !== "sync-button" || !container) {
+      return;
+    }
+
+    let doc = container.ownerDocument,
+        selector = "#PanelUI-remotetabs-mobile-promo > .remotetabs-promo-link";
+    [].forEach.call(doc.querySelectorAll(selector), function(label) {
+      let os;
+      if (label.hasAttribute("mobile-promo-os")) {
+        os = label.getAttribute("mobile-promo-os");
+      } else if (label.hasAttribute("href")) {
+        let regex = /^https:\/\/www\.mozilla\.org\/firefox\/(android|ios)\//;
+        let result = regex.exec(label.getAttribute("href"));
+        if (!result) {
+          return;
+        }
+
+        os = result[1];
+        label.removeAttribute("href");
+      }
+
+      // similar to https://bugzil.la/1237945
+      label.addEventListener("click", function(evt) {
+        if (evt.button > 1) {
+          return;
+        }
+        evt.stopPropagation();
+
+        let link = "http://www.firefox.com.cn/#" + os;
+        doc.defaultView.openUILinkIn(link, "tab");
+        CustomizableUI.hidePanelForNode(evt.target);
+      }, true);
+    });
+  }
+};
+
 var defaultFontHack = {
   get prefs() {
     delete this.prefs;
@@ -341,6 +382,7 @@ mozCNGuard.prototype = {
         loopButtonRemoval.init();
         pocketButtonRemoval.init();
         socialShareRemoval.init();
+        mobilePromoLinksHack.init();
         defaultFontHack.init();
         break;
       case "browser-delayed-startup-finished":
