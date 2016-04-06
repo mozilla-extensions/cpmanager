@@ -22,6 +22,7 @@ pref("plugin.state.npyunwebdetect", 2);
 pref("plugin.state.npcmbedit", 2);
 pref("plugin.state.npseceditctl.boc.x", 2);
 
+pref("plugin.state.npccbnetsigncom", 2);
 pref("plugin.state.npdmccbplugin", 2);
 pref("plugin.state.nphdzb2gsnctrl", 2);
 pref("plugin.state.npwdkctrl", 2);
