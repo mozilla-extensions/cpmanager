@@ -30,6 +30,23 @@ var cmImprove_BM = {
     var item_t = $("BMB_viewBookmarksToolbar");
     item_t && item_t.setAttribute("label", getString("menu.bookmarksToolbar"));
   },
+  showBookmarkToolbar: function() {
+    // If pref "initialized" has been set to True, this means it's not a new profile.
+    var prefs = Application.prefs;
+    if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
+      return;
+    }
+
+    if (!prefs.getValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false)) {
+      return;
+    }
+
+    prefs.setValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false);
+    // Show bookmark toolbar
+    if ($("PersonalToolbar")) {
+       setToolbarVisibility($("PersonalToolbar"), true);
+    }
+  },
   init: function() {
     BookmarkingUI.onCommand = function (aEvent) {
       if (aEvent.target != aEvent.currentTarget) {
@@ -109,6 +126,8 @@ var cmImprove_BM = {
       if (event.target.id == "editBookmarkPanel" && gEditItemOverlay.tempContainer && !StarUI._actionOnHide)
         Application.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder", gEditItemOverlay.tempContainer)
     }, false);
+
+    this.showBookmarkToolbar();
   },
   uninit: function() {
     this.bookmarksPopup && this.bookmarksPopup.removeEventListener("popupshowing", this, false);
