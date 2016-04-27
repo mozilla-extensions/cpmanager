@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function() {
+  var cpmPrefs = Cu.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
+
   let gTrackingNotificationInfoBar = {
 
     handleEvent: function Improve_CE__handleEvent(aEvent) {
@@ -23,8 +25,8 @@
     },
 
     init: function() {
-      if (!Application.prefs.getValue("extensions.cpmanager.tracking.notification.show", false) ||
-         !Application.prefs.getValue("extensions.cpmanager.tracking.enabled", false)) {
+      if (!cpmPrefs.prefs.getValue("extensions.cpmanager.tracking.notification.show", false) ||
+         !cpmPrefs.prefs.getValue("extensions.cpmanager.tracking.enabled", false)) {
         return;
       }
       this._showNotification();
@@ -35,7 +37,6 @@
     },
 
     _showNotification: function () {
-      Application.console.log("_displayInfoBar")
       if (this._getDataChoicesNotification()) {
         return;
       }
@@ -66,7 +67,7 @@
         this._notificationBox.PRIORITY_INFO_HIGH,
         buttons,
         function onEvent(event) {
-          Application.prefs.setValue("extensions.cpmanager.tracking.notification.show", false);
+          cpmPrefs.prefs.setValue("extensions.cpmanager.tracking.notification.show", false);
           if (event == "removed") {
             this._clearNotification();
           }
@@ -84,4 +85,3 @@
   };
   window.addEventListener("load", gTrackingNotificationInfoBar, false)
 })();
-

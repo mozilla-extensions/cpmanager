@@ -337,11 +337,6 @@
 		};
 	};
 
-	ns.sinceFx4 = function() {
-		return typeof Application.getExtensions !== 'undefined';
-		//return !!this.get('addon-bar')
-	};
-
 	ns.getBaseDomain = function(uri, addition) {
 		var eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"].getService(Ci.nsIEffectiveTLDService);
 		if (!addition) {

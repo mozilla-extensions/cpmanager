@@ -1,5 +1,7 @@
 var SDI = null;
 (function() {
+var cpmPrefs = Components.utils.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
+
 SDI = {
   handleEvent: function SDI__handleEvent(aEvent) {
     switch (aEvent.type) {
@@ -33,7 +35,7 @@ SDI = {
 
       window.sizeToContent()
     }
-    this.folderListPref = Application.prefs.getValue("browser.download.folderList", 1);
+    this.folderListPref = cpmPrefs.prefs.getValue("browser.download.folderList", 1);
     this.currentDir = this._indexToFolder(this.folderListPref); // file
     this.displayDownloadDirPref();
     var _onOK = dialog.onOK.bind(dialog);
@@ -47,8 +49,8 @@ SDI = {
   currentDir: null,
 
   savePrefs: function () {
-    Application.prefs.setValue("browser.download.folderList", this.folderListPref);
-    Application.prefs.setValue("browser.download.dir", this.currentDir.path);
+    cpmPrefs.prefs.setValue("browser.download.folderList", this.folderListPref);
+    cpmPrefs.prefs.setValue("browser.download.dir", this.currentDir.path);
   },
 
   chooseFolder: function () {
@@ -106,7 +108,7 @@ SDI = {
     var file = Cc['@mozilla.org/file/local;1']
                .createInstance(Ci.nsILocalFile);
     try {
-      var cdPref = Application.prefs.getValue("browser.download.dir","");
+      var cdPref = cpmPrefs.prefs.getValue("browser.download.dir","");
       file.initWithPath(cdPref);
     } catch(e) {
       file = this._getDownloadsFolder("Downloads");

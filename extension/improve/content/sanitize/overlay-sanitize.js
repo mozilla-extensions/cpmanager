@@ -1,7 +1,9 @@
-window.addEventListener('load', function() {
-  if (Application.prefs.getValue("extensions.cmimprove.features.sanitize.show", false))
+window.addEventListener('load', function() {  
+  var cpmPrefs = Components.utils.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
+
+  if (cpmPrefs.prefs.getValue("extensions.cmimprove.features.sanitize.show", false))
     return;
-  Application.prefs.setValue("extensions.cmimprove.features.sanitize.show", true);
+  cpmPrefs.prefs.setValue("extensions.cmimprove.features.sanitize.show", true);
   setTimeout(() => {
     gSanitizePromptDialog.showItemList();
   }, 100);

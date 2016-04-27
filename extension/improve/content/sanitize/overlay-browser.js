@@ -1,4 +1,6 @@
 (function() {
+  var cpmPrefs = Cu.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
+
   let gCHNotificationInfoBar = {
 
     handleEvent: function Improve_CE__handleEvent(aEvent) {
@@ -20,11 +22,11 @@
     },
 
     init: function() {
-      if (Application.prefs.getValue("extensions.cmimprove.clearhistory.notification.shown", false)) {
+      if (cpmPrefs.prefs.getValue("extensions.cmimprove.clearhistory.notification.shown", false)) {
         return;
       }
       this._displayInfoBar();
-      Application.prefs.setValue("extensions.cmimprove.clearhistory.notification.shown", true);
+      cpmPrefs.prefs.setValue("extensions.cmimprove.clearhistory.notification.shown", true);
     },
 
     _getNotification: function (name) {

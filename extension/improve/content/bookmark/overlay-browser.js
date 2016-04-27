@@ -1,4 +1,6 @@
 (function() {
+var cpmPrefs = Cu.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
+
 function $(id) {return document.getElementById(id);}
 var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
         getService(Ci.nsIStringBundleService).
@@ -32,7 +34,7 @@ var cmImprove_BM = {
   },
   showBookmarkToolbar: function() {
     // If pref "initialized" has been set to True, this means it's not a new profile.
-    var prefs = Application.prefs;
+    var prefs = cpmPrefs.prefs;
     if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
       return;
     }
@@ -63,7 +65,7 @@ var cmImprove_BM = {
         if (tfID == -1) {
           tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
         }
-        showUI = (this._itemIds.length > 0) || Application.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
+        showUI = (this._itemIds.length > 0) || cpmPrefs.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
         if (!showUI)
           tfID = PlacesUtils.unfiledBookmarksFolderId;
         var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
@@ -124,7 +126,7 @@ var cmImprove_BM = {
     }, false);
     StarUI.panel.addEventListener("popuphiding", function(event) {
       if (event.target.id == "editBookmarkPanel" && gEditItemOverlay.tempContainer && !StarUI._actionOnHide)
-        Application.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder", gEditItemOverlay.tempContainer)
+        cpmPrefs.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder", gEditItemOverlay.tempContainer)
     }, false);
 
     this.showBookmarkToolbar();
