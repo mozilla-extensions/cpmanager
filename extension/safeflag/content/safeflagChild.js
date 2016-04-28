@@ -41,7 +41,7 @@ function classifyDocument(aDocument) {
   if (docURI.indexOf('about:blocked') == 0) {
     updateClassifyResult(
       /* aIsMalware  =*/ docURI.indexOf('malwareBlocked') > 0,
-      /* aIsPhishing =*/ docURI.indexOf('phishingBlocked') > 0,
+      /* aIsPhishing =*/ (docURI.indexOf('deceptiveBlocked') > 0 || docURI.indexOf('phishingBlocked') > 0),
       /* aIsUnwanted =*/ docURI.indexOf('unwantedBlocked') > 0);
   } else {
     let uri = aDocument.location.href;
@@ -88,4 +88,3 @@ addMessageListener('SafeFlag::enabledChanged', (aEvent) => {
 if (Services.prefs.getBoolPref('extensions.safeflag.enable')) {
   classifyDocument(content.document);
 }
-
