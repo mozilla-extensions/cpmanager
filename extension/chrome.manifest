@@ -101,10 +101,10 @@ contract @mozilla.com.cn/tracking-old;1 {6E12E09F-1942-46F0-8D85-9C6B1D0E6448}
 category profile-after-change trackingFactoryClassOld @mozilla.com.cn/tracking-old;1
 
 # limit to most recent release version to prevent breakage, also not for Win8
-component {055d195f-168e-4d98-b18a-71bfbfd3f617} components/nsShellService.js          os=WINNT osversion<6.2 appversion<47.0
-component {1a80db92-3b6b-4872-968a-8711f53a09ba} components/nsShellServiceStartup.js   os=WINNT osversion<6.2 appversion<47.0
-contract @mozillaonline.com/shell-svc-startup;1 {1a80db92-3b6b-4872-968a-8711f53a09ba} os=WINNT osversion<6.2 appversion<47.0
-category profile-after-change ShellSvcStartup @mozillaonline.com/shell-svc-startup;1   os=WINNT osversion<6.2 appversion<47.0
+component {055d195f-168e-4d98-b18a-71bfbfd3f617} components/nsShellService.js          os=WINNT osversion<6.2 appversion<48.0
+component {1a80db92-3b6b-4872-968a-8711f53a09ba} components/nsShellServiceStartup.js   os=WINNT osversion<6.2 appversion<48.0
+contract @mozillaonline.com/shell-svc-startup;1 {1a80db92-3b6b-4872-968a-8711f53a09ba} os=WINNT osversion<6.2 appversion<48.0
+category profile-after-change ShellSvcStartup @mozillaonline.com/shell-svc-startup;1   os=WINNT osversion<6.2 appversion<48.0
 
 component {9a52065c-1cdc-4605-bf36-1ac1f0129bf7} improve/content/fxa/serviceSwitcher.js
 contract @mozillaonline.com/fxa-switcher;1 {9a52065c-1cdc-4605-bf36-1ac1f0129bf7}
