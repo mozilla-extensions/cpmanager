@@ -77,8 +77,14 @@
     try {
       let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
       let { require } = devtools;
-      let QR = require("devtools/toolkit/qrcode/index");
-      let Encoder = require("devtools/toolkit/qrcode/encoder/index").Encoder;
+      let QR, Encoder;
+      try {
+        QR = require("devtools/shared/qrcode/index");
+        Encoder = require("devtools/shared/qrcode/encoder/index").Encoder;
+      } catch (ex) {
+        QR = require("devtools/toolkit/qrcode/index");
+        Encoder = require("devtools/toolkit/qrcode/encoder/index").Encoder;
+      }
 
       quality = "L";
       version = QR.findMinimumVersion(message, quality);
@@ -97,6 +103,7 @@
       let cellSize = Math.max(2, altCellSize);
       return encoder.createImgData(cellSize);
     } catch(e) {
+      Cu.reportError(e);
       return {};
     }
   };
@@ -111,7 +118,7 @@
     text = {
       "about:cehome": (ns.CEHomepage.aboutpage.split("?")[0] + "?from=url2qr")
     }[text] || text;
-    let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text);
+    let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text, { modulesize: 2 });
     ns.popupImage.src = datauri;
     ns.CETracking.track("url2qr-qrshown");
   };
