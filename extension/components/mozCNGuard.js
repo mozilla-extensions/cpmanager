@@ -8,6 +8,8 @@ var Ci = Components.interfaces;
 var Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "SyncedTabsDeckComponent",
+  "resource:///modules/syncedtabs/SyncedTabsDeckComponent.js");
 XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
   "resource://gre/modules/Timer.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
@@ -295,6 +297,13 @@ var socialShareRemoval = Object.create(buttonRemoval, {
 var mobilePromoLinksHack = {
   init: function() {
     CustomizableUI.addListener(this);
+
+    SyncedTabsDeckComponent.prototype.openAndroidLink = function(event) {
+      this._openUrl("http://www.firefox.com.cn/#android", event);
+    };
+    SyncedTabsDeckComponent.prototype.openiOSLink = function(event) {
+      this._openUrl("http://www.firefox.com.cn/#ios", event);
+    };
   },
   onWidgetBeforeDOMChange: function(node, nextNode, container, isRemoval) {
     if (isRemoval || node.id !== "sync-button" || !container) {
