@@ -8,8 +8,6 @@ var Ci = Components.interfaces;
 var Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "SyncedTabsDeckComponent",
-  "resource:///modules/syncedtabs/SyncedTabsDeckComponent.js");
 XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
   "resource://gre/modules/Timer.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
@@ -40,6 +38,15 @@ XPCOMUtils.defineLazyGetter(this, "CEHomepage", function() {
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+});
+XPCOMUtils.defineLazyGetter(this, "SyncedTabsDeckComponent", function() {
+  try {
+    let tmp = {};
+    Cu.import("resource:///modules/syncedtabs/SyncedTabsDeckComponent.js", tmp);
+    return tmp.SyncedTabsDeckComponent;
+  } catch(ex) {
+    return {};
+  };
 });
 
 var safeBrowsingHack = {
@@ -297,6 +304,10 @@ var socialShareRemoval = Object.create(buttonRemoval, {
 var mobilePromoLinksHack = {
   init: function() {
     CustomizableUI.addListener(this);
+
+    if (!SyncedTabsDeckComponent.prototype) {
+      return;
+    }
 
     SyncedTabsDeckComponent.prototype.openAndroidLink = function(event) {
       this._openUrl("http://www.firefox.com.cn/#android", event);
