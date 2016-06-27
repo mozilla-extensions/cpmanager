@@ -120,14 +120,27 @@ var safeBrowsingHack = {
       this._skipSBData = SkipSBData.read();
     }
 
-    if ((this._skipSBData.urls &&
-         this._skipSBData.urls[aURI.asciiSpec]) ||
-        (this._skipSBData.baseDomains &&
-         this._skipSBData.baseDomains[Services.eTLD.getBaseDomain(aURI)])) {
-      aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
-      CETracking.track("sb-skip-classify");
-    } else {
-      CETracking.track("sb-will-classify");
+    try {
+      let baseDomain = Services.eTLD.getBaseDomain(aURI);
+      if ((this._skipSBData.urls &&
+           this._skipSBData.urls[aURI.asciiSpec]) ||
+          (this._skipSBData.baseDomains &&
+           this._skipSBData.baseDomains[baseDomain])) {
+        aChannel.loadFlags &= ~Ci.nsIChannel.LOAD_CLASSIFY_URI;
+        CETracking.track("sb-skip-classify");
+      } else {
+        CETracking.track("sb-will-classify");
+      }
+    } catch(e) {
+      switch (e.name) {
+        case "NS_ERROR_HOST_IS_IP_ADDRESS":
+        case "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS":
+          Services.console.logStringMessage(e.name + ": " + aURI.spec);
+          break;
+        default:
+          Cu.reportError(e);
+          break;
+      }
     }
   }
 }
