@@ -402,7 +402,6 @@ mozCNGuard.prototype = {
       case "profile-after-change":
         Services.obs.addObserver(this, "browser-delayed-startup-finished", false);
         Services.obs.addObserver(this, "sessionstore-state-finalized", false);
-        Services.obs.addObserver(this, "toplevel-window-ready", false);
         Services.obs.addObserver(this, "http-on-modify-request", false);
         Services.obs.addObserver(this, "http-on-examine-response", false);
         Services.obs.addObserver(this, "http-on-examine-cached-response", false);
@@ -423,7 +422,7 @@ mozCNGuard.prototype = {
         break;
       case "sessionstore-state-finalized":
       case "sessionstore-windows-restored":
-        this.trackRogueStartup(aTopic);
+        this.maybeOpenStartPages(aTopic);
         break;
       case "http-on-modify-request":
         safeBrowsingHack.onHttpRequest(aSubject);
@@ -468,7 +467,7 @@ mozCNGuard.prototype = {
     });
   },
 
-  trackRogueStartup: function MCG_trackRoughStartup(aTopic) {
+  maybeOpenStartPages: function MCG_maybeOpenStartPages(aTopic) {
     Services.obs.removeObserver(this, aTopic);
 
     let sessionStartup = Cc["@mozilla.org/browser/sessionstartup;1"].
@@ -481,79 +480,11 @@ mozCNGuard.prototype = {
 
     let w = Services.wm.getMostRecentWindow("navigator:browser");
 
-    // restore on startup/restart
-    let doRestore = sessionStartup.doRestore();
-
-    // urls to open when there's no url in arguments
-    let defaultArgs = this.browserHandler.defaultArgs;
-    let defaultArgZero = defaultArgs.split("|")[0];
-
-    // will open cehome in foreground if no arguments
-    let prefSet = !doRestore && this.isCEHome(defaultArgZero);
-
-    // no extra arguments
-    let noArgs = w.arguments && w.arguments[0] &&
-      w.arguments[0] == defaultArgs;
-
-    let self = this;
-    let reportFirstLocation = function(aURI) {
-      let expected = aURI.asciiSpec == defaultArgZero;
-      // normalize defaultArgZero, e.g. add trailing slash.
-      try {
-        let defaultArgZeroURI = Services.io.newURI(defaultArgZero, null, null);
-        expected = aURI.equals(defaultArgZeroURI);
-      } catch(e) {};
-
-      if (prefSet && noArgs) {
-        expected = expected || aURI.asciiSpec;
-      }
-
-      let urlTemplate = "http://addons.g-fox.cn/firstLocation.gif?" +
-                        "p=%PREF_SET%&a=%NO_ARGS%&e=%EXPECTED%" +
-                        "&bsp=%BSP_CHOICE%&r=%RANDOM%";
-      let url = urlTemplate.
-        replace("%PREF_SET%", prefSet).
-        replace("%NO_ARGS%", noArgs).
-        replace("%EXPECTED%", encodeURIComponent(expected)).
-        replace("%BSP_CHOICE%", self.startPageChoice).
-        replace("%RANDOM%", Math.random());
-      CETracking.send(url);
-    };
-
-    let progressListener = {
-      onLocationChange: function(aWebProgress, b, aLocation, d) {
-        if (aWebProgress.isTopLevel && (aLocation instanceof Ci.nsIURI)) {
-          w.gBrowser.removeProgressListener(progressListener);
-
-          reportFirstLocation(aLocation);
-        }
-      }
-    };
-
-    /**
-     * BUSY_FLAGS_BEFORE_PAGE_LOAD seems to work, but not really sure.
-     * could use a better check here.
-     */
-    let docShell = w.gBrowser.selectedBrowser.docShell;
-    if (docShell.busyFlags & Ci.nsIDocShell.BUSY_FLAGS_BEFORE_PAGE_LOAD) {
-      /**
-       * addProgressListener: listener for the selectedBrowser
-       * addTabsProgressListener: listener for every browser in gBrowser
-       */
-      w.gBrowser.addProgressListener(progressListener);
-    } else {
-      reportFirstLocation(w.gBrowser.selectedBrowser.currentURI);
-    }
-
-    this.maybeOpenStartPages(w);
-  },
-
-  maybeOpenStartPages: function MCG_maybeOpenStartPages(aSubject) {
     if (this.startPageChoice != 1) {
       return;
     }
 
-    let argumentsZero = aSubject.arguments && aSubject.arguments[0];
+    let argumentsZero = w.arguments && w.arguments[0];
     if (this.browserHandler.defaultArgs == argumentsZero) {
       return;
     }
@@ -587,15 +518,15 @@ mozCNGuard.prototype = {
           title = "\u706b\u72d0\u4e3b\u9875";
         }
 
-        aSubject.PlacesUtils.asyncHistory.getPlacesInfo(uri, {
+        w.PlacesUtils.asyncHistory.getPlacesInfo(uri, {
           handleError: function() {},
           handleResult: function(aPlaceInfo) {
             title = aPlaceInfo.title;
           },
           handleCompletion: function() {
-            let tab = aSubject.gBrowser.addTab();
-            aSubject.gBrowser.moveTabTo(tab, aIndex);
-            aSubject.SessionStore.setTabState(tab, JSON.stringify({
+            let tab = w.gBrowser.addTab();
+            w.gBrowser.moveTabTo(tab, aIndex);
+            w.SessionStore.setTabState(tab, JSON.stringify({
               entries: [{ url: aPage, title: title }]
             }));
           }
