@@ -149,7 +149,9 @@
             try {
                 baseDomain = MOA.AN.Lib.getBaseDomain(httpChannel.URI, addition)
             } catch(err) {
-                MOA.debug(err);
+                MOA.debug(err.name + ': ' +
+                          (httpChannel.URI && httpChannel.URI.spec) + ' (' +
+                          addition + ' extra)');
                 break
             }
             var rule_related = _regexps[baseDomain];

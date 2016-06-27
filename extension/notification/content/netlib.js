@@ -4,66 +4,6 @@
 	var Cc = Components.classes;
 	var Cu = Components.utils;
 
-	// FIXME can not get tab for iframe
-	ns.getTabIDForHttpChannel = function (oHttpChannel) {
-		if (!gBrowser)
-			return null;
-
-		try {
-			if (oHttpChannel.notificationCallbacks) {
-				var interfaceRequestor = oHttpChannel.notificationCallbacks.QueryInterface(Ci.nsIInterfaceRequestor);
-				var targetDoc = interfaceRequestor.getInterface(Ci.nsIDOMWindow).document;
-
-				var tab = null;
-				var targetBrowserIndex = gBrowser.getBrowserIndexForDocument(targetDoc);
-
-				// handle the case where there was no tab associated with the request (rss etc.)
-				if (targetBrowserIndex != -1) {
-					tab = gBrowser.tabContainer.childNodes[targetBrowserIndex];
-				} else {
-					return null;
-				}
-
-				return tab.linkedPanel;
-			}
-		} catch (ex) {
-			return null;
-		}
-
-		return null;
-	};
-
-	ns.getWebProgressForRequest = function(request) {
-		try {
-			if (request && request.notificationCallbacks)
-				return request.notificationCallbacks.getInterface(Ci.nsIWebProgress);
-		} catch (err ) {
-			// MOA.debug(err);
-		}
-
-		try {
-			if (request && request.loadGroup && request.loadGroup.groupObserver)
-				return request.loadGroup.groupObserver.QueryInterface(Ci.nsIWebProgress);
-		} catch (err) {
-			// MOA.debug(err);
-		}
-	};
-
-	ns.getWindowForRequest = function(request) {
-		return this.getWindowForWebProgress(this.getWebProgressForRequest(request));
-	};
-
-	ns.getWindowForWebProgress = function(webProgress) {
-		try {
-			if (webProgress)
-				return webProgress.DOMWindow;
-		} catch (err) {
-			// MOA.debug(err);
-		}
-
-		return null;
-	};
-
 	ns.getRootWindow = function(win) {
 		for (; win; win = win.parent) {
 			if (!win.parent || win == win.parent || !(win.parent instanceof Window))
@@ -102,10 +42,15 @@
 	};
 
 	ns.getBrowserForTabId = function(tabId) {
-		var tabs = gBrowser.tabs;
-		for (var i = 0; i < tabs.length; i++) {
-			if (tabs[i].linkedPanel == tabId) {
-				return gBrowser.getBrowserForTab(tabs[i])
+		if (gBrowser.getBrowserForOuterWindowID) {
+			// Fx 38+, should be e10s compatible
+			return gBrowser.getBrowserForOuterWindowID(tabId);
+		} else {
+			var tabs = gBrowser.tabs;
+			for (var i = 0; i < tabs.length; i++) {
+				if (tabs[i].linkedPanel == tabId) {
+					return gBrowser.getBrowserForTab(tabs[i])
+				}
 			}
 		}
 	}

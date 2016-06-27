@@ -370,8 +370,10 @@
      */
     ns.showNotification = function(webProgress) {
         // Get current tab browser ID.
-        var win = webProgress.DOMWindow;
-        var tabId = MOA.AN.Lib.getTabIdForWindow(win);
+        var tabId = webProgress.DOMWindowID;
+        if (!gBrowser.getBrowserForOuterWindowID) {
+          tabId = MOA.AN.Lib.getTabIdForWindow(webProgress.DOMWindow);
+        }
         if (!tabNotiQueue[tabId])
             return;
 

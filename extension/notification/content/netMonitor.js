@@ -19,8 +19,14 @@
 		onStatusChange: function() {},
 		onSecurityChange: function() {},
 		onLocationChange: function(webProgress, request, uri) {
-			var tabId = MOA.AN.Lib.getTabIdForWindow(webProgress.DOMWindow);
-			MOA.AN.RuleCenter.checkAndShow({ URI: uri }, { tabId: tabId, isWindowURI: true });
+			var options = {
+				isWindowURI: true,
+				tabId: webProgress.DOMWindowID
+			};
+			if (!gBrowser.getBrowserForOuterWindowID) {
+				options.tabId = MOA.AN.Lib.getTabIdForWindow(webProgress.DOMWindow);
+			}
+			MOA.AN.RuleCenter.checkAndShow({ URI: uri }, options);
 			MOA.AN.Notification.showNotification(webProgress);
 		},
 
