@@ -22,6 +22,9 @@ XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
   "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AddonManager",
+  "resource://gre/modules/AddonManager.jsm");
+
 
 XPCOMUtils.defineLazyGetter(this, "CEHomepage", function() {
   try {
@@ -47,6 +50,11 @@ XPCOMUtils.defineLazyGetter(this, "SyncedTabsDeckComponent", function() {
   } catch(ex) {
     return {};
   };
+});
+
+XPCOMUtils.defineLazyGetter(this, "gMM", function() {
+  return Cc["@mozilla.org/globalmessagemanager;1"].
+    getService(Ci.nsIMessageListenerManager);
 });
 
 var safeBrowsingHack = {
@@ -389,6 +397,119 @@ var defaultFontHack = {
   }
 }
 
+var dragAndDrop = {
+  _appcenterEnabled: false,
+  _frameScript: "chrome://cmimprove/content/gesture/dragdrop.js",
+  _inited: false,
+  _listening: false,
+  _messageName: "cpmanager@mozillaonline.com:dragAndDrop",
+  _prefKey: "extensions.cmimprove.gesture.enabled",
+
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
+
+  get enabled() {
+    let enabled = false;
+    try {
+      enabled = Services.prefs.getBoolPref(this._prefKey);
+    } catch(e) {};
+    return !this._appcenterEnabled && enabled;
+  },
+
+  initOnce: function() {
+    if (this._inited) {
+      return;
+    }
+    this._inited = true;
+
+    let self = this;
+    AddonManager.getAddonByID("livemargins@mozillaonline.com", function(addon) {
+      if (addon && !addon.userDisabled && !addon.appDisabled &&
+          Services.vc.compare(addon.version, "5.2") < 0) {
+        self._appcenterEnabled = true;
+      }
+
+      gMM.loadFrameScript(self._frameScript, true);
+      self.toggleListener();
+      self.watchPrefs();
+    });
+  },
+
+  observe: function(subject, topic, data) {
+    if (topic === "nsPref:changed") {
+      switch (data) {
+        case this._prefKey:
+          this.toggleListener();
+          break;
+        default:
+          break;
+      }
+    }
+  },
+
+  openLink: function(browser, link) {
+    browser.ownerGlobal.gBrowser.loadOneTab(link, {
+      inBackground: true,
+      allowThirdPartyFixup: false,
+      relatedToCurrent: true
+    });
+  },
+
+  receiveMessage: function(msg) {
+    let browser = msg.target,
+        data = msg.data && msg.data.data,
+        type = msg.data && msg.data.type;
+    switch (type) {
+      case "image":
+      case "link":
+        this.openLink(browser, data);
+        break;
+      case "text":
+        this.searchText(browser, data);
+        break;
+      case "query":
+        if (data !== "listening") {
+          break;
+        }
+        browser.messageManager.sendAsyncMessage({
+          listening: this._listening
+        });
+        break;
+    }
+  },
+
+  searchText: function(browser, text) {
+    var engine = Services.search.currentEngine;
+    if (!engine) {
+      return;
+    }
+
+    var link = engine.getSubmission(text, null).uri.spec;
+    this.openLink(browser, link);
+  },
+
+  toggleListener: function() {
+    let enabled = this.enabled;
+    if (!this._listening && enabled) {
+      gMM.addMessageListener(this._messageName, this);
+      this._listening = true;
+    } else if (this._listening && !enabled) {
+      gMM.removeMessageListener(this._messageName, this);
+      this._listening = false;
+    } else {
+      Services.console.logStringMessage("dragAndDrop: {listening: " +
+        this._listening + ", enabled: " + enabled + "}");
+      return;
+    }
+    gMM.broadcastAsyncMessage(this._messageName, {
+      listening: this._listening
+    })
+  },
+
+  watchPrefs: function() {
+    Services.prefs.addObserver(this._prefKey, this, true);
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -419,6 +540,7 @@ mozCNGuard.prototype = {
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
+        dragAndDrop.initOnce();
         break;
       case "sessionstore-state-finalized":
       case "sessionstore-windows-restored":

@@ -56,7 +56,6 @@ skin     cmimprove-os  classic/1.0   improve/skin/mac/yosemite/ os=Darwin osvers
 skin     cmimprove-os  classic/1.0   improve/skin/linux/ os=Linux
 
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/overlay-browser.xul
-overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/gesture/overlay-browser.xul          appversion>=4.0
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/sanitize/overlay-browser.xul
 overlay  chrome://browser/content/browser.xul   chrome://cmimprove/content/url2qr/overlay-browser.xul
 overlay  chrome://browser/content/sanitize.xul  chrome://cmimprove/content/sanitize/overlay-sanitize.xul
