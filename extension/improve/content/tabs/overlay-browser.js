@@ -82,7 +82,7 @@ var undoclose = {
       case "unload":
         this.uninit();
         break;
-      case "TabClose": {
+      case "TabClose":
         /**
          * TabClose is not cancelable. Hopefully message arrives before tab is closed.
          * If not, animation won't be shown.
@@ -98,8 +98,7 @@ var undoclose = {
           });
           browserMM.loadFrameScript('chrome://cmimprove/content/tabs/animationFrameScript.js', false);
         }
-        break;
-      }
+        // intentionally no break;
       case "TabOpen":
       case "aftercustomization":
         this.toggleRecentlyClosedTabs();
