@@ -16,7 +16,7 @@ let DragDropObserver = {
   observe: function(subject, topic, data) {
     switch (topic) {
       case "content-document-global-created":
-        if (!content || !subject || subject !== content) {
+        if (!content || !subject || subject.top !== content) {
           return;
         }
         this.init(subject);
@@ -27,6 +27,10 @@ let DragDropObserver = {
   init: function(subject) {
     subject.addEventListener("DOMContentLoaded", this, false);
     subject.addEventListener("unload", this, false);
+
+    if (subject.top !== subject) {
+      return;
+    }
 
     sendAsyncMessage(this.messageName, {
       data: "listening",

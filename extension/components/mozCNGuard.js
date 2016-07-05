@@ -470,9 +470,13 @@ var dragAndDrop = {
         if (data !== "listening") {
           break;
         }
-        browser.messageManager.sendAsyncMessage({
-          listening: this._listening
-        });
+        try {
+          browser.messageManager.sendAsyncMessage(this._messageName, {
+            listening: this._listening
+          });
+        } catch(ex) {
+          browser.ownerGlobal.console.log(browser);
+        }
         break;
     }
   },
