@@ -560,6 +560,13 @@ mozCNGuard.prototype = {
       return;
     }
 
+    let host;
+    try {
+      host = channel.originalURI.host;
+    } catch(ex) {
+      return;
+    }
+
     let restrictedHosts = {
       "huohu123.com": "h.17huohu.com",
       "e.firefoxchina.cn": "e.17huohu.com",
@@ -574,7 +581,7 @@ mozCNGuard.prototype = {
       "n.17huohu.com": ""
     };
 
-    if (Object.keys(restrictedHosts).indexOf(channel.originalURI.host) > -1) {
+    if (Object.keys(restrictedHosts).indexOf(host) > -1) {
       let responseStatus = 0;
       try {
         responseStatus = channel.responseStatus;

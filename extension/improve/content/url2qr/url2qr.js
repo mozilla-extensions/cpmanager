@@ -47,10 +47,7 @@
     onStatusChange:   function() {},
     onSecurityChange: function() {},
     onLocationChange: function(aWebProgress, aRequest, aUri) {
-      let isTopLevel = aWebProgress.isTopLevel ||
-                       aWebProgress.DOMWindow == aWebProgress.DOMWindow.top;
-
-      if (!ns.enabled || !isTopLevel) {
+      if (!ns.enabled || !aWebProgress.isTopLevel) {
         return;
       }
 
@@ -75,13 +72,16 @@
 
   ns.generateGIFwithFx = function(message) {
     try {
-      let { devtools } = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
-      let { require } = devtools;
-      let QR, Encoder;
+      let require, QR, Encoder;;
       try {
+        // Fx 44+, https://bugzil.la/912121 & https://bugzil.la/1203159
+        require = Cu.import("resource://devtools/shared/Loader.jsm", {}).
+          devtools.require;
         QR = require("devtools/shared/qrcode/index");
         Encoder = require("devtools/shared/qrcode/encoder/index").Encoder;
       } catch (ex) {
+        require = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).
+          devtools.require;
         QR = require("devtools/toolkit/qrcode/index");
         Encoder = require("devtools/toolkit/qrcode/encoder/index").Encoder;
       }
