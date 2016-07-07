@@ -45,13 +45,7 @@ var mozCNSyncHack = (function() {
 
     if (FxaSwitcher.localServiceEnabled) {
       let caption = document.querySelector('#fxaGroup > caption:first-child');
-      let captionLabel = caption.querySelector('label');
-      let captionLabelText = _('caption.label');
-      if (captionLabel) {
-        captionLabel.textContent = captionLabelText;
-      } else {
-        caption.label = captionLabelText;
-      }
+      caption.querySelector('label').textContent = _('caption.label');
     }
 
     // We only change the color of the label that open old sync support page. However, there is

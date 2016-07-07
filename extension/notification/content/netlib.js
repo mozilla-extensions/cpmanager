@@ -4,55 +4,8 @@
 	var Cc = Components.classes;
 	var Cu = Components.utils;
 
-	ns.getRootWindow = function(win) {
-		for (; win; win = win.parent) {
-			if (!win.parent || win == win.parent || !(win.parent instanceof Window))
-				return win;
-		}
-
-		return null;
-	};
-
-	ns.getTabForWindow = function(win) {
-		aWindow = this.getRootWindow(win);
-
-		if (!aWindow || !gBrowser.getBrowserIndexForDocument)
-			return null;
-
-		try {
-			var targetDoc = aWindow.document;
-
-			var tab = null;
-			var targetBrowserIndex = gBrowser.getBrowserIndexForDocument(targetDoc);
-
-			if (targetBrowserIndex != -1) {
-				tab = gBrowser.tabContainer.childNodes[targetBrowserIndex];
-				return tab;
-			}
-		} catch (err) {
-			MOA.debug(err);
-		}
-
-		return null;
-	};
-
-	ns.getTabIdForWindow = function(win) {
-		var tab = this.getTabForWindow(win);
-		return tab ? tab.linkedPanel : null;
-	};
-
 	ns.getBrowserForTabId = function(tabId) {
-		if (gBrowser.getBrowserForOuterWindowID) {
-			// Fx 38+, should be e10s compatible
-			return gBrowser.getBrowserForOuterWindowID(tabId);
-		} else {
-			var tabs = gBrowser.tabs;
-			for (var i = 0; i < tabs.length; i++) {
-				if (tabs[i].linkedPanel == tabId) {
-					return gBrowser.getBrowserForTab(tabs[i])
-				}
-			}
-		}
+		return gBrowser.getBrowserForOuterWindowID(tabId);
 	}
 
 	ns.get = function(id) {

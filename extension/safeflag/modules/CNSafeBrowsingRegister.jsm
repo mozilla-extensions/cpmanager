@@ -222,10 +222,7 @@ let mozCNSafeBrowsing = {
           }
         }
       }
-      // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
-      if (listManager.maybeToggleUpdateChecking) {
-        listManager.maybeToggleUpdateChecking();
-      }
+      listManager.maybeToggleUpdateChecking();
 
       this.addListsToLookup(listsToLookup);
 
@@ -234,10 +231,7 @@ let mozCNSafeBrowsing = {
           listManager.enableUpdate(aListType);
         });
 
-        // `maybeToggleUpdateChecking` is introduced in <https://bugzil.la/1036684>
-        if (listManager.maybeToggleUpdateChecking) {
-          listManager.maybeToggleUpdateChecking();
-        }
+        listManager.maybeToggleUpdateChecking();
       }, this.updateDelay);
     });
   }

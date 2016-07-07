@@ -80,7 +80,7 @@ var safeBrowsingHack = {
   },
 
   init: function() {
-    // introduced in https://bugzil.la/1165816
+    // introduced in https://bugzil.la/1165816 , Fx 41
     if (this.prefs["apprep"].getPrefType("downloads.remote.timeout_ms") ==
         Services.prefs.PREF_INVALID) {
       this._shouldCancel["apprep"] = true;

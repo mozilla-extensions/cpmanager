@@ -50,14 +50,9 @@ function doLookup(aUrl, aTables, aCallback) {
     getNoAppCodebasePrincipal(Services.io.newURI(aUrl, null, null));
 
   try {
-    // since FF30, see <https://bugzil.la/985623>
     _ucdbSvc.lookup(principal, aTables, aCallback);
   } catch(e) {
-    try {
-      _ucdbSvc.lookup(principal, aCallback);
-    } catch(_e) {
-      aCallback("");
-    }
+    aCallback("");
   }
 }
 

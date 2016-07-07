@@ -67,29 +67,13 @@
                                                     .getService(Ci.amIWebInstallListener);
                         AddonManager.addInstallListener(webInstallListener);
                         var browser = MOA.AN.Lib.getBrowserForTabId(tabId);
-                        try {
-                            AddonManager.installAddonsFromWebpage("application/x-xpinstall",
-                                browser.contentWindow,
-                                browser.currentURI,
-                                [addonInstall]);
-                        } catch(e) {
-                            // second param changed to browser since Fx 36 <https://bugzil.la/1084558>
-                            if (e.result == Cr.NS_ERROR_ILLEGAL_VALUE) {
-                                if (Ci.amIWebInstallListener2) {
-                                    AddonManager.installAddonsFromWebpage("application/x-xpinstall",
-                                        browser,
-                                        Services.scriptSecurityManager.getNoAppCodebasePrincipal(browser.currentURI),
-                                        [addonInstall]);
-                                } else {
-                                    AddonManager.installAddonsFromWebpage("application/x-xpinstall",
-                                        browser,
-                                        browser.currentURI,
-                                        [addonInstall]);
-                                }
-                            } else {
-                                throw e;
-                            }
-                        }
+                        // Since Fx 40, https://bugzil.la/1042699
+                        AddonManager.installAddonsFromWebpage("application/x-xpinstall",
+                            browser,
+                            (Ci.amIWebInstallListener2 ?
+                             Services.scriptSecurityManager.getNoAppCodebasePrincipal(browser.currentURI) :
+                             browser.currentURI),
+                            [addonInstall]);
                     }, "application/x-xpinstall", null, reminder.addon_name);
                 } else if (reminder.type == 'text') {
                     gBrowser.selectedTab = gBrowser.addTab(reminder.learnmore_url);
@@ -371,9 +355,6 @@
     ns.showNotification = function(webProgress) {
         // Get current tab browser ID.
         var tabId = webProgress.DOMWindowID;
-        if (!gBrowser.getBrowserForOuterWindowID) {
-          tabId = MOA.AN.Lib.getTabIdForWindow(webProgress.DOMWindow);
-        }
         if (!tabNotiQueue[tabId])
             return;
 
