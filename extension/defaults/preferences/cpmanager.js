@@ -15,7 +15,6 @@ pref("plugin.state.npaliedit", 2);
 pref("plugin.state.npalisecctrl", 2);
 pref("plugin.state.npalissologin", 2);
 pref("plugin.state.npqqmailwebkit", 2);
-pref("plugin.state.npqqwebgame", 2);
 pref("plugin.state.npqzonemusic", 2);
 pref("plugin.state.npssoaxctrlforptlogin", 2);
 pref("plugin.state.npwangwang", 2);
