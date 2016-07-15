@@ -101,12 +101,6 @@ var cmImprove_BM = {
       return this._unstarredTooltip =
         getString("starButtonOff.tooltip");
     });
-    StarUI.panel.addEventListener("popupshown", function () {
-      StarUI._element("editBookmarkPanelTitle").value = getString("editBookmarkPanel.addBookmarkTitle");
-      var footer = document.getAnonymousElementByAttribute(StarUI.panel, "class", "panel-inner-arrowcontentfooter");
-      var link = document.getAnonymousElementByAttribute(footer, "anonid", "promo-link");
-      link.setAttribute("href", "http://www.firefox.com.cn/sync/");
-    }, false);
 
     this.bookmarksPopup && this.bookmarksPopup.addEventListener("popupshowing", this, false);
 

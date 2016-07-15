@@ -324,6 +324,10 @@ var socialShareRemoval = Object.create(buttonRemoval, {
 
 var mobilePromoLinksHack = {
   init: function() {
+    if (Services.vc.compare(Services.appinfo.version, "48.0") >= 0) {
+      return;
+    }
+
     CustomizableUI.addListener(this);
 
     if (!SyncedTabsDeckComponent.prototype) {
