@@ -118,8 +118,7 @@
     text = {
       "about:cehome": (ns.CEHomepage.aboutpage.split("?")[0] + "?from=url2qr")
     }[text] || text;
-    let datauri = ns.generateGIFwithFx(text).src || MOA.URL2QR.QRCode.generatePNG(text, { modulesize: 2 });
-    ns.popupImage.src = datauri;
+    ns.popupImage.src = ns.generateGIFwithFx(text).src;
     ns.CETracking.track("url2qr-qrshown");
   };
 

@@ -7,7 +7,6 @@
 <overlay id="mo-url2qr" xmlns:html="http://www.w3.org/1999/xhtml"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/javascript;version=1.8" src="chrome://cmimprove/content/url2qr/qr.js"></script>
   <script type="application/javascript;version=1.8" src="chrome://cmimprove/content/url2qr/url2qr.js"></script>
 
   <hbox id="urlbar-icons">
