@@ -297,12 +297,7 @@ const ADU_Task = [
     task: "5s",
     delay: 5*1000,
     url: 'http://adu.g-fox.cn/adu.gif',
-  },
-  {
-    task: "5m",
-    delay: 5*60*1000,
-    url: 'http://adu.g-fox.cn/adu-1.gif',
-  },
+  }
 ];
 var ADUIndex = 0;
 const ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
