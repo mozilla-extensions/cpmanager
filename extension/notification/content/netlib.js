@@ -5,7 +5,15 @@
 	var Cu = Components.utils;
 
 	ns.getBrowserForTabId = function(tabId) {
-		return gBrowser.getBrowserForOuterWindowID(tabId);
+		if (gBrowser.getBrowserForOuterWindowID) {
+			// Fx 39+, should be e10s compatible
+			return gBrowser.getBrowserForOuterWindowID(tabId);
+		} else {
+			return Services.wm.getOuterWindowWithId(tabId).
+				QueryInterface(Ci.nsIInterfaceRequestor).
+				getInterface(Ci.nsIWebNavigation).QueryInterface(Ci.nsIDocShell).
+				chromeEventHandler;
+		}
 	}
 
 	ns.get = function(id) {
