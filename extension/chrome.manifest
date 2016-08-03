@@ -94,8 +94,6 @@ overlay  about:preferences?entrypoint=syncbutton   chrome://cmimprove/content/fx
 overlay  about:preferences?entrypoint=tabs-sidebar chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 overlay  about:preferences?entrypoint=uitour       chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
-style  about:addons  chrome://cmimprove/skin/hiddenWarning.css  appversion<41.0
-
 component {6E12E09F-1942-46F0-8D85-9C6B1D0E6448} components/ceTracking-old.js
 contract @mozilla.com.cn/tracking-old;1 {6E12E09F-1942-46F0-8D85-9C6B1D0E6448}
 category profile-after-change trackingFactoryClassOld @mozilla.com.cn/tracking-old;1
@@ -110,5 +108,5 @@ component {9a52065c-1cdc-4605-bf36-1ac1f0129bf7} improve/content/fxa/serviceSwit
 contract @mozillaonline.com/fxa-switcher;1 {9a52065c-1cdc-4605-bf36-1ac1f0129bf7}
 category profile-after-change mozCNFxaSwitcher @mozillaonline.com/fxa-switcher;1
 
-content copygif copygif/content/ contentaccessible=yes
-overlay chrome://browser/content/browser.xul chrome://copygif/content/overlay.xul
+content copygif copygif/content/ contentaccessible=yes                            os=WINNT appversion<51.0
+overlay chrome://browser/content/browser.xul chrome://copygif/content/overlay.xul os=WINNT appversion<51.0
