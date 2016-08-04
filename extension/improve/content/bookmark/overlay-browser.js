@@ -33,6 +33,10 @@ var cmImprove_BM = {
     item_t && item_t.setAttribute("label", getString("menu.bookmarksToolbar"));
   },
   showBookmarkToolbar: function() {
+    if (Services.vc.compare(Services.appinfo.version, "47.0") >= 0) {
+      return;
+    }
+
     // If pref "initialized" has been set to True, this means it's not a new profile.
     var prefs = cpmPrefs.prefs;
     if (prefs.getValue("extensions.cpmanager@mozillaonline.com.initialized", false)) {
