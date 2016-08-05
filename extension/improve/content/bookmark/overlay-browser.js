@@ -1,36 +1,13 @@
 (function() {
 var cpmPrefs = Cu.import("resource://cmtracking/Prefs.jsm", {}).CPManagerPrefs;
 
-function $(id) {return document.getElementById(id);}
-var _bundles = Cc["@mozilla.org/intl/stringbundle;1"].
-        getService(Ci.nsIStringBundleService).
-        createBundle("chrome://cmimprove/locale/browser.properties");
-function getString(key) {
-  return _bundles.GetStringFromName(key);
-}
-
 var cmImprove_BM = {
   handleEvent: function (aEvent) {
     switch (aEvent.type) {
       case "load":
         this.init();
         break;
-      case "unload":
-        this.uninit();
-        break;
-      case "popupshowing":
-        this.bookmarksPopup_popupshowing();
-        break;
-
     }
-  },
-  get bookmarksPopup() {
-    delete this.bookmarksPopup;
-    return this.bookmarksPopup = $("BMB_bookmarksPopup");
-  },
-  bookmarksPopup_popupshowing: function() {
-    var item_t = $("BMB_viewBookmarksToolbar");
-    item_t && item_t.setAttribute("label", getString("menu.bookmarksToolbar"));
   },
   showBookmarkToolbar: function() {
     if (Services.vc.compare(Services.appinfo.version, "47.0") >= 0) {
@@ -49,91 +26,15 @@ var cmImprove_BM = {
 
     prefs.setValue("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", false);
     // Show bookmark toolbar
-    if ($("PersonalToolbar")) {
-       setToolbarVisibility($("PersonalToolbar"), true);
+    personalToolbar = document.getElementById("PersonalToolbar");
+    if (personalToolbar) {
+       setToolbarVisibility(personalToolbar, true);
     }
   },
   init: function() {
-    BookmarkingUI.onCommand = function (aEvent) {
-      if (aEvent.target != aEvent.currentTarget) {
-        return;
-      }
-
-      // Handle special case when the button is in the panel.
-      let isBookmarked = this._itemIds.length > 0;
-
-      var tfID = PlacesUtils.unfiledBookmarksFolderId;
-      var showUI = true;
-      try {
-        tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-        if (tfID == -1) {
-          tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
-        }
-        showUI = (this._itemIds.length > 0) || cpmPrefs.prefs.getValue("extensions.cmimprove.bookmarks.add.showEditUI", false);
-        if (!showUI)
-          tfID = PlacesUtils.unfiledBookmarksFolderId;
-        var folderTitle = PlacesUtils.bookmarks.getItemTitle(tfID)
-      } catch(e) {
-        tfID = PlacesUtils.unfiledBookmarksFolderId;
-        showUI = true;;
-      }
-
-      if (this._currentAreaType == CustomizableUI.TYPE_MENU_PANEL) {
-        this._showSubview();
-        return;
-      }
-      let widget = CustomizableUI.getWidget(this.BOOKMARK_BUTTON_ID)
-                                 .forWindow(window);
-      if (widget.overflowed) {
-        // Allow to close the panel if the page is already bookmarked, cause
-        // we are going to open the edit bookmark panel.
-        if (showUI/*isBookmarked*/)
-          widget.node.removeAttribute("closemenu");
-        else
-          widget.node.setAttribute("closemenu", "none");
-      }
-
-      // Ignore clicks on the star if we are updating its state.
-      if (!this._pendingStmt) {
-        if (!isBookmarked)
-          this._showBookmarkedNotification();
-        PlacesCommandHook.bookmarkCurrentPage(showUI/*isBookmarked*/, tfID);
-      }
-    }
-    BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
-      delete this._unstarredTooltip;
-      return this._unstarredTooltip =
-        getString("starButtonOff.tooltip");
-    });
-
-    this.bookmarksPopup && this.bookmarksPopup.addEventListener("popupshowing", this, false);
-
-    gEditItemOverlay.tempContainer = 0;
-    var _onFolderMenuListCommand = gEditItemOverlay.onFolderMenuListCommand.bind(gEditItemOverlay);
-    gEditItemOverlay.onFolderMenuListCommand = (function(event) {
-      _onFolderMenuListCommand(event);
-      var t = event.target.tagName;
-      if (event.target.id == "editBMPanel_chooseFolderMenuItem")
-        return;
-      gEditItemOverlay.tempContainer = gEditItemOverlay._getFolderIdFromMenuList();
-    }).bind(gEditItemOverlay);
-
-    StarUI.panel.addEventListener("popupshowing", function(event) {
-      if (event.target.id == "editBookmarkPanel")
-        gEditItemOverlay.tempContainer = 0;
-    }, false);
-    StarUI.panel.addEventListener("popuphiding", function(event) {
-      if (event.target.id == "editBookmarkPanel" && gEditItemOverlay.tempContainer && !StarUI._actionOnHide)
-        cpmPrefs.prefs.setValue("extensions.cmimprove.bookmarks.add.defaultFolder", gEditItemOverlay.tempContainer)
-    }, false);
-
     this.showBookmarkToolbar();
-  },
-  uninit: function() {
-    this.bookmarksPopup && this.bookmarksPopup.removeEventListener("popupshowing", this, false);
-  },
+  }
 }
 
 window.addEventListener('load'  , cmImprove_BM, false)
-window.addEventListener('unload', cmImprove_BM, false)
 })();

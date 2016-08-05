@@ -55,15 +55,8 @@ function cmd_cloneTab() {
   openUILinkIn(tab.linkedBrowser.currentURI.spec, "tab");
 }
 function cmd_bookmark() {
-  tab = TabContextMenu.contextTab;
-  if (!tab) {
-    return;
-  }
-  var tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.parentFolder");
-  if (tfID == -1) {
-    tfID = Services.prefs.getIntPref("extensions.cmimprove.bookmarks.add.defaultFolder");
-  }
-  PlacesCommandHook.bookmarkPage(tab.linkedBrowser, tfID, true);
+  // limited to the selected tab elsewhere
+  PlacesCommandHook.bookmarkCurrentPage(true);
 }
 function cmd_reloadSkipCache() {
   tab = TabContextMenu.contextTab;

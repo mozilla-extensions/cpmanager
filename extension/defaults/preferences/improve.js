@@ -8,9 +8,6 @@
 pref("extensions.cmimprove.bookmarks.parentFolder", -1);
 pref("extensions.cmimprove.bookmarks.add.defaultFolder", 5);
 
-// whether or not to show the edit-bookmark UI when adds a bookmark to the page
-pref("extensions.cmimprove.bookmarks.add.showEditUI", true);
-
 // features enable
 pref("extensions.cmimprove.features.tabcontextmenu.enable", true);
 pref("extensions.cmimprove.features.undocloseanimation.enable", true);

@@ -8,6 +8,8 @@ var Ci = Components.interfaces;
 var Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ShortcutUtils",
+  "resource://gre/modules/ShortcutUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
   "resource://gre/modules/Timer.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
@@ -16,6 +18,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
   "resource://gre/modules/SafeBrowsing.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
+  "resource://gre/modules/PlacesUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
@@ -518,6 +522,156 @@ var dragAndDrop = {
   }
 }
 
+var bookmarkHack = {
+  _itemId: -1,
+  _prefKey: "extensions.cmimprove.bookmarks.add.defaultFolder",
+  get recentFolder() {
+    let id = PlacesUtils.unfiledBookmarksFolderId;
+    try {
+      id = Services.prefs.getIntPref(this._prefKey);
+    } catch(ex) {};
+    return id;
+  },
+  set recentFolder(folderId) {
+    Services.prefs.setIntPref(this._prefKey, folderId);
+  },
+  get strings() {
+    let spec = "chrome://cmimprove/locale/browser.properties";
+    delete this.strings;
+    return this.strings = Services.strings.createBundle(spec);
+  },
+  handleEvent: function(evt) {
+    win = evt.target.ownerGlobal;
+    if (evt.originalTarget !== win.StarUI.panel) {
+      return;
+    }
+    switch (evt.type) {
+      case "popupshown":
+        if (win.StarUI._isNewBookmark === false) { // undefined before Fx 47
+          break;
+        }
+        this._itemId = win.StarUI._itemId;
+        this._recentFolderForUndo = this.recentFolder;
+        break;
+      case "popuphidden":
+        this._itemId = -1;
+        if (((win.StarUI._isNewBookmark &&
+              win.StarUI._uriForRemoval) || // Fx 47+
+             win.StarUI._actionOnHide) && // before Fx 47
+            !isNaN(this._recentFolderForUndo)) {
+          this.recentFolder = this._recentFolderForUndo;
+        }
+        delete this._recentFolderForUndo;
+        break;
+    }
+  },
+
+  init: function() {
+    PlacesUtils.bookmarks.addObserver(this, false);
+  },
+
+  onBeforeItemRemoved: function() {},
+  onBeginUpdateBatch: function() {},
+  onEndUpdateBatch: function() {},
+  onItemAdded: function() {},
+  onItemChanged: function() {},
+  onItemMoved: function(itemId, b, c, newParentId, e, f, g, h, i) {
+    if (itemId !== this._itemId) {
+      return;
+    }
+    this.recentFolder = newParentId;
+  },
+  onItemRemoved: function() {},
+  onItemVisited: function() {},
+
+  patchBrowserWindow: function(win) {
+    win.MOA = win.MOA || {};
+    win.MOA.Improve = win.MOA.Improve || {};
+    win.MOA.Improve.Bookmark = win.MOA.Improve.Bookmark || {
+      getParentFolder: this._getParentFolder.bind(this),
+      getString: this._getString.bind(this)
+    };
+
+    let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
+    if (bmb_vbt) {
+      bmb_vbt.setAttribute("label", this._getString("menu.bookmarksToolbar"));
+    }
+
+    if (win.BookmarkingUI) {
+      win.BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
+        let g;
+        try {
+          g = win;
+        } catch(e) {
+          g = window;
+        }
+
+        let unstarredTooltip = g.MOA.Improve.Bookmark.
+          getString("starButtonOff.tooltip");
+        if (this.BOOKMARK_BUTTON_SHORTCUT) {
+          let args = [];
+          let shortcut = g.document.
+            getElementById(this.BOOKMARK_BUTTON_SHORTCUT);
+          if (shortcut) {
+            args.push(ShortcutUtils.prettifyShortcut(shortcut));
+            unstarredTooltip = g.MOA.Improve.Bookmark.
+              getString("starButtonOff.tooltip2", args);
+          }
+        }
+
+        delete this._unstarredTooltip;
+        return this._unstarredTooltip = unstarredTooltip;
+      });
+    }
+
+    if (win.PlacesCommandHook && win.PlacesCommandHook.bookmarkCurrentPage) {
+      win.MOA.Improve.Bookmark.bookmarkCurrentPage =
+        win.PlacesCommandHook.bookmarkCurrentPage;
+      win.PlacesCommandHook.bookmarkCurrentPage = function(...args) {
+        let g;
+        try {
+          g = win;
+        } catch(e) {
+          g = window;
+        }
+
+        // For Fx earlier than 47
+        if (Components.stack.caller &&
+            (Components.stack.caller.name === "BUI_onCommand")) {
+          args[0] = true;
+        }
+        args[1] = args[1] || g.MOA.Improve.Bookmark.getParentFolder();
+        g.MOA.Improve.Bookmark.bookmarkCurrentPage.
+          apply(g.PlacesCommandHook, args);
+      }
+    }
+
+    if (win.StarUI && win.StarUI.panel) {
+      win.StarUI.panel.addEventListener("popupshown", this, false);
+      win.StarUI.panel.addEventListener("popuphidden", this, false);
+    }
+  },
+  _getParentFolder: function() {
+    let id = -1;
+    try {
+      let prefKey = "extensions.cmimprove.bookmarks.parentFolder";
+      id = Services.prefs.getIntPref(prefKey);
+    } catch(ex) {};
+    if (PlacesUtils.isRootItem(id)) {
+      return id;
+    }
+
+    return this.recentFolder;
+  },
+  _getString: function(id, args) {
+    if (args) {
+      return this.strings.formatStringFromName(id, args, args.length);
+    } else {
+      return this.strings.GetStringFromName(id);
+    }
+  }
+};
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -545,9 +699,11 @@ mozCNGuard.prototype = {
         socialShareRemoval.init();
         mobilePromoLinksHack.init();
         defaultFontHack.init();
+        bookmarkHack.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
+        bookmarkHack.patchBrowserWindow(aSubject);
         dragAndDrop.initOnce();
         break;
       case "sessionstore-state-finalized":
