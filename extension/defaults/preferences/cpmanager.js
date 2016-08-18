@@ -8,16 +8,11 @@ pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 pref("privacy.trackingprotection.pbmode.enabled", false);
 pref("startup.homepage_welcome_url.additional", "");
 
-pref("plugin.state.npalicdo", 2);
-pref("plugin.state.npalidcp", 2);
 pref("plugin.state.npaliedit", 2);
 pref("plugin.state.npalisecctrl", 2);
 pref("plugin.state.npalissologin", 2);
 pref("plugin.state.npqqmailwebkit", 2);
-pref("plugin.state.npqzonemusic", 2);
-pref("plugin.state.npssoaxctrlforptlogin", 2);
 pref("plugin.state.npwangwang", 2);
-pref("plugin.state.npyunwebdetect", 2);
 
 pref("plugin.state.npcmbedit", 2);
 pref("plugin.state.npseceditctl.boc.x", 2);
