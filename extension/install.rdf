@@ -16,7 +16,6 @@
 		<em:contributor>Rui You</em:contributor>
 		<em:homepageURL>http://www.firefox.com.cn/</em:homepageURL>
 		<em:optionsURL>chrome://cmsafeflag/content/options.xul</em:optionsURL>
-		<em:unpack>true</em:unpack>
 		<em:multiprocessCompatible>true</em:multiprocessCompatible>
 		<em:targetApplication>
 			<Description>
