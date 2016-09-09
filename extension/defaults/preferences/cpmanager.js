@@ -8,8 +8,6 @@ pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 pref("privacy.trackingprotection.pbmode.enabled", false);
 pref("startup.homepage_welcome_url.additional", "");
 
-pref("plugin.state.npaliedit", 2);
-pref("plugin.state.npalisecctrl", 2);
 pref("plugin.state.npalissologin", 2);
 pref("plugin.state.npqqmailwebkit", 2);
 pref("plugin.state.npwangwang", 2);
