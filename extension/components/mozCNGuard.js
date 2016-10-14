@@ -672,6 +672,34 @@ var bookmarkHack = {
   }
 };
 
+var webchannelObjectHack = {
+  branchStr: "webchannel.allowObject.",
+  extraURLs: [
+    "https://accounts.firefox.com.cn"/*,
+    "http://e.firefoxchina.cn",
+    "http://i.firefoxchina.cn",
+    "http://n.firefoxchina.cn"*/
+  ],
+  prefKey: "urlWhitelist",
+  get prefs() {
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch(this.branchStr);
+  },
+
+  init: function() {
+    this.defaultPrefTweak();
+  },
+
+  defaultPrefTweak: function() {
+    if (!this.prefs.getPrefType(this.prefKey)) {
+      return;
+    }
+    let urls = this.prefs.getCharPref(this.prefKey).split(/\s+/);
+    urls = this.extraURLs.concat(urls);
+    this.prefs.setCharPref(this.prefKey, urls.join(" "));
+  }
+};
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -700,6 +728,7 @@ mozCNGuard.prototype = {
         mobilePromoLinksHack.init();
         defaultFontHack.init();
         bookmarkHack.init();
+        webchannelObjectHack.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
