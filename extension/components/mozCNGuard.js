@@ -753,6 +753,7 @@ mozCNGuard.prototype = {
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
+        webchannelObjectHack.defaultPrefTweak();
         break;
     }
   },
