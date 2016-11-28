@@ -8,6 +8,13 @@ var Ci = Components.interfaces;
 var Cc = Components.classes;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
+  return Cc["@mozilla.org/weave/service;1"]
+           .getService(Ci.nsISupports)
+           .wrappedJSObject;
+});
+XPCOMUtils.defineLazyModuleGetter(this, "Weave",
+  "resource://services-sync/main.js");
 XPCOMUtils.defineLazyModuleGetter(this, "ShortcutUtils",
   "resource://gre/modules/ShortcutUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
@@ -20,6 +27,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "SkipSBData",
   "resource://cmsafeflag/SkipSBData.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
   "resource://gre/modules/PlacesUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PlacesUIUtils",
+  "resource:///modules/PlacesUIUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
@@ -522,7 +531,7 @@ var dragAndDrop = {
   }
 }
 
-var bookmarkHack = {
+var bookmarkingUIHack = {
   _itemId: -1,
   _prefKey: "extensions.cmimprove.bookmarks.add.defaultFolder",
   get recentFolder() {
@@ -675,10 +684,7 @@ var bookmarkHack = {
 var webchannelObjectHack = {
   branchStr: "webchannel.allowObject.",
   extraURLs: [
-    "https://accounts.firefox.com.cn"/*,
-    "http://e.firefoxchina.cn",
-    "http://i.firefoxchina.cn",
-    "http://n.firefoxchina.cn"*/
+    "https://accounts.firefox.com.cn"
   ],
   prefKey: "urlWhitelist",
   get prefs() {
@@ -697,6 +703,143 @@ var webchannelObjectHack = {
     let urls = this.prefs.getCharPref(this.prefKey).split(/\s+/);
     urls = this.extraURLs.concat(urls);
     this.prefs.setCharPref(this.prefKey, urls.join(" "));
+  }
+};
+
+var mobileBookmarksHack = {
+  id: "mozcn-mobile-bookmarks-button",
+  type : "view",
+  viewId : "PanelUI-MOA-mobileBookmarksView",
+  defaultArea : CustomizableUI.AREA_BOOKMARKS,
+  get label() {
+    var label;
+    try {
+      label = Services.strings.
+        createBundle("chrome://places/locale/places.properties").
+        GetStringFromName("MobileBookmarksFolderTitle");
+    } catch(ex) {
+      label = Services.strings.
+        createBundle("chrome://weave/locale/services/sync.properties").
+        GetStringFromName("mobile.label");
+    }
+    delete this.label;
+    return this.label = label;
+  },
+  get tooltiptext() {
+    delete this.tooltiptext;
+    return this.tooltiptext = this.label;
+  },
+  onViewShowing: function(evt) {
+    var subView = evt.target;
+    var win = subView.ownerGlobal;
+    var header = subView.querySelector("label.panel-subview-header");
+    if (!header.hasAttribute("value")) {
+      header.setAttribute("value", this.label);
+    }
+    var deck = subView.querySelector("#PanelUI-MOA-mobileBookmarks-deck");
+    if (this.isConfiguredToSyncBookmarks) {
+      if (!this.mobileFolderId ||
+          PlacesUtils.bookmarks.getIdForItemAt(this.mobileFolderId, 0) === -1) {
+        deck.setAttribute("selectedIndex", this.deckIndices.DECK_INDEX_NOCLIENTS);
+        return;
+      }
+    } else {
+      deck.setAttribute("selectedIndex", this.deckIndices.DECKINDEX_BOOKMARKSDISABLED);
+      return;
+    }
+
+    evt.preventDefault();
+    subView.removeAttribute("current");
+
+    var widget = CustomizableUI.getWidget(this.id).forWindow(win);
+    var area = CustomizableUI.getPlacementOfWidget(this.id).area;
+    if (area === CustomizableUI.AREA_PANEL || widget.overflowed) {
+      var hierarchy = ["AllBookmarks"];
+      if (this.mobileQuery) {
+        hierarchy.push(this.mobileQuery.itemId);
+      }
+      win.PlacesCommandHook.showPlacesOrganizer(hierarchy);
+      win.PanelUI.hide();
+      return;
+    }
+
+    // delay to run after panelRemover, where anchor.open is set to false
+    win.setTimeout(this.showBookmarksPopup, 0, widget);
+  },
+
+  bookmarksPopupId: "mozcn-mobile-bookmarks-popup",
+  deckIndices: {
+    "DECKINDEX_BOOKMARKSDISABLED": 0,
+    "DECK_INDEX_NOCLIENTS": 1
+  },
+  get mobileFolderId() {
+    // PlacesUtils.mobileFolderId since Fx 51
+    return PlacesUtils.mobileFolderId || PlacesUtils.annotations.
+      getItemsWithAnnotation("mobile/bookmarksRoot", {})[0] || 0;
+  },
+  get isConfiguredToSyncBookmarks() {
+    if (!weaveXPCService.ready) {
+      return true;
+    }
+
+    let engine = Weave.Service.engineManager.get("bookmarks");
+    return engine && engine.enabled;
+  },
+  get mobileQuery() {
+    delete this.mobileQuery;
+    return this.mobileQuery = PlacesUtils.annotations.
+      getAnnotationsWithName(PlacesUIUtils.ORGANIZER_QUERY_ANNO, {}).
+      filter(function(annotation) {
+        return annotation.annotationValue === "MobileBookmarks";
+      })[0];
+  },
+  handleEvent: function(evt) {
+    // current/original/explicitOriginal ??
+    if (evt.target.id !== this.bookmarksPopupId) {
+      return;
+    }
+    evt.target.removeEventListener(evt.type, this);
+
+    var win = evt.target.ownerGlobal;
+    var widget = CustomizableUI.getWidget(this.id).forWindow(win);
+    var mainPopupSet = win.document.getElementById("mainPopupSet");
+    switch (evt.type) {
+      case "popuphidden":
+        if (widget.anchor.open) {
+          widget.anchor.open = false;
+        }
+        mainPopupSet.appendChild(evt.target);
+        break;
+      case "popupshowing":
+        this.maybeAttachPlacesView(evt);
+        // set open to true prematurely will trigger unnecessary rebuild
+        if (!widget.anchor.open) {
+          widget.anchor.open = true;
+        }
+        break;
+      default:
+        break;
+    }
+  },
+  init: function() {
+    this.showBookmarksPopup = this._showBookmarksPopup.bind(this);
+
+    CustomizableUI.createWidget(this);
+  },
+  maybeAttachPlacesView: function(evt) {
+    if (evt.target.parentNode._placesView) {
+      return;
+    }
+
+    var win = evt.target.ownerGlobal;
+    new win.PlacesMenu(evt, ("place:folder=" + this.mobileFolderId));
+  },
+  _showBookmarksPopup: function(widget) {
+    var popup = widget.node.ownerDocument.getElementById(this.bookmarksPopupId);
+    widget.node.appendChild(popup);
+    popup.addEventListener("popuphidden", this, false);
+    popup.addEventListener("popupshowing", this, false);
+    popup.openPopup(widget.anchor, "bottomright topright");
   }
 };
 
@@ -727,12 +870,13 @@ mozCNGuard.prototype = {
         socialShareRemoval.init();
         mobilePromoLinksHack.init();
         defaultFontHack.init();
-        bookmarkHack.init();
+        bookmarkingUIHack.init();
         webchannelObjectHack.init();
+        mobileBookmarksHack.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
-        bookmarkHack.patchBrowserWindow(aSubject);
+        bookmarkingUIHack.patchBrowserWindow(aSubject);
         dragAndDrop.initOnce();
         break;
       case "sessionstore-state-finalized":

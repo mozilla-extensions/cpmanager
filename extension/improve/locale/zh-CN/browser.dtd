@@ -13,3 +13,12 @@
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "关闭时清除历史记录">
 
 <!ENTITY cp.mozillaComCn.label "社区论坛">
+
+<!ENTITY cp.moaMobileBookmarks.bookmarksnotsyncing.title "未检测到移动书签">
+<!ENTITY cp.moaMobileBookmarks.bookmarksnotsyncing.label "同步设置中书签选项未启用">
+<!ENTITY cp.moaMobileBookmarks.enablebookmarkssync.label "点击启用">
+<!ENTITY cp.moaMobileBookmarks.noclients.title           "请下载移动版 Firefox">
+<!ENTITY cp.moaMobileBookmarks.generic.label             "登录火狐通行证，同步书签、附加组件，畅享快速、智能、安全的移动互联网体验">
+<!ENTITY cp.moaMobileBookmarks.mobilePromo.label         "立即下载">
+<!ENTITY cp.moaMobileBookmarks.notsignedin.title         "未登录火狐通行证">
+<!ENTITY cp.moaMobileBookmarks.signin.label              "立即登录">

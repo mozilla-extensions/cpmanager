@@ -13,3 +13,12 @@
 <!ENTITY cp.clearRecentHistory.clearOnClose.label "Always clear history when Firefox closes">
 
 <!ENTITY cp.mozillaComCn.label "Community Website">
+
+<!ENTITY cp.moaMobileBookmarks.bookmarksnotsyncing.title "No Mobile Bookmarks">
+<!ENTITY cp.moaMobileBookmarks.bookmarksnotsyncing.label "Bookmarks syncing disabled">
+<!ENTITY cp.moaMobileBookmarks.enablebookmarkssync.label "Click to Enable">
+<!ENTITY cp.moaMobileBookmarks.noclients.title           "Download Firefox for Android">
+<!ENTITY cp.moaMobileBookmarks.generic.label             "Sign in to view the bookmarks from your mobile devices.">
+<!ENTITY cp.moaMobileBookmarks.mobilePromo.label         "Download Now">
+<!ENTITY cp.moaMobileBookmarks.notsignedin.title         "Sync not configured">
+<!ENTITY cp.moaMobileBookmarks.signin.label              "Sign in to Sync">

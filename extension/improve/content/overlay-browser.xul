@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <?xml-stylesheet href="chrome://cmimprove-os/skin/cm_menu_maintenance.css" type="text/css" ?>
+<?xml-stylesheet href="chrome://cmimprove/skin/mobile_bookmarks.css" type="text/css" ?>
 <?xml-stylesheet href="chrome://cmimprove/skin/undo_closetab.css" type="text/css" ?>
 <!DOCTYPE window [
 <!ENTITY % improveDTD SYSTEM "chrome://cmimprove/locale/browser.dtd">
@@ -57,6 +58,73 @@
   </menupopup>
 
   <panelmultiview id="PanelUI-multiView" mainViewId="PanelUI-mainView">
+    <panelview id="PanelUI-MOA-mobileBookmarksView" flex="1" class="PanelUI-subView">
+      <label class="panel-subview-header"/>
+      <vbox class="panel-subview-body">
+        <vbox id="PanelUI-MOA-mobileBookmarks-main" observes="sync-syncnow-state">
+          <!-- vbox: button to force a sync, not in the first release -->
+          <deck id="PanelUI-MOA-mobileBookmarks-deck">
+            <!-- vbox: bookmarks from mobile devices, use menupopup instead -->
+            <hbox id="PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane" pack="center" flex="1">
+              <vbox class="PanelUI-MOA-mobileBookmarks-instruction-box">
+                <hbox pack="center">
+                  <image class="fxaSyncIllustration" alt=""/>
+                </hbox>
+                <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.bookmarksnotsyncing.title;</label>
+                <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.bookmarksnotsyncing.label;</label>
+                <hbox pack="center">
+                  <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
+                                 label="&cp.moaMobileBookmarks.enablebookmarkssync.label;"
+                                 oncommand="Preferences.set('services.sync.engine.bookmarks', true);"/>
+                </hbox>
+              </vbox>
+            </hbox>
+            <!-- vbox: fetching? not really necessary for bookmarks -->
+            <hbox id="PanelUI-MOA-mobileBookmarks-nodevicespane" pack="center" flex="1">
+              <vbox class="PanelUI-MOA-mobileBookmarks-instruction-box">
+                <hbox pack="center">
+                  <image class="fxaSyncIllustration" alt=""/>
+                </hbox>
+                <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.noclients.title;</label>
+                <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
+                <!-- used to be downloads for both android and ios, but bi-directional bookmarks sync not yet enabled on ios -->
+                <hbox pack="center">
+                  <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
+                                 label="&cp.moaMobileBookmarks.mobilePromo.label;"
+                                 oncommand="openUILinkIn('http://www.firefox.com.cn/#android', 'tab');"/>
+                </hbox>
+              </vbox>
+            </hbox>
+          </deck>
+        </vbox>
+        <hbox pack="center" flex="1">
+          <vbox id="PanelUI-MOA-mobileBookmarks-setupsync"
+                flex="1"
+                align="center"
+                class="PanelUI-MOA-mobileBookmarks-instruction-box"
+                observes="sync-setup-state">
+                  <image class="fxaSyncIllustration" alt=""/>
+                  <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.notsignedin.title;</label>
+                  <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
+                  <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
+                                 label="&cp.moaMobileBookmarks.signin.label;"
+                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks');"/>
+          </vbox>
+          <vbox id="PanelUI-MOA-mobileBookmarks-reauthsync"
+                flex="1"
+                align="center"
+                class="PanelUI-MOA-mobileBookmarks-instruction-box"
+                observes="sync-reauth-state">
+                  <image class="fxaSyncIllustration" alt=""/>
+                  <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.notsignedin.title;</label>
+                  <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
+                  <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
+                                 label="&cp.moaMobileBookmarks.signin.label;"
+                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks');"/>
+          </vbox>
+        </hbox>
+      </vbox>
+    </panelview>
     <panelview id="PanelUI-MOA-undoCloseView" flex="1" class="PanelUI-subView"
                tooltip="bhTooltip" popupsinherittooltip="true"/>
   </panelmultiview>
@@ -74,6 +142,17 @@
                  popupsinherittooltip="true" />
     </menu>
   </menupopup>
+
+  <popupset id="mainPopupSet">
+    <menupopup id="mozcn-mobile-bookmarks-popup"
+               placespopup="true"
+               context="placesContext"
+               oncommand="BookmarksEventHandler.onCommand(event, this.parentNode._placesView);"
+               onclick="BookmarksEventHandler.onClick(event, this.parentNode._placesView);"
+               tooltip="bhTooltip" popupsinherittooltip="true">
+    </menupopup>
+  </popupset>
+
   <vbox id="browser-panel" >
     <html:canvas id="ce-animation-canvas" class="animation-content" />
   </vbox>

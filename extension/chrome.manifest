@@ -86,13 +86,14 @@ overlay  chrome://browser/content/preferences/sync.xul      chrome://cmimprove/c
 
 overlay  about:preferences  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
 
-overlay  about:preferences                         chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=abouthome    chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=menubar      chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=menupanel    chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=syncbutton   chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=tabs-sidebar chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
-overlay  about:preferences?entrypoint=uitour       chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences                                 chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=abouthome            chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=menubar              chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=menupanel            chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=syncbutton           chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=tabs-sidebar         chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=uitour               chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
+overlay  about:preferences?entrypoint=moa-mobile-bookmarks chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
 component {6E12E09F-1942-46F0-8D85-9C6B1D0E6448} components/ceTracking-old.js
 contract @mozilla.com.cn/tracking-old;1 {6E12E09F-1942-46F0-8D85-9C6B1D0E6448}

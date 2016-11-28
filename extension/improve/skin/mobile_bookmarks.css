@@ -1,0 +1,89 @@
+#mozcn-mobile-bookmarks-button {
+  list-style-image: url("chrome://cmimprove/skin/mobile-16.png") !important;
+}
+
+#mozcn-mobile-bookmarks-button[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
+  list-style-image: url("chrome://cmimprove/skin/mobile-32.png") !important;
+}
+
+@media (-moz-mac-lion-theme) and (min-resolution: 2dppx) {
+  #mozcn-mobile-bookmarks-button {
+    list-style-image: url("chrome://cmimprove/skin/mobile-32.png") !important;
+  }
+  #mozcn-mobile-bookmarks-button[cui-areatype="menu-panel"],
+  toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
+    list-style-image: url("chrome://cmimprove/skin/mobile-64.png") !important;
+  }
+}
+
+/* mostly copyed from chrome://browser/skin/customizableui/panelUI.css */
+#PanelUI-MOA-mobileBookmarksView {
+  --panel-ui-sync-illustration-height: 157.5px;
+}
+
+.PanelUI-MOA-mobileBookmarks-instruction-title,
+.PanelUI-MOA-mobileBookmarks-instruction-label {
+  margin: 15px;
+  text-align: center;
+  text-shadow: none;
+  max-width: 18em; /* 15em */
+  color: GrayText;
+}
+
+.PanelUI-MOA-mobileBookmarks-instruction-title {
+  font-size: 1.3em;
+}
+
+.PanelUI-MOA-mobileBookmarks-instruction-box {
+  padding-bottom: 30px;
+  padding-top: 15px;
+}
+
+#PanelUI-MOA-mobileBookmarks-deck:not([selectedIndex="0"]) > #PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane,
+#PanelUI-MOA-mobileBookmarks-deck:not([selectedIndex="1"]) > #PanelUI-MOA-mobileBookmarks-nodevicespane {
+  visibility: collapse;
+}
+
+.PanelUI-MOA-mobileBookmarks-prefs-button {
+  -moz-appearance: none;
+  background-color: #0096dd;
+  color: white !important;
+  border-radius: 2px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 8px;
+  text-shadow: none;
+  min-width: 200px;
+}
+.PanelUI-MOA-mobileBookmarks-prefs-button:hover,
+.PanelUI-MOA-mobileBookmarks-prefs-button:hover:active {
+  background-color: #018acb;
+}
+.PanelUI-MOA-mobileBookmarks-prefs-button > .toolbarbutton-text {
+  text-align: center !important;
+  text-shadow: none;
+}
+
+#PanelUI-MOA-mobileBookmarksView[mainview] {
+  min-width: 22em; /* 19em */
+}
+
+#PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-setupsync,
+#PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-reauthsync,
+#PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-nodevicespane,
+#PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane {
+  min-height: calc(var(--panel-ui-sync-illustration-height) +
+                   20px + /* margin of .PanelUI-remotetabs-prefs-button */
+                   16px + /* padding of .PanelUI-remotetabs-prefs-button */
+                   30px + /* margin of .PanelUI-remotetabs-instruction-label */
+                   30px + 15px + /* padding of .PanelUI-remotetabs-instruction-box */
+                   11em);
+}
+
+#PersonalToolbar #mozcn-mobile-bookmarks-button {
+  -moz-box-orient: horizontal; /* necessary for macOS */
+}
+#PersonalToolbar #mozcn-mobile-bookmarks-button > .toolbarbutton-text {
+  display: -moz-box !important;
+}
