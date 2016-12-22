@@ -23,6 +23,7 @@ const DEBUG = 0;
 
 const PREF_SYNC_TOKENSERVER_LEGACY = 'services.sync.tokenServerURI';
 const PREF_SYNC_TOKENSERVER = 'identity.sync.tokenserver.uri';
+const PREF_WEBCHANNEL_OBJECT_WHITELIST = 'webchannel.allowObject.urlWhitelist';
 
 const PREF_RESTART_FLAG = 'extensions.cpmanager@mozilla.com.flag.restart';
 
@@ -45,7 +46,8 @@ let defaultPrefs = Services.prefs.getDefaultBranch('');
   'services.sync.statusURL',
   'services.sync.fxa.privacyURL',
   'services.sync.fxa.termsURL',
-  PREF_SYNC_TOKENSERVER_LEGACY
+  PREF_SYNC_TOKENSERVER_LEGACY,
+  PREF_WEBCHANNEL_OBJECT_WHITELIST
 ].forEach(function(prefKey) {
   if (defaultPrefs.getPrefType(prefKey) !== Services.prefs.PREF_INVALID) {
     try {
@@ -209,7 +211,8 @@ function repairOnlySyncBookmark() {
 
 function switchToLocalService(aExcludeFxAPrefs) {
   Object.keys(SERVICE_PREFS).forEach(function(key) {
-    if (aExcludeFxAPrefs && key.startsWith('identity.fxaccounts.')) {
+    if (aExcludeFxAPrefs && (key.startsWith('identity.fxaccounts.') ||
+                             key === PREF_WEBCHANNEL_OBJECT_WHITELIST)) {
       return;
     }
 
@@ -254,7 +257,8 @@ function repairPrefs() {
 
     if (isLocalValue) {
       hasLocalPref = true;
-      if (key.startsWith('identity.fxaccounts.')) {
+      if (key.startsWith('identity.fxaccounts.') ||
+          key === PREF_WEBCHANNEL_OBJECT_WHITELIST) {
         hasLocalFxAPref = true;
       }
     }
