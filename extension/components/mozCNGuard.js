@@ -681,31 +681,6 @@ var bookmarkingUIHack = {
   }
 };
 
-var webchannelObjectHack = {
-  branchStr: "webchannel.allowObject.",
-  extraURLs: [
-    "https://accounts.firefox.com.cn"
-  ],
-  prefKey: "urlWhitelist",
-  get prefs() {
-    delete this.prefs;
-    return this.prefs = Services.prefs.getDefaultBranch(this.branchStr);
-  },
-
-  init: function() {
-    this.defaultPrefTweak();
-  },
-
-  defaultPrefTweak: function() {
-    if (!this.prefs.getPrefType(this.prefKey)) {
-      return;
-    }
-    let urls = this.prefs.getCharPref(this.prefKey).split(/\s+/);
-    urls = this.extraURLs.concat(urls);
-    this.prefs.setCharPref(this.prefKey, urls.join(" "));
-  }
-};
-
 var mobileBookmarksHack = {
   id: "mozcn-mobile-bookmarks-button",
   type : "view",
@@ -916,7 +891,6 @@ mozCNGuard.prototype = {
         mobilePromoLinksHack.init();
         defaultFontHack.init();
         bookmarkingUIHack.init();
-        webchannelObjectHack.init();
         mobileBookmarksHack.init();
         readOnlyPrefsJs.init();
         break;
@@ -944,7 +918,6 @@ mozCNGuard.prototype = {
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
-        webchannelObjectHack.defaultPrefTweak();
         break;
     }
   },
