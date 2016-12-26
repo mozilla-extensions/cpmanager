@@ -741,10 +741,16 @@ var mobileBookmarksHack = {
       if (!this.mobileFolderId ||
           PlacesUtils.bookmarks.getIdForItemAt(this.mobileFolderId, 0) === -1) {
         deck.setAttribute("selectedIndex", this.deckIndices.DECK_INDEX_NOCLIENTS);
+        if (win.document.getElementById("sync-syncnow-state").hidden) {
+          this._track("auth", "show");
+        } else {
+          this._track("noclients", "show");
+        }
         return;
       }
     } else {
       deck.setAttribute("selectedIndex", this.deckIndices.DECKINDEX_BOOKMARKSDISABLED);
+      this._track("bookmarksdisabled", "show");
       return;
     }
 
@@ -760,11 +766,13 @@ var mobileBookmarksHack = {
       }
       win.PlacesCommandHook.showPlacesOrganizer(hierarchy);
       win.PanelUI.hide();
+      this._track("places", "show");
       return;
     }
 
     // delay to run after panelRemover, where anchor.open is set to false
     win.setTimeout(this.showBookmarksPopup, 0, widget);
+    this._track("menupopup", "show");
   },
 
   bookmarksPopupId: "mozcn-mobile-bookmarks-popup",
@@ -834,12 +842,22 @@ var mobileBookmarksHack = {
     var win = evt.target.ownerGlobal;
     new win.PlacesMenu(evt, ("place:folder=" + this.mobileFolderId));
   },
+  patchBrowserWindow: function(win) {
+    win.MOA = win.MOA || {};
+    win.MOA.Improve = win.MOA.Improve || {};
+    win.MOA.Improve.MobileBookmarks = win.MOA.Improve.MobileBookmarks || {
+      track: this._track.bind(this)
+    };
+  },
   _showBookmarksPopup: function(widget) {
     var popup = widget.node.ownerDocument.getElementById(this.bookmarksPopupId);
     widget.node.appendChild(popup);
     popup.addEventListener("popuphidden", this, false);
     popup.addEventListener("popupshowing", this, false);
     popup.openPopup(widget.anchor, "bottomright topright");
+  },
+  _track: function(type, action) {
+    CETracking.track(["mbm", type, action || "click"].join("-"));
   }
 };
 
@@ -877,6 +895,7 @@ mozCNGuard.prototype = {
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
         bookmarkingUIHack.patchBrowserWindow(aSubject);
+        mobileBookmarksHack.patchBrowserWindow(aSubject);
         dragAndDrop.initOnce();
         break;
       case "sessionstore-state-finalized":
