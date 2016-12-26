@@ -1,94 +1,18 @@
-
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
+const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 const _CID = Components.ID('{44FA5595-2842-6F60-1385-B6C7AC6F118B}');
 const _CONTRACTID = "@mozilla.com.cn/clearHistory;1";
 
-
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/PlacesUtils.jsm");
-
-function LOG(txt) {
-  var consoleService = Cc["@mozilla.org/consoleservice;1"]
-                       .getService(Ci.nsIConsoleService);
-                       consoleService.logStringMessage("clear history : " + txt);
-}
-
-function getBoolPref(name, defValue) {
-  try {
-  	return Services.prefs.getBoolPref(name);
-  } catch (e) {
-  	return defValue;
-  }
-}
-
-function getIntPref(name, defValue) {
-  try {
-  	return Services.prefs.getIntPref(name);
-  } catch (e) {
-  	return defValue;
-  }
-}
-
-function clearHistory()
-{
-  var isAuto = getBoolPref("privacy.sanitize.sanitizeOnShutdown", false);
-  if (isAuto)
-    return;
-  var timeout = getIntPref("extensions.cpmanager@mozillaonline.com.sanitize.timeout", 0);
-  var days = 0;
-  switch (timeout) {
-    case -1: //"daily":
-      days = 1;
-      break;
-    case -2: //"weekly":
-      days = 7;
-      break;
-    case -3: //"monthly":
-      days = 30;
-      break;
-    case -4: //"querterly":
-      days = 90;
-      break;
-    case -6: //"yearly":
-      days = 365;
-      break;
-    default :
-      days = timeout;
-      break;
-  }
-  if (days == 0)
-    return;
-  var range = getClearRange(days)
-  var globalHistory = PlacesUtils.history.QueryInterface(Ci.nsIBrowserHistory);
-  globalHistory.removeVisitsByTimeframe(range[0], range[1]);
-//  try {
-//    var os = Components.classes["@mozilla.org/observer-service;1"]
-//                       .getService(Components.interfaces.nsIObserverService);
-//    os.notifyObservers(null, "browser:purge-session-history", "");
-//  }
-//  catch (e) { }
-//
-//  // Clear last URL of the Open Web Location dialog
-//  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-//                        .getService(Components.interfaces.nsIPrefBranch);
-//  try {
-//    prefs.clearUserPref("general.open_location.last_url");
-//  }
-//  catch (e) { }
-}
-
-function getClearRange(days) {
-  var startDate = 0;
-  var endDate = Date.now() * 1000;
-  endDate -= days * 24 * 3600000000; // 1*60*60*1000000
-  return [startDate, endDate];
-}
+XPCOMUtils.defineLazyModuleGetter(this, "Services",
+  "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Preferences",
+  "resource://gre/modules/Preferences.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
+  "resource://gre/modules/PlacesUtils.jsm");
+XPCOMUtils.defineLazyServiceGetter(this, "PlacesDB",
+  "@mozilla.org/browser/nav-history-service;1", "nsPIPlacesDatabase");
 
 function chFactoryClass() {
   this.wrappedJSObject = this;
@@ -102,18 +26,115 @@ chFactoryClass.prototype = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
                                          Ci.nsISupportsWeakReference]),
 
+  clearHistoryByBrowser: "privacy.sanitize.sanitizeOnShutdown",
+
+  /*
+   * For test:
+     let progress = {
+       _history: "uninitialized",
+       get history() {
+         return this._history;
+       },
+       set history(val) {
+         console.log("settings progress.history to " + val);
+         this._history = val;
+       }
+     };
+     let promise = Cc["@mozilla.com.cn/clearHistory;1"].
+       getService(Ci.nsISupports).wrappedJSObject.
+       clearHistoryAsync({ progress }).catch(function(ex) {
+         console.error(ex);
+       });
+   */
+  clearHistoryAsync: function(options) {
+    let self = this;
+    return new Promise(function(resolve, reject) {
+      if (Preferences.get(self.clearHistoryByBrowser, false)) {
+        return resolve();
+      }
+
+      let progress = options.progress;
+      progress.history = "ready";
+
+      let days = self.getDaysToClear();
+      if (!days) {
+        progress.history = "skipped";
+        return resolve();
+      }
+      
+      let range = self.getRangeByDays(days);
+      let promise = PlacesUtils.history.removeVisitsByFilter({
+        beginDate: new Date(range[0] / 1000),
+        endDate: new Date(range[1] / 1000)
+      }).then(function() {
+        progress.history = "cleared";
+        resolve();
+      }, function(ex) {
+        progress.history = "failed";
+        reject(ex);
+      });
+      progress.history = "blocking";
+    });
+  },
+
+  clearHistorySync: function() {
+    if (Preferences.get(this.clearHistoryByBrowser, false)) {
+      return;
+    }
+
+    let days = this.getDaysToClear();
+    if (!days) {
+      return;
+    }
+
+    let range = this.getRangeByDays(days);
+    PlacesUtils.history.QueryInterface(Ci.nsIBrowserHistory).
+      removeVisitsByTimeframe(range[0], range[1]);
+  },
+
+  getDaysToClear: function() {
+    let prefKey = "extensions.cpmanager@mozillaonline.com.sanitize.timeout";
+    let option = Preferences.get(prefKey, 0);
+    return days = {
+      "-1": 1,
+      "-2": 7,
+      "-3": 30,
+      "-4": 90,
+      "-6": 365
+    }[option] || option;
+  },
+
+  getRangeByDays: function(days) {
+    return [0, (Date.now() - days * 86400e3) * 1e3];
+  },
+
   observe: function (aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
-        Services.obs.addObserver(this, "quit-application", true);
+        if (PlacesDB.shutdownClient &&
+            PlacesDB.shutdownClient.jsclient &&
+            PlacesUtils.history.removeVisitsByFilter) {
+          let progress = {};
+          let self = this;
+          PlacesDB.shutdownClient.jsclient.addBlocker("ceClearHistory",
+            function() {
+              return self.clearHistoryAsync({ progress });
+            },
+            {
+              fetchState: function() {
+                return { progress };
+              }
+            }
+          );
+        } else {
+          Services.obs.addObserver(this, "quit-application", true);
+        }
         break;
-
       case "quit-application":
-        clearHistory();
+        this.clearHistorySync();
         break;
     };
-  },
-
+  }
 }
 
 const NSGetFactory = XPCOMUtils.generateNSGetFactory([chFactoryClass]);
