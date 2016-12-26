@@ -75,7 +75,7 @@
                 <hbox pack="center">
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.enablebookmarkssync.label;"
-                                 oncommand="Preferences.set('services.sync.engine.bookmarks', true); MOA.MobileBookmarks.track('bookmarksdisabled');"/>
+                                 oncommand="Preferences.set('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"/>
                 </hbox>
               </vbox>
             </hbox>
@@ -91,7 +91,7 @@
                 <hbox pack="center">
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.mobilePromo.label;"
-                                 oncommand="openUILinkIn('http://www.firefox.com.cn/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks#android', 'tab'); MOA.MobileBookmarks.track('noclients');"/>
+                                 oncommand="openUILinkIn('http://www.firefox.com.cn/?utm_source=firefox-browser&amp;utm_medium=firefox-browser&amp;utm_campaign=moa-mobile-bookmarks#android', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"/>
                 </hbox>
               </vbox>
             </hbox>
@@ -108,7 +108,7 @@
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.signin.label;"
-                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.MobileBookmarks.track('auth');"/>
+                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
           </vbox>
           <vbox id="PanelUI-MOA-mobileBookmarks-reauthsync"
                 flex="1"
@@ -120,7 +120,7 @@
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.signin.label;"
-                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.MobileBookmarks.track('auth');"/>
+                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
           </vbox>
         </hbox>
       </vbox>
