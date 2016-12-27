@@ -27,6 +27,9 @@
                              xbl:inherits="oncommand=closebuttoncommand"
                              tooltiptext="&closeNotification.tooltip;"/>
         </xul:hbox>
+        <xul:checkbox anonid="checkbox"
+                      xbl:inherits="hidden=checkboxhidden,checked=checkboxchecked,label=checkboxlabel,oncommand=checkboxcommand" />
+        <xul:description class="popup-notification-warning" xbl:inherits="hidden=warninghidden,xbl:text=warninglabel"/>
         <xul:spacer flex="1"/>
         <xul:hbox class="popup-notification-button-container"
                   pack="end" align="center">
