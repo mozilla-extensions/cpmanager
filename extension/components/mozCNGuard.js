@@ -861,6 +861,29 @@ var mobileBookmarksHack = {
   }
 };
 
+var readOnlyPrefsJs = {
+  init: function() {
+    OS.File.stat(OS.Path.join(OS.Constants.Path.profileDir, "prefs.js")).
+      then(info => {
+        CETracking.track("prefsjs-stat");
+        if (!info.winAttributes.readOnly) {
+          return;
+        }
+
+        CETracking.track("prefsjs-readonly");
+        OS.File.setPermissions(info.path, {
+          winAttributes: {
+            readOnly: false
+          }
+        }).then(() => {
+          CETracking.track("prefsjs-readonly-cleared");
+        }, () => {
+          CETracking.track("prefsjs-readonly-clearfail");
+        });
+      });
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -891,6 +914,7 @@ mozCNGuard.prototype = {
         bookmarkingUIHack.init();
         webchannelObjectHack.init();
         mobileBookmarksHack.init();
+        readOnlyPrefsJs.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
