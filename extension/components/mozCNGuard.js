@@ -830,6 +830,10 @@ var mobileBookmarksHack = {
     }
   },
   init: function() {
+    if (Services.vc.compare(Services.appinfo.version, "45.0") < 0) {
+      return;
+    }
+
     this.showBookmarksPopup = this._showBookmarksPopup.bind(this);
 
     CustomizableUI.createWidget(this);
