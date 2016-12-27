@@ -13,4 +13,4 @@
 <!ENTITY safeflag.aboutBlocked.contentUnwanted "根据报告，位于<span class='site-host'></span>的此网页包含不受欢迎的软件。现已根据您的安全选项予以拦截。" >
 <!ENTITY safeflag.aboutBlocked.getMeOutButton "关闭网页" >
 <!ENTITY safeflag.aboutBlocked.ignoreWarningButton "忽略警告，继续访问" >
-<!ENTITY safeflag.aboutBlocked.footer "以上安全检索数据，由<span class='partner pingan'>凭安科技</span>、<span class='partner baidu'>百度网址安全</span>、<span class='partner alliance'>安全联盟</span> 和 Google 联合提供。<a href='#' id='cnReportButton'>站长申诉</a>" >
+<!ENTITY safeflag.aboutBlocked.footer "以上安全检索数据，由<span class='partner pingan'>凭安科技</span>、<span class='partner baidu'>百度网址安全</span>、<span class='partner alliance'>安全联盟</span> 和 Google 联合提供。<a id='cnReportButton'>站长申诉</a>" >
