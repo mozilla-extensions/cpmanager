@@ -848,6 +848,9 @@ var readOnlyPrefsJs = {
 
     OS.File.stat(OS.Path.join(OS.Constants.Path.profileDir, "prefs.js")).
       then(info => {
+        if (!info.winAttributes) {
+          return;
+        }
         CETracking.track("prefsjs-stat");
         if (!info.winAttributes.readOnly) {
           return;
