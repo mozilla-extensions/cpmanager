@@ -73,6 +73,9 @@
             }
             linklabel.hidden = false
         }
+        if (!this.notification.options.hasOwnProperty('checkbox')) {
+            this.setAttribute("checkboxhidden", "true");
+        }
       ]]></constructor>
       <method name="getByAID">
         <parameter name="aid"/>
