@@ -111,24 +111,24 @@ chFactoryClass.prototype = {
   observe: function (aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
-        if (PlacesDB.shutdownClient &&
-            PlacesDB.shutdownClient.jsclient &&
-            PlacesUtils.history.removeVisitsByFilter) {
-          let progress = {};
-          let self = this;
-          PlacesDB.shutdownClient.jsclient.addBlocker("ceClearHistory",
-            function() {
-              return self.clearHistoryAsync({ progress });
-            },
-            {
-              fetchState: function() {
-                return { progress };
-              }
-            }
-          );
-        } else {
+        // Why 46.0 instead of feature detection? <https://bugzil.la/1244650>
+        if (Services.vc.compare(Services.appinfo.version, "46.0") < 0) {          
           Services.obs.addObserver(this, "quit-application", true);
+          break;
         }
+
+        let progress = {};
+        let self = this;
+        PlacesDB.shutdownClient.jsclient.addBlocker("ceClearHistory",
+          function() {
+            return self.clearHistoryAsync({ progress });
+          },
+          {
+            fetchState: function() {
+              return { progress };
+            }
+          }
+        );
         break;
       case "quit-application":
         this.clearHistorySync();
