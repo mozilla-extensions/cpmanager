@@ -842,6 +842,10 @@ var mobileBookmarksHack = {
 
 var readOnlyPrefsJs = {
   init: function() {
+    if (OS.Constants.Sys.Name !== "WINNT") {
+      return;
+    }
+
     OS.File.stat(OS.Path.join(OS.Constants.Path.profileDir, "prefs.js")).
       then(info => {
         CETracking.track("prefsjs-stat");
