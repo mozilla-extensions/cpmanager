@@ -111,8 +111,7 @@ chFactoryClass.prototype = {
   observe: function (aSubject, aTopic, aData) {
     switch (aTopic) {
       case "profile-after-change":
-        // Why 46.0 instead of feature detection? <https://bugzil.la/1244650>
-        if (Services.vc.compare(Services.appinfo.version, "46.0") < 0) {          
+        if (PlacesUtils.history.removeVisitsByTimeframe) {
           Services.obs.addObserver(this, "quit-application", true);
           break;
         }
