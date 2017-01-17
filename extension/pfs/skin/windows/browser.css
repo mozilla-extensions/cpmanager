@@ -1,7 +1,0 @@
-.popup-notification-icon[popupid="plugins-not-found"] {
-  list-style-image: url(chrome://cmpfs-os/skin/pluginInstall-64.png);
-}
-
-#plugin-install-notification-icon {
-  list-style-image: url(chrome://cmpfs-os/skin/pluginInstall-16.png);
-}

@@ -1,5 +1,4 @@
 pref("browser.tabs.autoHide", false);
-pref("pfs.datasource.url", "https://services.mozilla.com.cn/pfs/plugins/PluginFinderService.php?mimetype=%PLUGIN_MIMETYPE%&appID=%APP_ID%&appVersion=%APP_VERSION%&clientOS=%CLIENT_OS%&chromeLocale=%CHROME_LOCALE%&appRelease=%APP_RELEASE%");
 
 pref("extensions.cpmanager@mozillaonline.com.show_bookmark_toolbar", true);
 
