@@ -8,18 +8,6 @@ pref("dom.ipc.plugins.enabled.npccbnetsigncom.dll", false);
 pref("privacy.trackingprotection.pbmode.enabled", false);
 pref("startup.homepage_welcome_url.additional", "");
 
-pref("plugin.state.npalissologin", 2);
-pref("plugin.state.npqqmailwebkit", 2);
-pref("plugin.state.npwangwang", 2);
-
-pref("plugin.state.npcmbedit", 2);
-pref("plugin.state.npseceditctl.boc.x", 2);
-
-pref("plugin.state.npccbnetsigncom", 2);
-pref("plugin.state.npdmccbplugin", 2);
-pref("plugin.state.nphdzb2gsnctrl", 2);
-pref("plugin.state.npwdkctrl", 2);
-
 //data choices of tracking
 pref("extensions.cpmanager.tracking.notification.show", true);
 pref("extensions.cpmanager.tracking.enabled", true);

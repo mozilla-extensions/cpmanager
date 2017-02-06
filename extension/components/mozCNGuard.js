@@ -870,6 +870,36 @@ var readOnlyPrefsJs = {
   }
 }
 
+var pluginCtPWhitelist = {
+  plugins: [
+    "npalissologin",
+    "npqqmailwebkit",
+    "npwangwang",
+    
+    "npcmbedit",
+    "npseceditctl.boc.x",
+    
+    "npccbnetsigncom",
+    "npdmccbplugin",
+    "nphdzb2gsnctrl",
+    "npwdkctrl"
+  ],
+  get prefs() {
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch("plugin.state.");
+  },
+
+  init: function() {
+    if (Services.vc.compare(Services.appinfo.version, "52.0") >= 0) {
+      return;
+    }
+
+    this.plugins.forEach(plugin => {
+      this.prefs.setIntPref(plugin, 2);
+    });
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -900,6 +930,7 @@ mozCNGuard.prototype = {
         bookmarkingUIHack.init();
         mobileBookmarksHack.init();
         readOnlyPrefsJs.init();
+        pluginCtPWhitelist.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
