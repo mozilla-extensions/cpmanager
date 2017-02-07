@@ -35,6 +35,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
   "resource://cmsafeflag/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "AppConstants",
+  "resource://gre/modules/AppConstants.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "AddonManager",
   "resource://gre/modules/AddonManager.jsm");
 
@@ -900,6 +902,132 @@ var pluginCtPWhitelist = {
   }
 }
 
+var pluginEOL = {
+  _displayCountLimit: 3,
+  _frameScript: "chrome://cmnotification/content/plugin-eol.js",
+  _messageName: "cpmanager@mozillaonline.com:pluginEOL",
+  _plugins: {
+    "flash": "",
+    "npcoba": "",
+
+    /*"npqqmailwebkit": "coba",
+    "npseceditctl.boc.x": "coba",*/
+    "npcmbedit": "coba",
+
+    "npcaosoft_web_print_lodop": "esr",
+    "npcertreader": "esr",
+    "npytosecurityplugin": "esr",
+    "npxfweb": "esr",
+    "npffax": "esr",
+    "npweb_print_cainiao": "esr",
+    "npgldnet": "esr"
+  },
+  get _learnMoreLink() {
+    delete this._learnMoreLink;
+    return this._learnMoreLink = Services.urlFormatter.
+      formatURLPref("app.support.baseURL") + "npapi";
+  },
+  get _prefs() {
+    delete this._prefs;
+    return this._prefs = Services.prefs.
+      getBranch("extensions.addonnotification.plugin_eol.")
+  },
+  get _strings() {
+    let spec = "chrome://cmnotification/locale/overlay.properties";
+    delete this._strings;
+    return this._strings = Services.strings.createBundle(spec);
+  },
+
+  _getDownloadLink: function(id) {
+    switch (id) {
+      case "coba":
+        return "http://mozilla.com.cn/addon/182-coba/";
+      case "esr":
+        return "http://www.firefox.com.cn/download/#download-esr";
+      default:
+        return;
+    }
+  },
+  _getString: function(id) {
+    return this._strings.GetStringFromName("plugin_eol." + id);
+  },
+
+  init: function() {
+    if (!AppConstants.isPlatformAndVersionAtLeast("win", "6.1")) {
+      return;
+    }
+
+    gMM.loadFrameScript(this._frameScript, true);
+    gMM.addMessageListener(this._messageName, this);
+  },
+
+  receiveMessage: function(msg) {
+    let browser = msg.target,
+        pluginNiceName = msg.data;
+    let messageId = this._plugins[pluginNiceName];
+    switch (messageId) {
+      case "coba":
+      case "esr":
+        this.showNotificationForPlugin(messageId, browser, pluginNiceName);
+        break;
+      default:
+        break;
+    }
+  },
+
+  showNotificationForPlugin(messageId, browser, pluginNiceName) {
+    let displayCount = 0;
+    try {
+      displayCount = this._prefs.getIntPref(pluginNiceName);
+    } catch(ex) {}
+    if (displayCount > this._displayCountLimit) {
+      return;
+    }
+
+    let win = browser.ownerGlobal;
+    let notificationBox = win.gBrowser.getNotificationBox(browser);
+    let notificationValue = "mococn-plugin-eol";
+    if (notificationBox.getNotificationWithValue(notificationValue)) {
+      return;
+    }
+
+    let message = this._getString(messageId);
+    let priority = notificationBox.PRIORITY_WARNING_HIGH;
+    let iconURL = "chrome://mozapps/skin/plugins/notifyPluginGeneric.png";
+    let buttons = [{
+      accessKey: "L",
+      isDefault: false,
+      label: this._getString("LearnMore"),
+      callback: () => {
+        win.gBrowser.loadOneTab(this._learnMoreLink, {
+          inBackground: false,
+          relatedToCurrent: true
+        });
+        this._prefs.setIntPref(pluginNiceName, this._displayCountLimit + 1);
+      } 
+    }];
+
+    let downloadLink = this._getDownloadLink(messageId);
+    if (downloadLink) {
+      buttons.unshift({
+        accessKey: "N",
+        label: this._getString("DownloadNow"),
+        callback: () => {
+          win.gBrowser.loadOneTab(downloadLink, {
+            inBackground: false,
+            relatedToCurrent: true
+          });
+          this._prefs.setIntPref(pluginNiceName, this._displayCountLimit + 1);
+        } 
+      });
+    }
+
+    let notification = notificationBox.appendNotification(message,
+      notificationValue, iconURL, priority, buttons);
+    this._prefs.setIntPref(pluginNiceName, displayCount + 1);
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -931,6 +1059,7 @@ mozCNGuard.prototype = {
         mobileBookmarksHack.init();
         readOnlyPrefsJs.init();
         pluginCtPWhitelist.init();
+        pluginEOL.init();
         break;
       case "browser-delayed-startup-finished":
         this.initProgressListener(aSubject);
