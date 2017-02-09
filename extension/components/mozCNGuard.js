@@ -1028,6 +1028,73 @@ var pluginEOL = {
   }
 }
 
+var distributorChannelHack = {
+  distributionTopic: "distribution-customization-complete",
+  normalizedChannels: {
+    "stub.firefox.com.cn": "mainWinStub",
+    "stub.esr.firefox.com.cn": "mainWinStub",
+    "firefox.baidusd": "baidu",
+    "firefox.baidu": "baidu",
+    "firefox.3gj": "qihoo",
+    "firefox-win64.3gj": "qihoo",
+    "full.firefox.com.cn": "mainWinFull",
+    "full.firefox-win64.com.cn": "mainWinFull",
+    "www.firefox.com.cn": "unknown",
+    "firefox.others": "others",
+    "firefox-win64.others": "others",
+    "firefox.com.cn": "mainOther",
+    "firefox.latest": "mainWinStubFallback",
+    "firefox.xbsafe2": "xbsafe",
+    "stub.firefox.xiazaiba": "xiazaba",
+    "firefox.kis": "kingsoft"
+  },
+  seen: new Set(),
+  get prefs() {
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch("app.");
+  },
+  prefSource: "chinaedition.channel",
+  prefTarget: "distributor.channel",
+
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
+                                         Ci.nsISupportsWeakReference]),
+
+  _maybeOverrideDistributorChannel: function(prefKey) {
+    // wait for their original values to be set
+    this.seen.add(prefKey);
+    if (this.seen.size < 2) {
+      return;
+    }
+    this.seen.clear();
+
+    let sourceVal = this.prefs.getCharPref(this.prefSource);
+    let targetVal = this.normalizedChannels[sourceVal] || "unspecified";
+    this.prefs.setCharPref(this.prefTarget, targetVal);
+  },
+
+  defaultPrefTweak: function() {
+    Services.obs.addObserver(this, this.distributionTopic, false);
+    this.prefs.addObserver("", this, true);
+  },
+
+  observe: function(subject, topic, data) {
+    switch (topic) {
+      case this.distributionTopic:
+        Services.obs.removeObserver(this, topic);
+        this.prefs.removeObserver("", this, false);
+        break;
+      case "nsPref:changed":
+        if (data === this.prefSource ||
+            data === this.prefTarget) {
+          this._maybeOverrideDistributorChannel(data);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+}
+
 function mozCNGuard() {}
 
 mozCNGuard.prototype = {
@@ -1085,6 +1152,7 @@ mozCNGuard.prototype = {
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
         defaultFontHack.defaultPrefTweak();
+        distributorChannelHack.defaultPrefTweak();
         break;
     }
   },
