@@ -1137,7 +1137,10 @@ mozCNGuard.prototype = {
     }
 
     let self = this;
-    if (argumentsZero instanceof Ci.nsISupportsArray) {
+    // changed to nsIMutableArray in https://bugzil.la/1312901
+    if (argumentsZero instanceof Ci.nsIMutableArray ||
+        argumentsZero instanceof Ci.nsISupportsArray) {
+      // nsIMutableArray.Count() etc. provided by https://bugzil.la/1311191
       let len = argumentsZero.Count(), externalURLs = [];
       for (let i = 0; i < len; i++) {
         let urisstring = argumentsZero.GetElementAt(i)
