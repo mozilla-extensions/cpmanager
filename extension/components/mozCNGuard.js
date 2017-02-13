@@ -980,7 +980,7 @@ var pluginEOL = {
     try {
       displayCount = this._prefs.getIntPref(pluginNiceName);
     } catch(ex) {}
-    if (displayCount > this._displayCountLimit) {
+    if (displayCount >= this._displayCountLimit) {
       return;
     }
 
