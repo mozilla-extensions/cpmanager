@@ -1045,7 +1045,7 @@ var distributorChannelHack = {
     "firefox.com.cn": "mainOther",
     "firefox.latest": "mainWinStubFallback",
     "firefox.xbsafe2": "xbsafe",
-    "stub.firefox.xiazaiba": "xiazaba",
+    "stub.firefox.xiazaiba": "xiazaiba",
     "firefox.kis": "kingsoft"
   },
   seen: new Set(),
@@ -1065,11 +1065,14 @@ var distributorChannelHack = {
     if (this.seen.size < 2) {
       return;
     }
+    // clear `seen` so the `setCharPref` below doesn't re-trigger this function
     this.seen.clear();
 
     let sourceVal = this.prefs.getCharPref(this.prefSource);
     let targetVal = this.normalizedChannels[sourceVal] || "unspecified";
     this.prefs.setCharPref(this.prefTarget, targetVal);
+    // clear `seen` again, after the above `setCharPref` call
+    this.seen.clear();
   },
 
   defaultPrefTweak: function() {
