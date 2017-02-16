@@ -1048,7 +1048,6 @@ var distributorChannelHack = {
     "stub.firefox.xiazaiba": "xiazaiba",
     "firefox.kis": "kingsoft"
   },
-  seen: new Set(),
   get prefs() {
     delete this.prefs;
     return this.prefs = Services.prefs.getDefaultBranch("app.");
@@ -1060,19 +1059,17 @@ var distributorChannelHack = {
                                          Ci.nsISupportsWeakReference]),
 
   _maybeOverrideDistributorChannel: function(prefKey) {
-    // wait for their original values to be set
-    this.seen.add(prefKey);
-    if (this.seen.size < 2) {
+    // wait until both prefs are set by distribution.ini
+    // also do nothing if it's already something other than "chinaedition"
+    if (this.prefs.getPrefType(this.prefSource) !== this.prefs.PREF_STRING ||
+        this.prefs.getPrefType(this.prefTarget) !== this.prefs.PREF_STRING ||
+        this.prefs.getCharPref(this.prefTarget) !== "chinaedition") {
       return;
     }
-    // clear `seen` so the `setCharPref` below doesn't re-trigger this function
-    this.seen.clear();
 
     let sourceVal = this.prefs.getCharPref(this.prefSource);
     let targetVal = this.normalizedChannels[sourceVal] || "unspecified";
     this.prefs.setCharPref(this.prefTarget, targetVal);
-    // clear `seen` again, after the above `setCharPref` call
-    this.seen.clear();
   },
 
   defaultPrefTweak: function() {
