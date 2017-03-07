@@ -14,7 +14,7 @@ SDI = {
 
   tracking: function SDI__tracking() {
     try {
-      var ceTracking = Cc["@mozilla.com.cn/tracking;1"].
+      var ceTracking = Components.classes["@mozilla.com.cn/tracking;1"].
                          getService().wrappedJSObject;
       ceTracking.track("unknownContentType-load");
     } catch(e) {}
@@ -105,8 +105,8 @@ SDI = {
         return this._getDownloadsFolder("Downloads");
     }
 
-    var file = Cc['@mozilla.org/file/local;1']
-               .createInstance(Ci.nsILocalFile);
+    var file = Components.classes['@mozilla.org/file/local;1']
+               .createInstance(Components.interfaces.nsILocalFile);
     try {
       var cdPref = cpmPrefs.prefs.getValue("browser.download.dir","");
       file.initWithPath(cdPref);
