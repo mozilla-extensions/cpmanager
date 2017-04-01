@@ -14,10 +14,10 @@ locale    cmsafeflag  en-US        safeflag/locale/en-US/
 locale    cmsafeflag  zh-CN        safeflag/locale/zh-CN/
 skin      cmsafeflag  classic/1.0  safeflag/skin/
 
-content  cmnotification                 notification/content/       appversion<53.0
-skin     cmnotification   classic/1.0   notification/skin/          appversion<53.0
-locale   cmnotification   en-US         notification/locale/en-US/  appversion<53.0
-locale   cmnotification   zh-CN         notification/locale/zh-CN/  appversion<53.0
+content  cmnotification                 notification/content/
+skin     cmnotification   classic/1.0   notification/skin/
+locale   cmnotification   en-US         notification/locale/en-US/
+locale   cmnotification   zh-CN         notification/locale/zh-CN/
 overlay   chrome://browser/content/browser.xul          chrome://cmsafeflag/content/overlay.xul
 override  chrome://safeflag/content/overlay.xul         chrome://cmsafeflag/content/safeflag_blank.xul
 override  chrome://browser/content/blockedSite.xhtml    chrome://cmsafeflag/content/blockedSite.xhtml
@@ -28,7 +28,7 @@ style     chrome://browser/content/browser.xul          chrome://cmsafeflag/skin
 overlay   chrome://cmsafeflag/content/options.xul            chrome://cmnotification/content/optionsOverlay.xul      appversion<53.0
 
 overlay   chrome://browser/content/browser.xul               chrome://cmnotification/content/ff-overlay.xul          appversion<53.0
-override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotification/content/notification_blank.xul  appversion<53.0
+override  chrome://addonnotification/content/ff-overlay.xul  chrome://cmnotification/content/notification_blank.xul
 style     chrome://browser/content/browser.xul               chrome://cmnotification/skin/overlay-win.css            appversion<53.0 os=WINNT
 
 content  cmimprove                   improve/content/

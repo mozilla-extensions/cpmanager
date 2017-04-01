@@ -32,7 +32,7 @@
       <preference id="b-enableurl2qr" name="extensions.cmimprove.url2qr.enabled" type="bool"/>
       <preference id="b-enablegesture" name="extensions.cmimprove.gesture.enabled" type="bool"/>
     </preferences>
-    <vbox id="checkboxes">
+    <vbox id="checkboxes" style="min-width: 256px">
       <checkbox id="c-enable" preference="b-enable" label="&c-enable.label;"/>
       <checkbox id="c-safe" preference="b-safe" label="&c-safe.label;" class="indent"/>
       <checkbox id="c-unsafe" preference="b-unsafe" label="&c-unsafe.label;" class="indent"/>
