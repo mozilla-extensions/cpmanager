@@ -68,7 +68,7 @@
             <hbox id="PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane" pack="center" flex="1">
               <vbox class="PanelUI-MOA-mobileBookmarks-instruction-box">
                 <hbox pack="center">
-                  <image class="fxaSyncIllustration" alt=""/>
+                  <image class="fxaSyncIllustration" src="chrome://browser/skin/fxa/sync-illustration.svg"/>
                 </hbox>
                 <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.bookmarksnotsyncing.title;</label>
                 <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.bookmarksnotsyncing.label;</label>
@@ -83,7 +83,7 @@
             <hbox id="PanelUI-MOA-mobileBookmarks-nodevicespane" pack="center" flex="1">
               <vbox class="PanelUI-MOA-mobileBookmarks-instruction-box">
                 <hbox pack="center">
-                  <image class="fxaSyncIllustration" alt=""/>
+                  <image class="fxaSyncIllustration" src="chrome://browser/skin/fxa/sync-illustration.svg"/>
                 </hbox>
                 <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.noclients.title;</label>
                 <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
@@ -103,7 +103,7 @@
                 align="center"
                 class="PanelUI-MOA-mobileBookmarks-instruction-box"
                 observes="sync-setup-state">
-                  <image class="fxaSyncIllustration" alt=""/>
+                  <image class="fxaSyncIllustration" src="chrome://browser/skin/fxa/sync-illustration.svg"/>
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.notsignedin.title;</label>
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
@@ -115,7 +115,7 @@
                 align="center"
                 class="PanelUI-MOA-mobileBookmarks-instruction-box"
                 observes="sync-reauth-state">
-                  <image class="fxaSyncIllustration" alt=""/>
+                  <image class="fxaSyncIllustration" src="chrome://browser/skin/fxa/sync-illustration.svg"/>
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-title">&cp.moaMobileBookmarks.notsignedin.title;</label>
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
