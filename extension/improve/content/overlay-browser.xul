@@ -108,7 +108,7 @@
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.signin.label;"
-                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
+                                 oncommand="MOA.Improve.MobileBookmarks.openPrefs(window, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
           </vbox>
           <vbox id="PanelUI-MOA-mobileBookmarks-reauthsync"
                 flex="1"
@@ -120,7 +120,7 @@
                   <label class="PanelUI-MOA-mobileBookmarks-instruction-label">&cp.moaMobileBookmarks.generic.label;</label>
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.signin.label;"
-                                 oncommand="gSyncUI.openSetup(null, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
+                                 oncommand="MOA.Improve.MobileBookmarks.openPrefs(window, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');"/>
           </vbox>
         </hbox>
       </vbox>

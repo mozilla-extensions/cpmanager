@@ -827,8 +827,17 @@ var mobileBookmarksHack = {
     win.MOA = win.MOA || {};
     win.MOA.Improve = win.MOA.Improve || {};
     win.MOA.Improve.MobileBookmarks = win.MOA.Improve.MobileBookmarks || {
+      openPrefs: this._openPrefs.bind(this),
       track: this._track.bind(this)
     };
+  },
+  _openPrefs: function(win, entrypoint) {
+    // Before Fx 54, see https://bugzil.la/1296767
+    if (win.gSyncUI.openSetup) {
+      win.gSyncUI.openSetup(null, entrypoint);
+    } else {
+      win.gSyncUI.openPrefs(entrypoint);
+    }
   },
   _showBookmarksPopup: function(widget) {
     var popup = widget.node.ownerDocument.getElementById(this.bookmarksPopupId);
