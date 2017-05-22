@@ -41,6 +41,7 @@ let defaultPrefs = Services.prefs.getDefaultBranch('');
   'identity.fxaccounts.remote.signup.uri',
   'identity.fxaccounts.remote.uri',
   'identity.fxaccounts.remote.webchannel.uri',
+  'identity.fxaccounts.settings.devices.uri',
   'identity.fxaccounts.settings.uri',
   PREF_SYNC_TOKENSERVER,
   'services.sync.statusURL',
