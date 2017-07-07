@@ -832,8 +832,11 @@ var mobileBookmarksHack = {
     };
   },
   _openPrefs: function(win, entrypoint) {
-    // Before Fx 54, see https://bugzil.la/1296767
-    if (win.gSyncUI.openSetup) {
+    if (win.gSync && win.gSync.openPrefs) {
+      // Since Fx 55, see https://bugzil.la/1353571
+      win.gSync.openPrefs(entrypoint);
+    } else if (win.gSyncUI.openSetup) {
+      // Before Fx 54, see https://bugzil.la/1296767
       win.gSyncUI.openSetup(null, entrypoint);
     } else {
       win.gSyncUI.openPrefs(entrypoint);
@@ -886,10 +889,10 @@ var pluginCtPWhitelist = {
     "npalissologin",
     "npqqmailwebkit",
     "npwangwang",
-    
+
     "npcmbedit",
     "npseceditctl.boc.x",
-    
+
     "npccbnetsigncom",
     "npdmccbplugin",
     "nphdzb2gsnctrl",
@@ -1013,7 +1016,7 @@ var pluginEOL = {
           relatedToCurrent: true
         });
         this._prefs.setIntPref(pluginNiceName, this._displayCountLimit + 1);
-      } 
+      }
     }];
 
     let downloadLink = this._getDownloadLink(messageId);
@@ -1027,7 +1030,7 @@ var pluginEOL = {
             relatedToCurrent: true
           });
           this._prefs.setIntPref(pluginNiceName, this._displayCountLimit + 1);
-        } 
+        }
       });
     }
 
