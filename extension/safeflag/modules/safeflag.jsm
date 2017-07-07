@@ -40,14 +40,19 @@ XPCOMUtils.defineLazyGetter(this, "lookupTables", function() {
     lookupTables = getTables();
   };
   for (let key of keys) {
-    prefs.addObserver(key, update, false);  
+    prefs.addObserver(key, update, false);
   }
   return getTables();
 });
 
 function doLookup(aUrl, aTables, aCallback) {
-  let principal = Services.scriptSecurityManager.
-    getNoAppCodebasePrincipal(Services.io.newURI(aUrl, null, null));
+  let principal,
+      uri = Services.io.newURI(aUrl, null, null);
+  if (Services.scriptSecurityManager.createCodebasePrincipal) {
+    principal = Services.scriptSecurityManager.createCodebasePrincipal(uri, {});
+  } else {
+    principal = Services.scriptSecurityManager.getNoAppCodebasePrincipal(uri);
+  }
 
   try {
     _ucdbSvc.lookup(principal, aTables, aCallback);
