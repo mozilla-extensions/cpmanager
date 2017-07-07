@@ -1245,19 +1245,33 @@ mozCNGuard.prototype = {
           title = "\u706b\u72d0\u4e3b\u9875";
         }
 
-        w.PlacesUtils.asyncHistory.getPlacesInfo(uri, {
-          handleError: function() {},
-          handleResult: function(aPlaceInfo) {
-            title = aPlaceInfo.title;
-          },
-          handleCompletion: function() {
+        let pu = w.PlacesUtils;
+        if (pu.asyncHistory && pu.asyncHistory.getPlacesInfo) {
+          // Before Fx 55, see https://bugzil.la/1350377
+          pu.asyncHistory.getPlacesInfo(uri, {
+            handleError: function() {},
+            handleResult: function(aPlaceInfo) {
+              title = aPlaceInfo.title;
+            },
+            handleCompletion: function() {
+              let tab = w.gBrowser.addTab();
+              w.gBrowser.moveTabTo(tab, aIndex);
+              w.SessionStore.setTabState(tab, JSON.stringify({
+                entries: [{ url: aPage, title: title }]
+              }));
+            }
+          });
+        } else {
+          pu.history.fetch(uri.spec).then(info => {
+            title = info && info.title
+          }).then(() => {
             let tab = w.gBrowser.addTab();
             w.gBrowser.moveTabTo(tab, aIndex);
             w.SessionStore.setTabState(tab, JSON.stringify({
               entries: [{ url: aPage, title: title }]
             }));
-          }
-        });
+          });
+        }
       });
     }
   },
