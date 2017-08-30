@@ -75,7 +75,7 @@
                 <hbox pack="center">
                   <toolbarbutton class="PanelUI-MOA-mobileBookmarks-prefs-button"
                                  label="&cp.moaMobileBookmarks.enablebookmarkssync.label;"
-                                 oncommand="Preferences.set('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"/>
+                                 oncommand="gPrefService.setBoolPref('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"/>
                 </hbox>
               </vbox>
             </hbox>
