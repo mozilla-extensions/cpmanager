@@ -1,0 +1,41 @@
+{
+    "applications": {
+      "gecko": {
+        "id": "cpmanager@mozillaonline.com",
+        "strict_min_version": "57.0"
+      }
+    },
+    "background": {
+      "scripts": [
+        "tracking.js",
+        "trackingProtection.js",
+        "undoCloseTab.js"
+      ]
+    },
+    "browser_action": {
+      "browser_style": true,
+      "default_icon": {
+        "16": "icons/undoCloseTab-16.png",
+        "32": "icons/undoCloseTab-32.png"
+      },
+      "default_title": "__MSG_undoCloseTabTitle__",
+      "theme_icons": [{
+        "light": "icons/undoCloseTab-16.png",
+        "dark": "icons/undoCloseTab-16-inverted.png",
+        "size": 16
+      }]
+    },
+    "default_locale": "en_US",
+    "description": "__MSG_extensionDescription__",
+    "homepage_url": "http://www.firefox.com.cn/",
+    "manifest_version": 2,
+    "name": "__MSG_extensionName__",
+    "permissions": [
+      "menus",
+      "privacy",
+      "sessions",
+      "storage",
+      "tabs"
+    ],
+    "version": "3.57a7"
+  }

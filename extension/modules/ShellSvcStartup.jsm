@@ -1,0 +1,65 @@
+// based on /browser/components/downloads/src/DownloadsStartup.js
+this.EXPORTED_SYMBOLS = ["ShellSvcStartup"];
+
+"use strict";
+
+const Ci = Components.interfaces;
+const Cm = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+const Cu = Components.utils;
+
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "Services",
+  "resource://gre/modules/Services.jsm");
+
+const kOrigShellSvcCid = Components.ID("{63c7b9f4-0cc8-43f8-b666-0a661655cb73}");
+const kShellSvcCid = Components.ID("{055d195f-168e-4d98-b18a-71bfbfd3f617}");
+const kShellSvcContractId = "@mozilla.org/browser/shell-service;1";
+
+this.ShellSvcStartup = {
+  topic: "profile-after-change",
+  get shouldApply() {
+    delete this.shouldApply;
+    return this.shouldApply = Services.appinfo.OS == "WINNT" &&
+      Services.vc.compare(Services.sysinfo.getProperty("version"), "6.2") < 0 &&
+      Services.vc.compare(Services.appinfo.version, "58.0") < 0;
+  },
+
+  _init() {
+    Cm.registerFactory(kShellSvcCid, "",
+                       kShellSvcContractId, null);
+  },
+
+  init(isAppStartup) {
+    if (!this.shouldApply) {
+      return;
+    }
+
+    if (isAppStartup) {
+      Services.obs.addObserver(this, this.topic);
+    } else {
+      this._init();
+    }
+  },
+
+  observe(subject, topic, data) {
+    if (topic != this.topic) {
+      Cu.reportError("Unexpected observer notification.");
+      return;
+    }
+
+    Services.obs.removeObserver(this, this.topic);
+    this._init();
+  },
+
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
+
+  uninit() {
+    if (!this.shouldApply) {
+      return;
+    }
+
+    // does this work?
+    Cm.registerFactory(kOrigShellSvcCid, "",
+                       kShellSvcContractId, null);
+  }
+};

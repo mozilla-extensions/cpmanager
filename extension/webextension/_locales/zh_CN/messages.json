@@ -1,0 +1,14 @@
+{
+  "extensionDescription": {
+    "message": "用来管理火狐的附加组件系统。"
+  },
+  "extensionName": {
+    "message": "附加组件管理器"
+  },
+  "restoreAllTabs": {
+    "message": "还原所有标签页"
+  },
+  "undoCloseTabTitle": {
+    "message": "恢复关闭的标签页"
+  }
+}

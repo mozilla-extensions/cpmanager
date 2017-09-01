@@ -1,0 +1,14 @@
+{
+  "extensionDescription": {
+    "message": "To manage the addons package in Firefox."
+  },
+  "extensionName": {
+    "message": "Addons Manager"
+  },
+  "restoreAllTabs": {
+    "message": "Restore All Tabs"
+  },
+  "undoCloseTabTitle": {
+    "message": "Undo Close Tab"
+  }
+}

@@ -15,30 +15,15 @@
 }
 
 #mo-url2qr-popup > hbox {
-  height: 28px;
-}
-
-#mo-url2qr-popup > hbox:first-of-type {
   height: 42px;
-}
-
-#mo-url2qr-popup > hbox:last-of-type {
   margin-bottom: 10px;
 }
 
 #mo-url2qr-popup > hbox > label {
   color: #333;
   font-family: sans-serif;
-  font-size: 13px;
+  font-size: 18px;
   line-height: 1.5;
   -moz-margin-start: 2px;
   -moz-margin-end: 2px;
-}
-
-#mo-url2qr-popup > hbox:first-of-type > label {
-  font-size: 18px;
-}
-
-#mo-url2qr-popup > hbox > label.text-link {
-  color: #06c;
 }

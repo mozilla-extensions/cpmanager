@@ -1,0 +1,16 @@
+{
+  "name": "cpmanager",
+  "version": "3.57.0",
+  "description": "To manage the addons package in Firefox.",
+  "scripts": {
+    "lint": "eslint --ext .js,.jsm extension"
+  },
+  "author": "Mozilla Online Limited",
+  "license": "MPL-2.0",
+  "repository": "ssh://git@git.mozilla.com.cn/repository/git/repositories/cpmanager.git",
+  "devDependencies": {
+    "eslint": "3.19.0",
+    "eslint-plugin-mozilla": "0.4.2",
+    "eslint-plugin-no-unsanitized": "2.0.1"
+  }
+}

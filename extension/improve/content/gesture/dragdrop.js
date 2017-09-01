@@ -1,3 +1,6 @@
+/* eslint-env mozilla/frame-script */
+/* globals Services */
+
 let DragDropObserver = {
   // We want to know the "true" source of the drag, which we can no longer
   // reliably get from the drag session in Gecko 1.9.1
@@ -9,11 +12,11 @@ let DragDropObserver = {
   _listening: false,
   messageName: "cpmanager@mozillaonline.com:dragAndDrop",
 
-  receiveMessage: function(msg) {
+  receiveMessage(msg) {
     this._listening = msg.data.listening;
   },
 
-  observe: function(subject, topic, data) {
+  observe(subject, topic, data) {
     switch (topic) {
       case "content-document-global-created":
         if (!content || !subject || subject.top !== content) {
@@ -24,9 +27,9 @@ let DragDropObserver = {
     }
   },
 
-  init: function(subject) {
-    subject.addEventListener("DOMContentLoaded", this, false);
-    subject.addEventListener("unload", this, false);
+  init(subject) {
+    subject.addEventListener("DOMContentLoaded", this);
+    subject.addEventListener("unload", this);
 
     if (subject.top !== subject) {
       return;
@@ -38,27 +41,27 @@ let DragDropObserver = {
     });
   },
 
-  fireDragGestureEvent: function(event) {
+  fireDragGestureEvent(event) {
     this.onDragGesture(event);
 
     this._startX = -1;
     this._startY = -1;
   },
 
-  attachWindow: function(event) {
-    event.target.addEventListener("dragstart", this, false);
-    event.target.addEventListener("dragover", this, false);
-    event.target.addEventListener("drop", this, false);
+  attachWindow(event) {
+    event.target.addEventListener("dragstart", this);
+    event.target.addEventListener("dragover", this);
+    event.target.addEventListener("drop", this);
   },
 
-  detachWindow: function(event) {
-    event.target.removeEventListener("dragstart", this, false);
-    event.target.removeEventListener("dragover", this, false);
-    event.target.removeEventListener("drop", this, false);
+  detachWindow(event) {
+    event.target.removeEventListener("dragstart", this);
+    event.target.removeEventListener("dragover", this);
+    event.target.removeEventListener("drop", this);
   },
 
-  handleEvent: function(event) {
-    switch(event.type) {
+  handleEvent(event) {
+    switch (event.type) {
       case "dragstart":
         this.dragstart(event);
         break;
@@ -92,7 +95,7 @@ let DragDropObserver = {
    **/
 
   // Similar to nsDragAndDrop.js's data retrieval; see nsDragAndDrop.drop
-  _getDragData: function( aEvent ) {
+  _getDragData( aEvent ) {
     var data = "";
     var type = "text/unicode";
 
@@ -106,7 +109,7 @@ let DragDropObserver = {
 
       if (data.length != 0) {
         var lines = data.replace(/^\s+|\s+$/g, "").split(/\s*\n\s*/);
-        if (lines.length > 1 && lines[1] === selection)  {
+        if (lines.length > 1 && lines[1] === selection) {
           type = "text/unicode";
           data = selection;
         } else {
@@ -117,26 +120,26 @@ let DragDropObserver = {
       }
     }
 
-    return({ data: data, type: type });
+    return ({ data, type });
   },
 
   // Similar to nsDragAndDrop.dragDropSecurityCheck
-  _securityCheck: function( aEvent ) {
+  _securityCheck( aEvent ) {
     let name = {};
     return Services.droppedLinkHandler.dropLink(aEvent, name, true);
   },
 
   // Determine if two DOM nodes are from the same content area.
-  _fromSameContentArea: function( node1, node2 ) {
-    return(
-      node1 && node1.ownerDocument && node1.ownerDocument.defaultView &&
-      node2 && node2.ownerDocument && node2.ownerDocument.defaultView &&
-      node1.ownerDocument.defaultView.top.document == node2.ownerDocument.defaultView.top.document
+  _fromSameContentArea( node1, node2 ) {
+    return (
+      node1 && node1.ownerGlobal &&
+      node2 && node2.ownerGlobal &&
+      node1.ownerGlobal.top.document == node2.ownerGlobal.top.document
     );
   },
 
   // Is this an event that we want to handle?
-  _shouldHandleEvent: function( evt ) {
+  _shouldHandleEvent( evt ) {
     return (
       this._listening &&
       Services.droppedLinkHandler.canDropLink(evt, true) &&
@@ -149,20 +152,20 @@ let DragDropObserver = {
    * Event handlers
    **/
 
-  dragstart: function( evt ) {
+  dragstart( evt ) {
     this._sourceNode = evt.explicitOriginalTarget;
     this._startX = evt.pageX;
     this._startY = evt.pageY;
   },
 
-  dragover: function( evt ) {
+  dragover( evt ) {
     if (!this._shouldHandleEvent(evt)) {
       return;
     }
     evt.preventDefault();
   },
 
-  dragdrop: function( evt ) {
+  dragdrop( evt ) {
     if (!this._shouldHandleEvent(evt)) {
       return;
     }
@@ -243,7 +246,7 @@ let DragDropObserver = {
       // middle clicks over HTTP/HTTPS
       var referrer = null;
       if (sourceNode) {
-        referrer = Services.io.newURI(sourceNode.ownerDocument.location.href, null, null);
+        referrer = Services.io.newURI(sourceNode.ownerDocument.location.href);
 
         if (!(isImage && /^https?$/i.test(referrer.scheme)))
           referrer = null;
@@ -287,13 +290,13 @@ let DragDropObserver = {
     evt.stopPropagation();
   },
 
-  onDragGesture: function(event) {
+  onDragGesture(event) {
     var deltaX = event.endX - event.startX;
     var deltaY = event.endY - event.startY;
 
     if (deltaX * deltaX + deltaY * deltaY <= 25) {
       // not drag long enough I think
-      return false;
+      return;
     }
 
     sendAsyncMessage(this.messageName, {
@@ -304,4 +307,4 @@ let DragDropObserver = {
 };
 
 addMessageListener(DragDropObserver.messageName, DragDropObserver);
-Services.obs.addObserver(DragDropObserver, "content-document-global-created", false);
+Services.obs.addObserver(DragDropObserver, "content-document-global-created");
