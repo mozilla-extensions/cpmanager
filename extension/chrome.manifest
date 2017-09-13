@@ -69,7 +69,8 @@ overlay  chrome://browser/content/browser.xul               chrome://cmtracking/
 overlay  chrome://browser/content/preferences/advanced.xul  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
 overlay  chrome://browser/content/preferences/sync.xul      chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 
-overlay  about:preferences  chrome://cmtracking/content/dataChoices/overlay-preferences.xul
+overlay  about:preferences  chrome://cmtracking/content/dataChoices/overlay-preferences-legacy.xul appversion<56.0
+overlay  about:preferences  chrome://cmtracking/content/dataChoices/overlay-preferences.xul appversion>=56.0
 
 overlay  about:preferences                                 chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
 overlay  about:preferences?entrypoint=abouthome            chrome://cmimprove/content/fxa/overlay-preferences-sync.xul
