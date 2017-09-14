@@ -56,7 +56,11 @@
         accessKey: _bundles.getString("dataChoicesNotification.button.accessKey"),
         popup: null,
         callback: function () {
-          window.openAdvancedPreferences("dataChoicesTab");
+          if (Services.prefs.getBoolPref("browser.preferences.useOldOrganization", true)) {
+            window.openAdvancedPreferences("dataChoicesTab");
+          } else {
+            window.openPreferences("privacy-reports", {origin: "dataReporting"});
+          }
         },
       }];
 
