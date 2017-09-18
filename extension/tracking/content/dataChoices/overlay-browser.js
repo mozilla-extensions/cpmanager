@@ -56,7 +56,7 @@
         accessKey: _bundles.getString("dataChoicesNotification.button.accessKey"),
         popup: null,
         callback: function () {
-          if (Services.prefs.getBoolPref("browser.preferences.useOldOrganization", true)) {
+          if (cpmPrefs.prefs.getValue("browser.preferences.useOldOrganization", true)) {
             window.openAdvancedPreferences("dataChoicesTab");
           } else {
             window.openPreferences("privacy-reports", {origin: "dataReporting"});
