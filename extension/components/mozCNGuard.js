@@ -1148,6 +1148,7 @@ mozCNGuard.prototype = {
         loopButtonRemoval.init();
         pocketButtonRemoval.init();
         socialShareRemoval.init();
+        screenshotButtonRemoval.init();
         mobilePromoLinksHack.init();
         defaultFontHack.init();
         bookmarkingUIHack.init();
