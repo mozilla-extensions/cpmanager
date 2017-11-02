@@ -345,6 +345,15 @@ var screenshotButtonRemoval = Object.create(buttonRemoval, {
   prefKey: {
     value: "extensions.cpmanager@mozillaonline.com.screenshotButtonRemoved"
   },
+  earlyReturn: {
+    value: function() {
+      var disabled = false;
+      try {
+        disabled = Services.prefs.getBoolPref("extensions.screenshots.disabled");
+      } catch (ex) {}
+      return disabled;
+    }
+  },
   removeIt: {
     value: function() {
       Services.prefs.setBoolPref("extensions.screenshots.disabled", true);
