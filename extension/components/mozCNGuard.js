@@ -269,6 +269,10 @@ var buttonRemoval = {
       return;
     }
 
+    this.removeIt();
+  },
+
+  removeIt: function() {
     CustomizableUI.addListener(this);
   },
   onAreaNodeRegistered: function(aArea) {
@@ -333,6 +337,18 @@ var socialShareRemoval = Object.create(buttonRemoval, {
   earlyReturn: {
     value: function() {
       return Services.vc.compare(Services.appinfo.version, "35.0") < 0;
+    }
+  }
+});
+
+var screenshotButtonRemoval = Object.create(buttonRemoval, {
+  prefKey: {
+    value: "extensions.cpmanager@mozillaonline.com.screenshotButtonRemoved"
+  },
+  removeIt: {
+    value: function() {
+      Services.prefs.setBoolPref("extensions.screenshots.disabled", true);
+      Services.prefs.setBoolPref(this.prefKey, true);
     }
   }
 });
