@@ -34,6 +34,7 @@ const SERVICE_PREFS = {
 let defaultPrefs = Services.prefs.getDefaultBranch("");
 [
   "identity.fxaccounts.auth.uri",
+  "identity.fxaccounts.remote.email.uri",
   "identity.fxaccounts.remote.force_auth.uri",
   "identity.fxaccounts.remote.oauth.uri",
   "identity.fxaccounts.remote.profile.uri",
