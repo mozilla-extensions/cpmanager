@@ -418,7 +418,8 @@ this.mobileBookmarksHack = {
     let winUtils = this.getWinUtils(win);
     winUtils.loadSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
-    let parent = doc.getElementById("PanelUI-multiView");
+    let parent = doc.getElementById("appMenu-multiView") ||
+                 doc.getElementById("PanelUI-multiView");
 
     let panelview = doc.createElement("panelview");
     panelview.id = this.viewId;
