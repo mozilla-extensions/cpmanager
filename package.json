@@ -1,6 +1,6 @@
 {
   "name": "cpmanager",
-  "version": "3.57.1",
+  "version": "3.57.2",
   "description": "To manage the addons package in Firefox.",
   "scripts": {
     "lint": "eslint --ext .js,.jsm extension"
