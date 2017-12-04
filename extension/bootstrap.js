@@ -1070,6 +1070,10 @@ function handleMessage(message, sender, sendResponse) {
   }
 
   switch (message.type) {
+    case "missingTPMode":
+      let defBranch = Services.prefs.getDefaultBranch("");
+      defBranch.setBoolPref("privacy.trackingprotection.pbmode.enabled", false);
+      break;
     case "trackingEnabled":
       sendResponse({
         "trackingEnabled": CETracking.ude

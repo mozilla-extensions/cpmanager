@@ -157,15 +157,17 @@ this.URL2QR = {
     popup.appendChild(hbox);
     mainPopupSet.appendChild(popup);
 
-    let pageActionButtons = doc.getElementById("page-action-buttons");
+    let parent = doc.getElementById("page-action-buttons") ||
+                 doc.getElementById("urlbar-icons");
     let popupAnchor = doc.createElement("image");
     popupAnchor.id = "mo-url2qr-icon";
     popupAnchor.classList.add("urlbar-button");
+    popupAnchor.classList.add("urlbar-icon");
     popupAnchor.classList.add("urlbar-page-action");
     popupAnchor.setAttribute("hidden", "true");
     popupAnchor.setAttribute("tooltiptext", this._("mo-url2qr.generateQR"));
     popupAnchor.setAttribute("popup", popup.id);
-    pageActionButtons.insertBefore(popupAnchor, pageActionButtons.firstChild);
+    parent.insertBefore(popupAnchor, parent.firstChild);
 
     this.elements.set(win, { popup, popupAnchor, popupImage });
     this.listeners.set(win, new Listener(win));

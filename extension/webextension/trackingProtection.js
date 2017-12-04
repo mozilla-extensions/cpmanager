@@ -1,4 +1,12 @@
 (async function() {
+  if (!browser.privacy.websites.trackingProtectionMode) {
+    browser.runtime.sendMessage({
+      dir: "bg2legacy",
+      type: "missingTPMode"
+    });
+    return;
+  }
+
   try {
     let result = await browser.storage.local.get({
       trackingProtection: {
