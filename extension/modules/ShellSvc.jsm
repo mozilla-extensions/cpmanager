@@ -62,7 +62,7 @@ let modShellSvc = Object.create(origShellSvc, {
     value(aClaimAllTypes, aForAllUsers) {
       let args = [].slice.call(arguments);
       try {
-        PlacesUtils.asyncHistory.isURIVisited(helpURI, function(a, aIsVisited) {
+        PlacesUtils.history.hasVisits(helpURI).then(aIsVisited => {
           origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
 
           try {
@@ -96,11 +96,14 @@ let modShellSvc = Object.create(origShellSvc, {
             worker.postMessage({ exeName });
 
             // clear the visits to helpURI
-            PlacesUtils.history.removePage(helpURI);
-          } catch (e) {}
-        });
-      } catch (e) {
+            PlacesUtils.history.remove(helpURI);
+          } catch (ex) {
+            Cu.reportError(ex);
+          }
+        }, ex => Cu.reportError(ex));
+      } catch (ex) {
         origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
+        Cu.reportError(ex);
       }
     }
   }
