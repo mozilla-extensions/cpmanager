@@ -42,6 +42,20 @@
     }
   }
 
+  // location change in active tab will revert browserAction to default,
+  // see https://bugzil.la/1395074
+  async function handleTabUpdate(tabId, changeInfo, tab) {
+    try {
+      if (!tab.active || changeInfo.url === undefined) {
+        return;
+      }
+
+      await toggleBrowserAction({tabId: tab.id, windowId: tab.windowId});
+    } catch (ex) {
+      console.error(ex.toString());
+    }
+  }
+
   // switch between already opened windows
   async function handleWindowFocusChange(windowId) {
     try {
@@ -116,5 +130,6 @@
   browser.browserAction.onClicked.addListener(handleBrowserActionClick);
   browser.sessions.onChanged.addListener(handleSessionChange);
   browser.tabs.onActivated.addListener(handleTabActivate);
+  browser.tabs.onUpdated.addListener(handleTabUpdate);
   browser.windows.onFocusChanged.addListener(handleWindowFocusChange);
 })();
