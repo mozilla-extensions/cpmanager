@@ -50,19 +50,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "ceTrackingOld",
 XPCOMUtils.defineLazyModuleGetter(this, "ceClearHistory",
   "resource://cpmanager/ceClearHistory.jsm");
 
-XPCOMUtils.defineLazyGetter(this, "CEHomepage", function() {
-  try {
-    let tmp = {};
-    Cu.import("resource://ntab/mozCNUtils.jsm", tmp);
-    if (tmp.Homepage && tmp.Homepage.aboutpage) {
-      return tmp.Homepage;
-    }
-  } catch (ex) {}
-
-  return {
-    aboutpage: "http://i.firefoxchina.cn/"
-  }
-});
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
@@ -115,7 +102,7 @@ this.userJSDetection = {
 
     return [
       /^about:cehome$/,
-      /^http:\/\/[a-z]+\.firefoxchina\.cn\/?$/
+      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(spec);
     });
@@ -994,7 +981,7 @@ this.mozCNGuard = {
   isCEHome: function MCG_isCEHome(aSpec) {
     return [
       /^about:cehome$/,
-      /^http:\/\/[a-z]+\.firefoxchina\.cn\/?$/
+      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(aSpec);
     });
@@ -1036,11 +1023,8 @@ this.mozCNGuard = {
         let title;
 
         // Don't open if already in commandline argument.
-        let page = {
-          "about:cehome": CEHomepage.aboutpage
-        }[uri.asciiSpec] || uri.asciiSpec;
         if (externalURLs.some(function(externalURL) {
-          return externalURL.split("?")[0] == page.split("?")[0];
+          return externalURL.split("?")[0] == uri.asciiSpec.split("?")[0];
         })) {
           return;
         }
