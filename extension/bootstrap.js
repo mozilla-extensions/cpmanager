@@ -41,6 +41,8 @@ XPCOMUtils.defineLazyServiceGetter(this, "gMM",
   "@mozilla.org/globalmessagemanager;1", "nsIMessageListenerManager");
 XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
   "resource://cpmanager/FxaSwitcher.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ExtensionSettingsStore",
+  "resource://gre/modules/ExtensionSettingsStore.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ceTracking",
@@ -812,6 +814,26 @@ this.onboardingTourHack = {
   }
 };
 
+this.trackingProtectionHack = {
+  get prefs() {
+    let branch = "privacy.trackingprotection.";
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch(branch);
+  },
+
+  async init() {
+    this.defaultPrefTweak();
+
+    await ExtensionSettingsStore.initialize();
+    ExtensionSettingsStore.removeSetting("cpmanager@mozillaonline.com",
+      "prefs", "websites.trackingProtectionMode");
+  },
+
+  defaultPrefTweak() {
+    this.prefs.setBoolPref("pbmode.enabled", false);
+  }
+}
+
 this.mozCNGuard = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
 
@@ -826,6 +848,7 @@ this.mozCNGuard = {
         mozCNSafeBrowsing.defaultPrefTweak();
         distributorChannelHack.defaultPrefTweak();
         onboardingTourHack.defaultPrefTweak();
+        trackingProtectionHack.defaultPrefTweak();
         break;
     }
   },
@@ -955,6 +978,7 @@ this.mozCNGuard = {
     mobileBookmarksHack.init();
     readOnlyPrefsJs.init();
     onboardingTourHack.init();
+    trackingProtectionHack.init();
 
     ceClearHistory.init();
     CETracking.init();
@@ -1054,10 +1078,6 @@ function handleMessage(message, sender, sendResponse) {
   }
 
   switch (message.type) {
-    case "missingTPMode":
-      let defBranch = Services.prefs.getDefaultBranch("");
-      defBranch.setBoolPref("privacy.trackingprotection.pbmode.enabled", false);
-      break;
     case "trackingEnabled":
       sendResponse({
         "trackingEnabled": CETracking.ude
