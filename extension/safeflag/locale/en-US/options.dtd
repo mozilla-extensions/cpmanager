@@ -1,6 +1,0 @@
-<!ENTITY title "CPManager Options">
-
-<!ENTITY generalpane.label "General">
-
-<!ENTITY c-enableurl2qr.label "Enable QR Code">
-<!ENTITY c-enablegesture.label "Enable drag and drop handling">

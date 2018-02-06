@@ -1078,10 +1078,24 @@ function handleMessage(message, sender, sendResponse) {
   }
 
   switch (message.type) {
+    case "initOptions":
+      let initOptions = {};
+      for (let option of ["gesture", "url2qr"]) {
+        let prefKey = `extensions.cmimprove.${option}.enabled`;
+        initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
+      }
+      sendResponse(initOptions);
+      break;
     case "trackingEnabled":
       sendResponse({
         "trackingEnabled": CETracking.ude
       });
+      break;
+    case "updateOptions":
+      for (let option in message.detail) {
+        let prefKey = `extensions.cmimprove.${option}.enabled`;
+        Services.prefs.setBoolPref(prefKey, message.detail[option]);
+      }
       break;
     default:
       break;

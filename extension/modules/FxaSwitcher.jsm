@@ -30,9 +30,9 @@ let FxaSwitcher = {
   get initStep() {
     if (Services.prefs.getPrefType(INIT_STEP_KEY) === Services.prefs.PREF_INT) {
       return Services.prefs.getIntPref(INIT_STEP_KEY, 0);
-    } else {
-      return Services.prefs.getBoolPref(ONE_CHECK_PREF, false) ? 1 : 0;
     }
+
+    return Services.prefs.getBoolPref(ONE_CHECK_PREF, false) ? 1 : 0;
   },
 
   set initStep(val) {

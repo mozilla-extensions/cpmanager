@@ -5,6 +5,12 @@
   "extensionName": {
     "message": "Addons Manager"
   },
+  "option.gesture": {
+    "message": "Enable drag and drop handling"
+  },
+  "option.url2qr": {
+    "message": "Enable QR Code"
+  },
   "restoreAllTabs": {
     "message": "Restore All Tabs"
   },

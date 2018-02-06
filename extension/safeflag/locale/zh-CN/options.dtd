@@ -1,6 +1,0 @@
-<!ENTITY title "附加组件管理器选项">
-
-<!ENTITY generalpane.label "基本功能">
-
-<!ENTITY c-enableurl2qr.label "启用地址栏二维码">
-<!ENTITY c-enablegesture.label "启用拖拽手势">
