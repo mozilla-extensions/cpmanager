@@ -290,12 +290,21 @@ ceTracking.prototype = {
   addPrefs(win) {
     let doc = win.document;
 
+    // Since Fx 59, https://bugzil.la/1379338
     let prefs = doc.getElementById("privacyPreferences");
-    let pref = doc.createElement("preference");
-    pref.id = "extensions.cpmanager.tracking.enabled";
-    pref.setAttribute("name", pref.id);
-    pref.setAttribute("type", "bool");
-    prefs.appendChild(pref);
+    let id = "extensions.cpmanager.tracking.enabled";
+    let type = "bool";
+    if (!prefs) {
+      win.Preferences.addAll([
+        { id, type }
+      ]);
+    } else {
+      let pref = doc.createElement("preference");
+      pref.id = id;
+      pref.setAttribute("name", id);
+      pref.setAttribute("type", type);
+      prefs.appendChild(pref);
+    }
 
     let body = doc.getElementById("dataCollectionGroup");
     let hbox = doc.createElement("hbox");
@@ -303,7 +312,7 @@ ceTracking.prototype = {
 
     let checkbox = doc.createElement("checkbox");
     checkbox.classList.add("tail-with-learn-more");
-    checkbox.setAttribute("preference", pref.id);
+    checkbox.setAttribute("preference", id);
     checkbox.setAttribute("label", this._("mococnTracking.label"));
     checkbox.setAttribute("accesskey", this._("mococnTracking.accesskey"));
 

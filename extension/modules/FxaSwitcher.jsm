@@ -103,8 +103,8 @@ let FxaSwitcher = {
 
         let p = Services.prompt;
         let shouldDisable = p.confirmEx(checkbox.ownerGlobal,
-          self._("warning.title", [checkbox.label]),
-          self._("warning.message", [checkbox.label]),
+          self._("fxa.preferences.warning.title"),
+          self._("fxa.preferences.warning.message", [checkbox.label]),
           p.STD_YES_NO_BUTTONS + p.BUTTON_POS_1_DEFAULT + p.BUTTON_DELAY_ENABLE,
           "", "", "", null, {}) === 0;
 
@@ -128,7 +128,9 @@ let FxaSwitcher = {
     // for https://bugzil.la/1182397
     let selector = 'checkbox[preference^="engine."]';
     [].filter.call(doc.querySelectorAll(selector), checkbox => {
-      return doc.getElementById(checkbox.getAttribute("preference")).
+      // Since Fx 59, https://bugzil.la/1379338
+      return (doc.getElementById(checkbox.getAttribute("preference")) ||
+              subject.Preferences.get(checkbox.getAttribute("preference"))).
         name.startsWith("services.sync.engine.");
     }).forEach(checkbox => {
       if (checkbox.hasAttribute("onsynctopreference")) {

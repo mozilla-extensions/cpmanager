@@ -110,12 +110,21 @@ this.ceClearHistory = {
     }
 
     let doc = subject.document;
+    // Since Fx 59, https://bugzil.la/1379338
     let prefs = doc.getElementById("privacyPreferences");
-    let pref = doc.createElement("preference");
-    pref.id = this.prefKey;
-    pref.setAttribute("name", pref.id);
-    pref.setAttribute("type", "int");
-    prefs.appendChild(pref);
+    let id = this.prefKey;
+    let type = "int";
+    if (!prefs) {
+      subject.Preferences.addAll([
+        { id, type }
+      ]);
+    } else {
+      let pref = doc.createElement("preference");
+      pref.id = id;
+      pref.setAttribute("name", id);
+      pref.setAttribute("type", "int");
+      prefs.appendChild(pref);
+    }
 
     let historyRememberPane = doc.getElementById("historyRememberPane");
     let hbox = doc.createElement("hbox");
@@ -124,7 +133,7 @@ this.ceClearHistory = {
 
     let menulist = doc.createElement("menulist");
     menulist.id = "mococnAutoClearHistory";
-    menulist.setAttribute("preference", pref.id);
+    menulist.setAttribute("preference", id);
 
     let menupopup = doc.createElement("menupopup");
     let options = [
