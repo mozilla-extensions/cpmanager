@@ -10,5 +10,3 @@ content  cmimprove                   improve/content/
 locale   cmimprove     en-US         improve/locale/en-US/
 locale   cmimprove     zh-CN         improve/locale/zh-CN/
 skin     cmimprove     classic/1.0   improve/skin/
-skin     cmimprove-os  classic/1.0   improve/skin/
-skin     cmimprove-os  classic/1.0   improve/skin/mac/yosemite/ os=Darwin osversion>=10.10
