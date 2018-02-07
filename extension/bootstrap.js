@@ -17,6 +17,8 @@ XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
 });
 XPCOMUtils.defineLazyModuleGetter(this, "Weave",
   "resource://services-sync/main.js");
+XPCOMUtils.defineLazyModuleGetter(this, "Utils",
+  "resource://gre/modules/sessionstore/Utils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "URL2QR",
   "resource://cpmanager/URL2QR.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TrackingNotificationInfoBar",
@@ -1064,7 +1066,11 @@ this.mozCNGuard = {
           let tab = w.gBrowser.addTab();
           w.gBrowser.moveTabTo(tab, aIndex);
           w.SessionStore.setTabState(tab, JSON.stringify({
-            entries: [{ url: aPage, title }]
+            entries: [{
+              url: aPage,
+              title,
+              triggeringPrincipal_base64: Utils.SERIALIZED_SYSTEMPRINCIPAL
+            }]
           }));
         });
       });
