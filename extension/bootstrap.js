@@ -9,6 +9,8 @@ const {
   results: Cr, utils: Cu
 } = Components;
 
+Cu.importGlobalProperties(["URL"]);
+
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
   return Cc["@mozilla.org/weave/service;1"]
@@ -834,7 +836,31 @@ this.trackingProtectionHack = {
   defaultPrefTweak() {
     this.prefs.setBoolPref("pbmode.enabled", false);
   }
-}
+};
+
+this.amoDiscoPaneHack = {
+  get prefs() {
+    let branch = "extensions.webservice.";
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch(branch);
+  },
+
+  init() {
+    this.defaultPrefTweak();
+  },
+
+  defaultPrefTweak() {
+    try {
+      let url = new URL(this.prefs.getCharPref("discoverURL"));
+      if (!url.searchParams.has("edition")) {
+        url.searchParams.append("edition", "china");
+      }
+      this.prefs.setCharPref("discoverURL", url.href);
+    } catch (ex) {
+      Cu.reportError(ex);
+    }
+  }
+};
 
 this.mozCNGuard = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
@@ -851,6 +877,7 @@ this.mozCNGuard = {
         distributorChannelHack.defaultPrefTweak();
         onboardingTourHack.defaultPrefTweak();
         trackingProtectionHack.defaultPrefTweak();
+        amoDiscoPaneHack.defaultPrefTweak();
         break;
     }
   },
@@ -981,6 +1008,7 @@ this.mozCNGuard = {
     readOnlyPrefsJs.init();
     onboardingTourHack.init();
     trackingProtectionHack.init();
+    amoDiscoPaneHack.init();
 
     ceClearHistory.init();
     CETracking.init();
