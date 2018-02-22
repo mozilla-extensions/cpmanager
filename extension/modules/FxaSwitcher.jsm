@@ -12,6 +12,8 @@ XPCOMUtils.defineLazyModuleGetter(this,
 XPCOMUtils.defineLazyModuleGetter(this,
   "FxAccountsConfig", "resource://gre/modules/FxAccountsConfig.jsm");
 XPCOMUtils.defineLazyModuleGetter(this,
+  "EnsureFxAccountsWebChannel", "resource://gre/modules/FxAccountsWebChannel.jsm");
+XPCOMUtils.defineLazyModuleGetter(this,
   "Services", "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -21,6 +23,9 @@ const AUTO_CONFIG_KEY = "identity.fxaccounts.autoconfig.uri";
 const AUTO_CONFIG_VAL = "https://accounts.firefox.com.cn";
 const FXA_PREF_KEY = "identity.fxaccounts.auth.uri";
 const FXA_PREF_VAL = "https://api-accounts.firefox.com.cn/v1";
+const FXA_WC_KEY_LEGACY = "identity.fxaccounts.remote.webchannel.uri";
+const FXA_WC_KEY = "identity.fxaccounts.remote.root";
+const FXA_WC_VAL = "https://accounts.firefox.com.cn/";
 const INIT_STEP_KEY = "extensions.cpmanager@mozillaonline.com.fxa.initstep";
 const ONE_CHECK_PREF = "cpmanager@mozillaonline.com.switch_fxa_pref.checked";
 
@@ -52,6 +57,20 @@ let FxaSwitcher = {
   _(key, args) {
     return args ? this.strings.formatStringFromName(key, args, args.length) :
                   this.strings.GetStringFromName(key);
+  },
+
+  ensureWebChannelUri() {
+    if (!this.useLocalSvc) {
+      return;
+    }
+
+    let prefKey = FXA_WC_KEY_LEGACY;
+    if (Services.prefs.getPrefType(FXA_WC_KEY) === Services.prefs.PREF_STRING) {
+      prefKey = FXA_WC_KEY;
+    }
+    Services.prefs.setCharPref(prefKey, FXA_WC_VAL);
+
+    EnsureFxAccountsWebChannel();
   },
 
   handleEvent(evt) {
@@ -87,6 +106,8 @@ let FxaSwitcher = {
     }
 
     this.initStep = 2;
+
+    this.ensureWebChannelUri();
   },
 
   observe(subject, topic, data) {
