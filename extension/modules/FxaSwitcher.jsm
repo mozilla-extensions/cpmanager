@@ -82,11 +82,15 @@ let FxaSwitcher = {
           this.switchToLocal();
         }
         break;
+      // remove 2=>3 backfill and the break above when a step 4 is added
+      case 2:
+        FxAccountsConfig.ensureConfigured();
+        break;
       default:
         break;
     }
 
-    this.initStep = 2;
+    this.initStep = 3;
   },
 
   observe(subject, topic, data) {
@@ -179,6 +183,7 @@ let FxaSwitcher = {
 
   switchToLocal() {
     Services.prefs.setCharPref(AUTO_CONFIG_KEY, AUTO_CONFIG_VAL);
+    FxAccountsConfig.ensureConfigured();
   },
 
   uninit() {
