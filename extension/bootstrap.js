@@ -449,13 +449,13 @@ this.mobileBookmarksHack = {
 
       let vbox = doc.createElement("vbox");
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
+      vbox.setAttribute("align", "center");
 
       let imageBox = doc.createElement("hbox");
       imageBox.setAttribute("pack", "center");
 
       let image = doc.createElement("image");
       image.className = "fxaSyncIllustration";
-      image.setAttribute("src", "chrome://browser/skin/fxa/sync-illustration.svg");
       imageBox.appendChild(image);
       vbox.appendChild(imageBox);
 
@@ -505,7 +505,6 @@ this.mobileBookmarksHack = {
 
       let image = doc.createElement("image");
       image.className = "fxaSyncIllustration";
-      image.setAttribute("src", "chrome://browser/skin/fxa/sync-illustration.svg");
       vbox.appendChild(image);
 
       let title = doc.createElement("label");

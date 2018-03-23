@@ -19,12 +19,12 @@ toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
 
 /* mostly copyed from chrome://browser/skin/customizableui/panelUI.css */
 #PanelUI-MOA-mobileBookmarksView {
-  --panel-ui-sync-illustration-height: 157.5px;
+  --panel-ui-sync-illustration-height: 91px;
 }
 
 .PanelUI-MOA-mobileBookmarks-instruction-title,
 .PanelUI-MOA-mobileBookmarks-instruction-label {
-  margin: 15px;
+  margin-bottom: 15px;
   text-align: center;
   text-shadow: none;
   max-width: 18em; /* 15em */
@@ -37,7 +37,6 @@ toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
 
 .PanelUI-MOA-mobileBookmarks-instruction-box {
   padding-bottom: 30px;
-  padding-top: 15px;
 }
 
 #PanelUI-MOA-mobileBookmarks-deck:not([selectedIndex="0"]) > #PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane,
@@ -47,22 +46,27 @@ toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
 
 .PanelUI-MOA-mobileBookmarks-prefs-button {
   -moz-appearance: none;
-  background-color: #0096dd;
+  background-color: #0060df;
   color: white !important;
   border-radius: 2px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   padding: 8px;
   text-shadow: none;
   min-width: 200px;
 }
 .PanelUI-MOA-mobileBookmarks-prefs-button:hover,
 .PanelUI-MOA-mobileBookmarks-prefs-button:hover:active {
-  background-color: #018acb;
+  background-color: #003eaa;
 }
 .PanelUI-MOA-mobileBookmarks-prefs-button > .toolbarbutton-text {
   text-align: center !important;
   text-shadow: none;
+}
+
+.PanelUI-MOA-mobileBookmarks-instruction-box .fxaSyncIllustration {
+  list-style-image: url(chrome://cmimprove/skin/sync-illustration.svg);
+  margin: 38px 0 15px;
 }
 
 #PanelUI-MOA-mobileBookmarksView[mainview] {
@@ -74,10 +78,11 @@ toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
 #PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-nodevicespane,
 #PanelUI-MOA-mobileBookmarksView[mainview] #PanelUI-MOA-mobileBookmarks-bookmarksdisabledpane {
   min-height: calc(var(--panel-ui-sync-illustration-height) +
-                   20px + /* margin of .PanelUI-remotetabs-prefs-button */
+                   53px + /* margin of .fxaSyncIllustration */
+                   30px + /* margin of .PanelUI-remotetabs-prefs-button */
                    16px + /* padding of .PanelUI-remotetabs-prefs-button */
-                   30px + /* margin of .PanelUI-remotetabs-instruction-label */
-                   30px + 15px + /* padding of .PanelUI-remotetabs-instruction-box */
+                   15px + /* margin of .PanelUI-remotetabs-instruction-label */
+                   30px + /* padding of .PanelUI-remotetabs-instruction-box */
                    11em);
 }
 
