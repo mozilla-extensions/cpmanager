@@ -9,6 +9,7 @@ const Cr = Components.results;
 const Cu = Components.utils;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{C40350A8-F734-4CFF-99D9-95274D408143}");
 const _CONTRACTID = "@mozilla.com.cn/tracking;1";
@@ -69,8 +70,7 @@ function isDefaultBrowser(aForAllTypes) {
 
 function httpGet(url) {
   try {
-    let xmlHttpRequest = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
-      createInstance(Ci.nsIXMLHttpRequest);
+    let xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.open("GET", url, true);
     xmlHttpRequest.send(null);
     xmlHttpRequest.onload = function() {
@@ -307,6 +307,7 @@ ceTracking.prototype = {
     }
 
     let body = doc.getElementById("dataCollectionGroup");
+    let parent = body.querySelector('[data-subcategory="reports"]') || body;
     let hbox = doc.createElement("hbox");
     hbox.setAttribute("align", "center");
 
@@ -324,7 +325,7 @@ ceTracking.prototype = {
 
     hbox.appendChild(checkbox);
     hbox.appendChild(label);
-    body.appendChild(hbox);
+    parent.appendChild(hbox);
 
     win.gPrivacyPane.
       _setupLearnMoreLink("extensions.cpmanager.tracking.infoURL", label.id);

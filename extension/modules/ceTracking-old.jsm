@@ -6,6 +6,7 @@ const Cr = Components.results;
 const Cu = Components.utils;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{6E12E09F-1942-46F0-8D85-9C6B1D0E6448}");
 const _CONTRACTID = "@mozilla.com.cn/tracking-old;1";
@@ -238,8 +239,7 @@ function _ADU(delay) {
   ADUTimer.initWithCallback({
     notify() {
       let str =  ADU_Task[ADUIndex].url + getADUData() + "&now=" + (new Date()).getTime();
-      let xhr = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
-        createInstance(Ci.nsIXMLHttpRequest);
+      let xhr = new XMLHttpRequest();
       xhr.open("GET", str, true);
       xhr.addEventListener("error", function(event) { _ADU(RETRY_DELAY); });
       xhr.addEventListener("load", function(event) { sendADU(++ADUIndex); });

@@ -127,6 +127,12 @@ let FxaSwitcher = {
     label.classList.add("text-link");
     label.addEventListener("click", this);
     noFxaAccount.appendChild(label);
+    if (label.previousSibling.className == "fxaMobilePromo") {
+      let marginOtherSide = parseInt(subject.
+        getComputedStyle(label.previousSibling).marginBottom, 10);
+      label.style.setProperty("margin-top",
+        `${32 - marginOtherSide}px`, "important");
+    }
     this.updateStrings(doc);
 
     // for https://bugzil.la/1182397
