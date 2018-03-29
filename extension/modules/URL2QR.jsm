@@ -115,7 +115,13 @@ this.URL2QR = {
   init(win) {
     this.createElements(win);
 
-    win.gBrowser.addProgressListener(this.listeners.get(win));
+    if (win.gBrowser) {
+      win.gBrowser.addProgressListener(this.listeners.get(win));
+    } else if (win._gBrowser) {
+      win._gBrowser.addProgressListener(this.listeners.get(win));
+    } else {
+      win.console.error("Neither gBrowser or _gBrowser ?");
+    }
   },
 
   uninit(win) {

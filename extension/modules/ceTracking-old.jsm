@@ -13,7 +13,6 @@ const _CONTRACTID = "@mozilla.com.cn/tracking-old;1";
 
 const ACTIVE_TIME_PREF = "extensions.cpmanager@mozillaonline.com.active_time";
 const PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
-const LOCALE_PREF = "general.useragent.locale";
 const CHANNEL_PREF = "app.chinaedition.channel"
 const DISTRIBUTION_PREF = "distribution.version"
 
@@ -141,12 +140,20 @@ function cpmanager_paramCEHome() {
 
 const ONEDAY = 24 * 60 * 60 * 1000;
 
-var prefileAge = -1;
+function getLocale() {
+  try {
+    return Services.locale.getAppLocaleAsLangTag();
+  } catch (ex) {
+    return "";
+  }
+}
+
+var profileAge = -1;
 function getAge() {
   function onSuccess(times) {
     if (times && times.created) {
       var days = (new Date() - times.created) / ONEDAY;
-      prefileAge = parseInt(days);
+      profileAge = parseInt(days);
     }
   }
   try {
@@ -202,19 +209,16 @@ function getADUData() {
   let ver = getPrefStr("extensions.lastAppVersion", "");
   let cev = getPrefStr(DISTRIBUTION_PREF, "");
   return channelidstr
-    // + cpmanager_paramFUOD(fuodPref)
-       + "&fxversion=" + ver                       // cpmanager_paramCEVersion
-       + "&ceversion=" + cev                       // cpmanager_paramCEVersion
-       + "&ver=2_2&pk=" + pk + "&uk=" + uk         // cpmanager_paramActCode()
-    // + cpmanager_paramSyncStatus()
+       + "&fxversion=" + ver
+       + "&ceversion=" + cev
+       + "&ver=2_2&pk=" + pk + "&uk=" + uk
        + cpmanager_paramCEHome()
-    // + cpmanager_paramPrevSessionLen()
-       + activeStr                                 // cpmanager_paramActive()
-       + "&locale=" + getPrefStr(LOCALE_PREF, "")  // cpmanager_paramLocale()
-       + "&age=" + prefileAge
+       + activeStr
+       + "&locale=" + getLocale()
+       + "&age=" + profileAge
        + "&default=" + isDefaultBrowser(true)
        + "&defaultHttp=" + isDefaultBrowser(false)
-       + "&flash=" + getPluginVersion("Shockwave Flash")  // get flash version
+       + "&flash=" + getPluginVersion("Shockwave Flash")
 }
 
 const RETRY_DELAY = 20 * 1000;
