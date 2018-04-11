@@ -560,17 +560,14 @@ this.mobileBookmarksHack = {
     let menupopup = doc.getElementById(this.bookmarksPopupId);
     menupopup.remove();
   },
-  async onViewShowing(evt) {
+  onViewShowing(evt) {
     var subView = evt.target;
     var win = subView.ownerGlobal;
 
     var deck = subView.querySelector("#PanelUI-MOA-mobileBookmarks-deck");
     if (this.isConfiguredToSyncBookmarks) {
-      let firstMobileItem = await PlacesUtils.bookmarks.fetch({
-        parentGuid: PlacesUtils.bookmarks.mobileGuid,
-        index: 0
-      });
-      if (!firstMobileItem) {
+      let prefKey = win.BookmarkingUI.MOBILE_BOOKMARKS_PREF;
+      if (!Services.prefs.getBoolPref(prefKey, false)) {
         deck.setAttribute("selectedIndex", this.deckIndices.DECK_INDEX_NOCLIENTS);
         if (win.document.getElementById("sync-syncnow-state").hidden) {
           this._track("auth", "show");
