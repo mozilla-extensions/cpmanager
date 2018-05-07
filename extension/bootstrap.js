@@ -41,8 +41,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
   "resource://cpmanager/CNSafeBrowsingRegister.jsm");
-XPCOMUtils.defineLazyServiceGetter(this, "gMM",
-  "@mozilla.org/globalmessagemanager;1", "nsIMessageListenerManager");
 XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
   "resource://cpmanager/FxaSwitcher.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ExtensionSettingsStore",
@@ -62,6 +60,15 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
 XPCOMUtils.defineLazyGetter(this, "CETrackingLegacy", function() {
   return Cc["@mozilla.com.cn/tracking-old;1"].getService().wrappedJSObject;
 });
+
+XPCOMUtils.defineLazyGetter(this, "gMM", () => {
+  return Cc["@mozilla.org/globalmessagemanager;1"].
+    getService(Ci.nsIMessageListenerManager || Ci.nsISupports);
+});
+XPCOMUtils.defineLazyServiceGetter(this, "resProto",
+  "@mozilla.org/network/protocol;1?name=resource",
+  "nsISubstitutingProtocolHandler");
+const RESOURCE_HOST = "cpmanager";
 
 this.userJSDetection = {
   get sandbox() {
@@ -1136,7 +1143,10 @@ function handleMessage(message, sender, sendResponse) {
 }
 
 function install() {}
-async function startup({ webExtension }, reason) {
+async function startup({ resourceURI, webExtension }, reason) {
+  resProto.setSubstitution(RESOURCE_HOST,
+    Services.io.newURI("modules/", null, resourceURI));
+
   mozCNGuard.init(reason === APP_STARTUP);
 
   let { browser } = await webExtension.startup();
@@ -1144,5 +1154,7 @@ async function startup({ webExtension }, reason) {
 }
 function shutdown(data, reason) {
   mozCNGuard.uninit(reason === APP_SHUTDOWN);
+
+  resProto.setSubstitution(RESOURCE_HOST, null);
 }
 function uninstall() {}

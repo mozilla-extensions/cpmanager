@@ -2,8 +2,6 @@ content   cmtracking         tracking/content/  contentaccessible=yes
 locale    cmtracking   en-US tracking/locale/en-US/
 locale    cmtracking   zh-CN tracking/locale/zh-CN/
 
-resource  cpmanager          modules/
-
 content   cmsafeflag               safeflag/content/  contentaccessible=yes
 
 content  cmimprove                   improve/content/
