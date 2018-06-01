@@ -13,8 +13,6 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
   "resource://gre/modules/PlacesUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "RecentWindow",
-  "resource:///modules/RecentWindow.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 
@@ -45,7 +43,7 @@ let maybeOpenHelp = function(aExtra) {
         p.BUTTON_POS_0 * p.BUTTON_TITLE_IS_STRING,
         bundle.GetStringFromName("setDefaultBrowserHelp.openHelp"), "", "",
         null, {}) === 0) {
-    let w = RecentWindow.getMostRecentBrowserWindow();
+    let w = Services.wm.getMostRecentWindow("navigator:browser");
     if (w && w.switchToTabHavingURI) {
       w.switchToTabHavingURI(helpURI, true);
     }

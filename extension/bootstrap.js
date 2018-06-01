@@ -447,7 +447,8 @@ this.mobileBookmarksHack = {
       titleKey: "noclients",
       labelKey: "generic",
       buttonKey: "mobilePromo",
-      command: "openUILinkIn('http://www.firefox.com.cn/?utm_source=firefox-browser&amp;utm_medium=firefox-browser&amp;utm_campaign=moa-mobile-bookmarks#android', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"
+      // openWebLinkIn introduced in https://bugzil.la/1374741 to provide the mandatory (null) principal
+      command: "(window.openWebLinkIn || window.openUILinkIn)('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"
     }]) {
       let pane = doc.createElement("hbox");
       pane.id = id;
