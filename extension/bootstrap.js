@@ -1080,6 +1080,10 @@ this.mozCNGuard = {
       }
 
       this.browserHandler.startPage.split("|").forEach((aPage, aIndex) => {
+        if (aPage === "about:blank") {
+          return;
+        }
+
         let uri = Services.io.newURI(aPage);
         let title;
 
