@@ -441,7 +441,7 @@ this.mobileBookmarksHack = {
       titleKey: "bookmarksnotsyncing",
       labelKey: "bookmarksnotsyncing",
       buttonKey: "enablebookmarkssync",
-      command: "gPrefService.setBoolPref('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"
+      command: "Services.prefs.setBoolPref('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"
     }, {
       id: "PanelUI-MOA-mobileBookmarks-nodevicespane",
       titleKey: "noclients",
