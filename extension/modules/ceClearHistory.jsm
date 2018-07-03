@@ -7,8 +7,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
   "resource://gre/modules/PlacesUtils.jsm");
-XPCOMUtils.defineLazyServiceGetter(this, "PlacesDB",
-  "@mozilla.org/browser/nav-history-service;1", "nsPIPlacesDatabase");
 
 this.ceClearHistory = {
   prefKey: "extensions.cpmanager@mozillaonline.com.sanitize.timeout",
@@ -93,7 +91,7 @@ this.ceClearHistory = {
 
     // 0/disable, -1/daily, -2/weekly, -3/monthly, -4/quarterly, -6/yearly
     Services.prefs.getDefaultBranch("").setIntPref(this.prefKey, -4);
-    PlacesDB.shutdownClient.jsclient.addBlocker("ceClearHistory",
+    PlacesUtils.history.shutdownClient.jsclient.addBlocker("ceClearHistory",
       this.condition,
       {
         fetchState() {
@@ -167,7 +165,7 @@ this.ceClearHistory = {
       return;
     }
 
-    PlacesDB.shutdownClient.jsclient.removeBlocker(this.condition);
+    PlacesUtils.history.shutdownClient.jsclient.removeBlocker(this.condition);
     Services.obs.removeObserver(this, this.topic);
   }
 }
