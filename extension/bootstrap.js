@@ -688,7 +688,10 @@ this.mobileBookmarksHack = {
     }
 
     var win = evt.target.ownerGlobal;
-    new win.PlacesMenu(evt, ("place:folder=" + PlacesUtils.mobileFolderId));
+    var query = Services.vc.compare(Services.appinfo.version, "61.*") > 0 ?
+                `place:parent=${PlacesUtils.bookmarks.mobileGuid}` :
+                `place:folder=${PlacesUtils.mobileFolderId}`;
+    new win.PlacesMenu(evt, query);
   },
   _(strKey) {
     return this.strings.GetStringFromName(strKey);
