@@ -51,8 +51,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "ceTracking",
   "resource://cpmanager/ceTracking.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ceTrackingOld",
   "resource://cpmanager/ceTracking-old.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ceClearHistory",
-  "resource://cpmanager/ceClearHistory.jsm");
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -989,7 +987,6 @@ this.mozCNGuard = {
     trackingProtectionHack.init();
     amoDiscoPaneHack.init();
 
-    ceClearHistory.init();
     CETracking.init();
     CETrackingLegacy.init();
     FxaSwitcher.init();
@@ -1005,7 +1002,6 @@ this.mozCNGuard = {
     dragAndDrop.uninit();
     mobileBookmarksHack.uninit();
 
-    ceClearHistory.uninit(isAppShutdown);
     CETracking.uninit(isAppShutdown);
     CETrackingLegacy.uninit();
     FxaSwitcher.uninit();
@@ -1102,6 +1098,25 @@ function handleMessage(message, sender, sendResponse) {
         initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
       }
       sendResponse(initOptions);
+      break;
+    case "migratePrefs":
+      let prefsToMigrate = {};
+      for (let prefKey of message.prefKeys) {
+        if (!Services.prefs.prefHasUserValue(prefKey)) {
+          continue;
+        }
+
+        switch (Services.prefs.getPrefType(prefKey)) {
+          case Services.prefs.PREF_INT:
+            prefsToMigrate[prefKey] = Services.prefs.getIntPref(prefKey);
+            break;
+          default:
+            break;
+        }
+
+        Services.prefs.clearUserPref(prefKey);
+      }
+      sendResponse(prefsToMigrate);
       break;
     case "trackingEnabled":
       sendResponse({

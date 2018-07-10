@@ -7,6 +7,7 @@
     },
     "background": {
       "scripts": [
+        "clearHistory.js",
         "tracking.js",
         "undoCloseTab.js"
       ]
@@ -33,6 +34,8 @@
       "page": "options.html"
     },
     "permissions": [
+      "history",
+      "idle",
       "menus",
       "privacy",
       "sessions",
