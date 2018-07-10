@@ -1,6 +1,8 @@
 (async function() {
   const DEBUG = false;
   const DEFAULT_DAYS_TO_CLEAR = 90;
+  const DAYS_KEY = "clearHistory.days";
+  const ENABLED_KEY = "clearHistory.enabled";
   const LEGACY_PREF_KEY = "extensions.cpmanager@mozillaonline.com.sanitize.timeout";
   const LEGACY_PREF_TO_DAYS = {
     "0": 0,
@@ -10,18 +12,18 @@
     "-4": 90,
     "-6": 365
   };
-  const STORAGE_KEY = "clearHistory.days";
 
   async function getDaysToClear() {
     let {
-      [STORAGE_KEY]: daysToClear
-    } = await browser.storage.local.get(STORAGE_KEY);
+      [DAYS_KEY]: daysToClear,
+      [ENABLED_KEY]: enabled
+    } = await browser.storage.local.get([DAYS_KEY, ENABLED_KEY]);
 
-    if (daysToClear) {
-      return daysToClear;
+    if (enabled !== undefined) {
+      return enabled ? Math.max(daysToClear, DEFAULT_DAYS_TO_CLEAR) : 0;
     }
     if (DEBUG) {
-      console.log(`"${STORAGE_KEY}" missing from storage.local`);
+      console.log(`"${DAYS_KEY}" missing from storage.local`);
     }
 
     let {
@@ -36,17 +38,24 @@
     }
 
     daysToClear = LEGACY_PREF_TO_DAYS[legacyPrefVal] || legacyPrefVal;
+    enabled = true;
+
     if (isNaN(daysToClear) || daysToClear < 0) {
       daysToClear = DEFAULT_DAYS_TO_CLEAR;
+    } else if (daysToClear === 0) {
+      daysToClear = DEFAULT_DAYS_TO_CLEAR;
+      enabled = false;
     }
     if (DEBUG) {
-      console.log(`Initial value of ${STORAGE_KEY} is ${daysToClear}`);
+      console.log(`Initial value of ${DAYS_KEY} is ${daysToClear}`);
+      console.log(`Initial value of ${ENABLED_KEY} is ${enabled}`);
     }
 
     await browser.storage.local.set({
-      [STORAGE_KEY]: daysToClear
+      [DAYS_KEY]: daysToClear,
+      [ENABLED_KEY]: enabled
     });
-    return daysToClear;
+    return enabled ? Math.max(daysToClear, DEFAULT_DAYS_TO_CLEAR) : 0;
   }
 
   async function handleIdleStateChanged(idleState) {

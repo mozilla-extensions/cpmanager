@@ -5,6 +5,9 @@
   "extensionName": {
     "message": "Addons Manager"
   },
+  "option.clearHistory.enabled": {
+    "message": "Enable aggressive expiring of history"
+  },
   "option.gesture": {
     "message": "Enable drag and drop handling"
   },

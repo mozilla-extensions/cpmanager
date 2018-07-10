@@ -5,6 +5,9 @@
   "extensionName": {
     "message": "附加组件管理器"
   },
+  "option.clearHistory.enabled": {
+    "message": "启用自动清除历史记录"
+  },
   "option.gesture": {
     "message": "启用拖拽手势"
   },
