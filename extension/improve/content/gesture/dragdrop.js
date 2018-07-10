@@ -182,7 +182,6 @@ let DragDropObserver = {
     // Flags
     var isURI = false;
     var isImage = false;
-    var isAnchorLink = false;
 
     // Parse the drag data
     var dragData = this._getDragData(evt);
@@ -199,15 +198,6 @@ let DragDropObserver = {
       if (sourceName == "IMG") {
         // Image or image link
         isImage = true;
-
-        // If the URI does not match the source node, then this is a
-        // linked image (note that we DO want to treat images linked to
-        // themselves as if they are not linked at all)
-        if (sourceNode.src != str)
-          isAnchorLink = true;
-      } else if (sourceName == "#text") {
-        // Text link
-        isAnchorLink = true;
       }
     }
 
