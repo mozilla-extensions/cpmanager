@@ -42,13 +42,6 @@ let mozCNSafeBrowsing = {
 
   delayTimeout: undefined,
 
-  _frameScript: "chrome://cmsafeflag/content/aboutBlockedFix.js",
-  get aboutBlockedFixNeeded() {
-    delete this.aboutBlockedFixNeeded;
-    return this.aboutBlockedFixNeeded = Services.vc.
-      compare(Services.appinfo.version, "58.0") < 0;
-  },
-
   defaultPrefTweak() {
     for (let tablePref in this.cachedLookupTables) {
       let tables = this.cachedLookupTables[tablePref];
@@ -85,10 +78,6 @@ let mozCNSafeBrowsing = {
     baiduBranch.setCharPref("reportMalwareMistakeURL", "https://bsb.baidu.com/appeal?url=");
     baiduBranch.setCharPref("reportPhishMistakeURL", "https://bsb.baidu.com/appeal?url=");
     baiduBranch.setCharPref("updateURL", "https://download.api.bsb.baidu.com/downloads?ver=2.2&key=ffD7Y9anV5dZVp8");
-
-    if (this.aboutBlockedFixNeeded) {
-      gMM.loadFrameScript(this._frameScript, true);
-    }
 
     // user pref set in previous versions
     if (Services.prefs.prefHasUserValue("urlclassifier.phishTable")) {
@@ -140,11 +129,7 @@ let mozCNSafeBrowsing = {
     }
   },
 
-  uninit() {
-    if (this.aboutBlockedFixNeeded) {
-      gMM.removeDelayedFrameScript(this._frameScript);
-    }
-  },
+  uninit() {},
 
   maybeRegister() {
     // Same here, we need to make sure the internal safe browsing has been

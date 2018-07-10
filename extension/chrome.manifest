@@ -4,8 +4,6 @@ locale    cmtracking   zh-CN tracking/locale/zh-CN/
 
 resource  cpmanager          modules/
 
-content   cmsafeflag               safeflag/content/  contentaccessible=yes
-
 content  cmimprove                   improve/content/
 locale   cmimprove     en-US         improve/locale/en-US/
 locale   cmimprove     zh-CN         improve/locale/zh-CN/
