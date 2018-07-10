@@ -1,5 +1,5 @@
 (async function() {
-  const DEBUG = true;
+  const DEBUG = false;
   const DEFAULT_DAYS_TO_CLEAR = 90;
   const LEGACY_PREF_KEY = "extensions.cpmanager@mozillaonline.com.sanitize.timeout";
   const LEGACY_PREF_TO_DAYS = {
@@ -63,7 +63,7 @@
       return;
     }
     if (DEBUG) {
-      console.log(`Clearing ${daysToClear} days of history`);
+      console.log(`Only keep ${daysToClear} days of history`);
     }
 
     browser.history.deleteRange({
