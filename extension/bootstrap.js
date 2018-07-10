@@ -236,7 +236,7 @@ this.screenshotButtonRemoval = Object.create(buttonRemoval, {
 });
 
 this.dragAndDrop = {
-  _frameScript: "chrome://cmimprove/content/gesture/dragdrop.js",
+  _frameScript: "resource://cpmanager/gesture-dragdrop.js",
   _listening: false,
   _messageName: "cpmanager@mozillaonline.com:dragAndDrop",
   _prefKey: "extensions.cmimprove.gesture.enabled",
