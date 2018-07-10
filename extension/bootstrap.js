@@ -711,36 +711,6 @@ this.mobileBookmarksHack = {
   }
 };
 
-this.readOnlyPrefsJs = {
-  init() {
-    if (OS.Constants.Sys.Name !== "WINNT") {
-      return;
-    }
-
-    OS.File.stat(OS.Path.join(OS.Constants.Path.profileDir, "prefs.js")).
-      then(info => {
-        if (!info.winAttributes) {
-          return;
-        }
-        CETracking.track("prefsjs-stat");
-        if (!info.winAttributes.readOnly) {
-          return;
-        }
-
-        CETracking.track("prefsjs-readonly");
-        OS.File.setPermissions(info.path, {
-          winAttributes: {
-            readOnly: false
-          }
-        }).then(() => {
-          CETracking.track("prefsjs-readonly-cleared");
-        }, () => {
-          CETracking.track("prefsjs-readonly-clearfail");
-        });
-      });
-  }
-};
-
 this.distributorChannelHack = {
   distributionTopic: "distribution-customization-complete",
   normalizedChannels: {
@@ -1015,7 +985,6 @@ this.mozCNGuard = {
     screenshotButtonRemoval.init();
     dragAndDrop.init();
     mobileBookmarksHack.init();
-    readOnlyPrefsJs.init();
     onboardingTourHack.init();
     trackingProtectionHack.init();
     amoDiscoPaneHack.init();
