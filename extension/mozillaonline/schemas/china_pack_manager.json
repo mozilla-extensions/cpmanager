@@ -1,0 +1,37 @@
+[
+    {
+      "namespace": "mozillaonline.chinaPackManager",
+      "description": "China Pack Manager",
+      "functions": [
+        {
+          "name": "sendLegacyMessage",
+          "type": "function",
+          "description": "(Kinda) replaces browser.runtime.sendMessage",
+          "parameters": [
+            {
+              "type": "any",
+              "name": "message"
+            },
+            {
+              "type": "function",
+              "name": "callback",
+              "parameters": [
+                {
+                  "type": "any",
+                  "name": "response"
+                }
+              ]
+            }
+          ],
+          "async": "callback"
+        },
+        {
+          "name": "startup",
+          "type": "function",
+          "description": "(Kinda) replaces bootstrap method startup",
+          "parameters": [],
+          "async": true
+        }
+      ]
+    }
+  ]

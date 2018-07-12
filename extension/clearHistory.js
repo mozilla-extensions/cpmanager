@@ -28,7 +28,7 @@
 
     let {
       [LEGACY_PREF_KEY]: legacyPrefVal
-    } = await browser.runtime.sendMessage({
+    } = await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
       dir: "bg2legacy",
       type: "migratePrefs",
       prefKeys: [LEGACY_PREF_KEY]

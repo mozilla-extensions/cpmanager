@@ -4,6 +4,8 @@
 
 /* globals APP_SHUTDOWN, APP_STARTUP */
 
+this.EXPORTED_SYMBOLS = ["mozCNGuard"];
+
 const {
   classes: Cc, interfaces: Ci, manager: Cm,
   results: Cr, utils: Cu
@@ -25,6 +27,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "URL2QR",
   "resource://cpmanager/URL2QR.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TrackingNotificationInfoBar",
   "resource://cpmanager/ceTracking.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "strings",
+  "resource://cpmanager/ShellSvc.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShortcutUtils",
   "resource://gre/modules/ShortcutUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShellSvcStartup",
@@ -63,10 +67,6 @@ XPCOMUtils.defineLazyGetter(this, "gMM", () => {
   return Cc["@mozilla.org/globalmessagemanager;1"].
     getService(Ci.nsIMessageListenerManager || Ci.nsISupports);
 });
-XPCOMUtils.defineLazyServiceGetter(this, "resProto",
-  "@mozilla.org/network/protocol;1?name=resource",
-  "nsISubstitutingProtocolHandler");
-const RESOURCE_HOST = "cpmanager";
 
 this.userJSDetection = {
   get sandbox() {
@@ -336,11 +336,6 @@ this.dragAndDrop = {
 };
 
 this.bookmarkingUIHack = {
-  get strings() {
-    let spec = "chrome://cmimprove/locale/browser.properties";
-    delete this.strings;
-    return this.strings = Services.strings.createBundle(spec);
-  },
   patchBrowserWindow(win) {
     let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
     if (bmb_vbt) {
@@ -381,10 +376,7 @@ this.bookmarkingUIHack = {
     }
   },
   _getString(id, args) {
-    if (args) {
-      return this.strings.formatStringFromName(id, args, args.length);
-    }
-    return this.strings.GetStringFromName(id);
+    return strings._(`bookmarkingUIHack.${id}`, args);
   }
 };
 
@@ -630,13 +622,8 @@ this.mobileBookmarksHack = {
         return annotation.annotationValue === "MobileBookmarks";
       })[0];
   },
-  get strings() {
-    let spec = "chrome://cmimprove/locale/browser.properties";
-    delete this.strings;
-    return this.strings = Services.strings.createBundle(spec);
-  },
   get styleSheet() {
-    let spec = "chrome://cmimprove/skin/mobile_bookmarks.css";
+    let spec = "resource://cpmanager/skin/mobile_bookmarks.css";
     delete this.styleSheet;
     return this.styleSheet = Services.io.newURI(spec);
   },
@@ -692,7 +679,8 @@ this.mobileBookmarksHack = {
     new win.PlacesMenu(evt, query);
   },
   _(strKey) {
-    return this.strings.GetStringFromName(strKey);
+    return strings._(strKey.replace("cp.moaMobileBookmarks.",
+                                    "mobileBookmarksHack."));
   },
   _openPrefs(win, entrypoint) {
     win.gSync.openPrefs(entrypoint);
@@ -916,8 +904,8 @@ this.mozCNGuard = {
   onWindowOpened(win) {
     bookmarkingUIHack.patchBrowserWindow(win);
 
-    TrackingNotificationInfoBar.init(win);
-    URL2QR.init(win);
+    TrackingNotificationInfoBar.init(win, strings);
+    URL2QR.init(win, strings);
   },
 
   onWindowClosed(win) {
@@ -966,7 +954,9 @@ this.mozCNGuard = {
     this.factories = new Map();
   },
 
-  init(isAppStartup) {
+  init(isAppStartup, context) {
+    strings.init(context);
+
     if (isAppStartup) {
       Services.obs.addObserver(this, "sessionstore-state-finalized");
     }
@@ -987,12 +977,12 @@ this.mozCNGuard = {
     trackingProtectionHack.init();
     amoDiscoPaneHack.init();
 
-    CETracking.init();
+    CETracking.init(strings);
     CETrackingLegacy.init();
-    FxaSwitcher.init();
+    FxaSwitcher.init(strings);
   },
 
-  uninit(isAppShutdown) {
+  uninit(isAppShutdown, context) {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
 
     this.uninitFactories(isAppShutdown);
@@ -1085,68 +1075,11 @@ this.mozCNGuard = {
   }
 };
 
-function handleMessage(message, sender, sendResponse) {
-  if (message.dir !== "bg2legacy") {
-    return;
+/*
+  async startup({ resourceURI, webExtension }, reason) {
+    mozCNGuard.init(reason === APP_STARTUP);
+  },
+  shutdown(data, reason) {
+    mozCNGuard.uninit(reason === APP_SHUTDOWN);
   }
-
-  switch (message.type) {
-    case "initOptions":
-      let initOptions = {};
-      for (let option of ["gesture", "url2qr"]) {
-        let prefKey = `extensions.cmimprove.${option}.enabled`;
-        initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
-      }
-      sendResponse(initOptions);
-      break;
-    case "migratePrefs":
-      let prefsToMigrate = {};
-      for (let prefKey of message.prefKeys) {
-        if (!Services.prefs.prefHasUserValue(prefKey)) {
-          continue;
-        }
-
-        switch (Services.prefs.getPrefType(prefKey)) {
-          case Services.prefs.PREF_INT:
-            prefsToMigrate[prefKey] = Services.prefs.getIntPref(prefKey);
-            break;
-          default:
-            break;
-        }
-
-        Services.prefs.clearUserPref(prefKey);
-      }
-      sendResponse(prefsToMigrate);
-      break;
-    case "trackingEnabled":
-      sendResponse({
-        "trackingEnabled": CETracking.ude
-      });
-      break;
-    case "updateOptions":
-      for (let option in message.detail) {
-        let prefKey = `extensions.cmimprove.${option}.enabled`;
-        Services.prefs.setBoolPref(prefKey, message.detail[option]);
-      }
-      break;
-    default:
-      break;
-  }
-}
-
-function install() {}
-async function startup({ resourceURI, webExtension }, reason) {
-  resProto.setSubstitution(RESOURCE_HOST,
-    Services.io.newURI("modules/", null, resourceURI));
-
-  mozCNGuard.init(reason === APP_STARTUP);
-
-  let { browser } = await webExtension.startup();
-  browser.runtime.onMessage.addListener(handleMessage);
-}
-function shutdown(data, reason) {
-  mozCNGuard.uninit(reason === APP_SHUTDOWN);
-
-  resProto.setSubstitution(RESOURCE_HOST, null);
-}
-function uninstall() {}
+*/

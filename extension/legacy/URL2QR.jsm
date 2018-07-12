@@ -43,17 +43,9 @@ this.URL2QR = {
   prefKey: "extensions.cmimprove.url2qr.enabled",
 
   get styleSheet() {
-    let spec = "chrome://cmimprove/skin/url2qr.css";
+    let spec = "resource://cpmanager/skin/url2qr.css";
     delete this.styleSheet;
     return this.styleSheet = Services.io.newURI(spec);
-  },
-  get strings() {
-    let spec = "chrome://cmimprove/locale/url2qr.properties";
-    delete this.strings;
-    return this.strings = Services.strings.createBundle(spec);
-  },
-  _(key) {
-    return this.strings.GetStringFromName(key);
   },
 
   generateGIFwithFx(message) {
@@ -112,8 +104,8 @@ this.URL2QR = {
     }
   },
 
-  init(win) {
-    this.createElements(win);
+  init(win, strings) {
+    this.createElements(win, strings);
 
     if (win.gBrowser) {
       win.gBrowser.addProgressListener(this.listeners.get(win));
@@ -135,7 +127,7 @@ this.URL2QR = {
       getInterface(Ci.nsIDOMWindowUtils);
   },
 
-  createElements(win) {
+  createElements(win, strings) {
     let doc = win.document;
 
     let winUtils = this.getWinUtils(win);
@@ -156,7 +148,7 @@ this.URL2QR = {
 
     let hbox = doc.createElement("hbox");
     let label = doc.createElement("label");
-    label.setAttribute("value", this._("mo-url2qr.instructions"));
+    label.setAttribute("value", strings._("URL2QR.instructions"));
     hbox.appendChild(label);
 
     popup.appendChild(popupImage);
@@ -171,7 +163,7 @@ this.URL2QR = {
     popupAnchor.classList.add("urlbar-icon");
     popupAnchor.classList.add("urlbar-page-action");
     popupAnchor.setAttribute("hidden", "true");
-    popupAnchor.setAttribute("tooltiptext", this._("mo-url2qr.generateQR"));
+    popupAnchor.setAttribute("tooltiptext", strings._("URL2QR.generateQR"));
     popupAnchor.setAttribute("popup", popup.id);
     parent.insertBefore(popupAnchor, parent.firstChild);
 

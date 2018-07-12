@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-this.EXPORTED_SYMBOLS = ["ShellSvcProxy"];
+this.EXPORTED_SYMBOLS = ["ShellSvcProxy", "strings"];
 
 const Cc = Components.classes;
 const CD = Components.classesByID;
@@ -32,16 +32,13 @@ const helpURI = Services.io.newURI(
 const osVer = Services.sysinfo.getProperty("version");
 const log = aMsg => Services.console.logStringMessage(aMsg);
 
-let maybeOpenHelp = function(aExtra) {
+this.maybeOpenHelp = function(aExtra) {
   let p = Services.prompt;
 
-  let properties = "chrome://cmtracking/locale/cmtracking.properties";
-  let bundle = Services.strings.createBundle(properties);
-
   if (p.confirmEx(null, Services.appinfo.name,
-        bundle.GetStringFromName("setDefaultBrowserHelp.msg"),
+        strings._("ShellSvcProxy.msg"),
         p.BUTTON_POS_0 * p.BUTTON_TITLE_IS_STRING,
-        bundle.GetStringFromName("setDefaultBrowserHelp.openHelp"), "", "",
+        strings._("ShellSvcProxy.openHelp"), "", "",
         null, {}) === 0) {
     let w = Services.wm.getMostRecentWindow("navigator:browser");
     if (w && w.switchToTabHavingURI) {
@@ -52,7 +49,7 @@ let maybeOpenHelp = function(aExtra) {
   }
 };
 
-let modShellSvc = Object.create(origShellSvc, {
+this.modShellSvc = Object.create(origShellSvc, {
   "setDefaultBrowser": {
     configurable: false,
     enumerable: true,
@@ -106,6 +103,27 @@ let modShellSvc = Object.create(origShellSvc, {
     }
   }
 });
+
+this.strings = {
+  _ctx: null,
+
+  init(context) {
+    this._ctx = context;
+  },
+
+  uninit() {
+    delete this._ctx;
+  },
+
+  _(name, subs) {
+    if (!this._ctx) {
+      return "";
+    }
+
+    let cloneScope = this._ctx.cloneScope;
+    return this._ctx.extension.localizeMessage(name, subs, {cloneScope});
+  }
+};
 
 function ShellSvcProxy() {}
 

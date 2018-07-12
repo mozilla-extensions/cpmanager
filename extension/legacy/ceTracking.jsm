@@ -120,22 +120,15 @@ let TrackingNotificationInfoBar = {
       document.getElementById("global-notificationbox");
   },
 
-  get strings() {
-    let spec = "chrome://cmtracking/locale/cmtracking.properties";
-    delete this.strings;
-    return this.strings = Services.strings.createBundle(spec);
-  },
-
   _(key, args) {
-    return args ?
-      this.strings.formatStringFromName(key, args, args.length) :
-      this.strings.GetStringFromName(key);
+    return this._strings._(key, args);
   },
 
-  init(win) {
+  init(win, strings) {
     if (this._win) {
       return;
     }
+    this._strings = strings;
     this._win = win;
 
     if (!Services.prefs.getBoolPref(this._prefKey, false) ||
@@ -158,10 +151,10 @@ let TrackingNotificationInfoBar = {
     let brandBundle = doc.getElementById("bundle_brand");
     let appName = brandBundle.getString("brandShortName");
 
-    let message = this._("dataChoicesNotification.message", [appName]);
+    let message = this._("TrackingNotificationInfoBar.message", [appName]);
 
-    let label = this._("dataChoicesNotification.button.label");
-    let accessKey = this._("dataChoicesNotification.button.accessKey");
+    let label = this._("TrackingNotificationInfoBar.button.label");
+    let accessKey = this._("TrackingNotificationInfoBar.button.accessKey");
     let buttons = [{
       label,
       accessKey,
@@ -200,6 +193,7 @@ let TrackingNotificationInfoBar = {
     }
 
     this._clearNotification();
+    delete this._strings;
   }
 };
 
@@ -217,11 +211,8 @@ ceTracking.prototype = {
   // tracking key:count
   data: {},
 
-  _strings: null,
   _(key) {
-    let spec = "chrome://cmtracking/locale/preferences.properties";
-    this._strings = this._strings || Services.strings.createBundle(spec);
-    return this._strings.GetStringFromName(key);
+    return this._strings._(key);
   },
 
   trackPrefs(key, value) {
@@ -260,7 +251,8 @@ ceTracking.prototype = {
     }
   },
 
-  init() {
+  init(strings) {
+    this._strings = strings;
     let defBranch = Services.prefs.getDefaultBranch("");
 
     defBranch.setBoolPref("extensions.cpmanager.tracking.notification.show", true);
@@ -285,6 +277,7 @@ ceTracking.prototype = {
     }
 
     Services.obs.removeObserver(this, "quit-application");
+    delete this._strings;
   },
 
   addPrefs(win) {
@@ -314,14 +307,14 @@ ceTracking.prototype = {
     let checkbox = doc.createElement("checkbox");
     checkbox.classList.add("tail-with-learn-more");
     checkbox.setAttribute("preference", id);
-    checkbox.setAttribute("label", this._("mococnTracking.label"));
-    checkbox.setAttribute("accesskey", this._("mococnTracking.accesskey"));
+    checkbox.setAttribute("label", this._("ceTracking.label"));
+    checkbox.setAttribute("accesskey", this._("ceTracking.accesskey"));
 
     let label = doc.createElement("label");
     label.id = "mococnTrackingLearnMore";
     label.classList.add("learnMore");
     label.classList.add("text-link");
-    label.textContent = this._("mococnTrackingLearnMore.label");
+    label.textContent = this._("ceTracking.learnMore.label");
 
     hbox.appendChild(checkbox);
     hbox.appendChild(label);

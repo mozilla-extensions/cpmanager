@@ -20,7 +20,7 @@ function createCheckboxesWithOptions(options, handleOptionChange) {
 }
 
 async function handleLegacyOptionChange(evt) {
-  return browser.runtime.sendMessage({
+  return browser.mozillaonline.chinaPackManager.sendLegacyMessage({
     dir: "bg2legacy",
     type: "updateOptions",
     detail: {
@@ -36,10 +36,11 @@ async function handleStorageOptionChange(evt) {
 }
 
 window.addEventListener("DOMContentLoaded", async evt => {
-  let initLegacyOptions = await browser.runtime.sendMessage({
-    dir: "bg2legacy",
-    type: "initOptions"
-  });
+  let initLegacyOptions = await browser.mozillaonline.
+    chinaPackManager.sendLegacyMessage({
+      dir: "bg2legacy",
+      type: "initOptions"
+    });
   createCheckboxesWithOptions(initLegacyOptions, handleLegacyOptionChange);
 
   let initStorageOptions = await browser.storage.local.get([

@@ -39,19 +39,13 @@ let FxaSwitcher = {
     Services.prefs.setIntPref(INIT_STEP_KEY, val);
   },
 
-  get strings() {
-    let spec = "chrome://cmimprove/locale/fxa.properties";
-    delete this.strings;
-    return this.strings = Services.strings.createBundle(spec);
-  },
-
   get useLocalSvc() {
     return FxAccountsConfig.getAutoConfigURL() === AUTO_CONFIG_VAL;
   },
 
   _(key, args) {
-    return args ? this.strings.formatStringFromName(key, args, args.length) :
-                  this.strings.GetStringFromName(key);
+    key = key.replace("fxa.", "FxaSwitcher.");
+    return this._strings ? this._strings._(key, args) : "";
   },
 
   handleEvent(evt) {
@@ -64,7 +58,9 @@ let FxaSwitcher = {
     }
   },
 
-  async init() {
+  async init(strings) {
+    this._strings = strings;
+
     Services.obs.addObserver(this, this.topic);
 
     let isSignedIn = !!(await fxAccounts.getSignedInUser());
@@ -194,6 +190,8 @@ let FxaSwitcher = {
 
   uninit() {
     Services.obs.removeObserver(this, this.topic);
+
+    delete this._strings;
   },
 
   updateStrings(doc) {

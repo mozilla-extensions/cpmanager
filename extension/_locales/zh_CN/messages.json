@@ -1,0 +1,132 @@
+{
+  "extensionDescription": {
+    "message": "用来管理火狐的附加组件系统。"
+  },
+  "extensionName": {
+    "message": "附加组件管理器"
+  },
+  "option.clearHistory.enabled": {
+    "message": "启用自动清除历史记录"
+  },
+  "option.gesture": {
+    "message": "启用拖拽手势"
+  },
+  "option.url2qr": {
+    "message": "启用地址栏二维码"
+  },
+  "restoreAllTabs": {
+    "message": "还原所有标签页"
+  },
+  "undoCloseTabTitle": {
+    "message": "恢复关闭的标签页"
+  },
+
+  "bookmarkingUIHack.menu.bookmarksToolbar": {
+    "message": "显示书签工具栏"
+  },
+  "bookmarkingUIHack.starButtonOff.tooltip2": {
+    "message": "收藏为书签 ($shortcut$)",
+    "placeholders": {
+      "shortcut": {
+        "content": "$1"
+      }
+    }
+  },
+
+  "ceTracking.accesskey": {
+    "message": "U"
+  },
+  "ceTracking.label": {
+    "message": "允许 Firefox 向 Mozilla 发送功能及扩展使用报告，帮助进一步改进用户体验"
+  },
+  "ceTracking.learnMore.label": {
+    "message": "详细了解"
+  },
+
+  "FxaSwitcher.confirm.body.switchToGlobal": {
+    "message": "全球服务可能会因为网络状况出现无法连接的问题，\n您是否切换到全球服务？"
+  },
+  "FxaSwitcher.confirm.body.switchToLocal": {
+    "message": "本地服务连接更稳定，推荐您使用。您是否切换到\n本地服务？"
+  },
+  "FxaSwitcher.confirm.title.switchService": {
+    "message": "切换服务"
+  },
+  "FxaSwitcher.preferences.action.switchToGlobal": {
+    "message": "切换至全球服务"
+  },
+  "FxaSwitcher.preferences.action.switchToLocal": {
+    "message": "切换至本地服务"
+  },
+  "FxaSwitcher.preferences.brand.global": {
+    "message": "Firefox 账户"
+  },
+  "FxaSwitcher.preferences.brand.local": {
+    "message": "火狐通行证"
+  },
+  "FxaSwitcher.preferences.warning.message": {
+    "message": "取消勾选“$engine$”将删除同步服务器中已保存的全部$engine$，用此账户登录的其他设备也将不再同步$engine$。以上操作不可撤销，为防止数据丢失，请谨慎选择。\n\n是否删除同步服务器上已保存的$engine$？",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "FxaSwitcher.preferences.warning.title": {
+    "message": "警告"
+  },
+
+  "mobileBookmarksHack.bookmarksnotsyncing.label": {
+    "message": "同步设置中书签选项未启用"
+  },
+  "mobileBookmarksHack.bookmarksnotsyncing.title": {
+    "message": "未检测到移动书签"
+  },
+  "mobileBookmarksHack.enablebookmarkssync.label": {
+    "message": "点击启用"
+  },
+  "mobileBookmarksHack.generic.label": {
+    "message": "登录火狐通行证，同步书签、附加组件，畅享快速、智能、安全的移动互联网体验"
+  },
+  "mobileBookmarksHack.mobilePromo.label": {
+    "message": "立即下载"
+  },
+  "mobileBookmarksHack.noclients.title": {
+    "message": "请下载移动版 Firefox"
+  },
+  "mobileBookmarksHack.notsignedin.title": {
+    "message": "未登录火狐通行证"
+  },
+  "mobileBookmarksHack.signin.label": {
+    "message": "立即登录"
+  },
+
+  "ShellSvcProxy.msg": {
+    "message": "设置默认浏览器失败！\n\n您的操作可能是被其它软件拦截，需手动对其进行修改。"
+  },
+  "ShellSvcProxy.openHelp": {
+    "message": "查看修改方法"
+  },
+
+  "TrackingNotificationInfoBar.button.accessKey": {
+    "message": "C"
+  },
+  "TrackingNotificationInfoBar.button.label": {
+    "message": "选择您要分享的数据"
+  },
+  "TrackingNotificationInfoBar.message": {
+    "message": "为提高用户体验，$appname$ 将发送部分功能的使用情况给我们，用于进一步优化火狐浏览器的易用性，您可以自由选择是否向我们分享数据。",
+    "placeholders": {
+      "appname": {
+        "content": "$1"
+      }
+    }
+  },
+
+  "URL2QR.generateQR": {
+    "message": "生成当前网址的二维码"
+  },
+  "URL2QR.instructions": {
+    "message": "扫一扫，直接在手机上打开"
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "extensionDescription": {
+    "message": "To manage the addons package in Firefox."
+  },
+  "extensionName": {
+    "message": "Addons Manager"
+  },
+  "option.clearHistory.enabled": {
+    "message": "Enable aggressive expiring of history"
+  },
+  "option.gesture": {
+    "message": "Enable drag and drop handling"
+  },
+  "option.url2qr": {
+    "message": "Enable QR Code"
+  },
+  "restoreAllTabs": {
+    "message": "Restore All Tabs"
+  },
+  "undoCloseTabTitle": {
+    "message": "Undo Close Tab"
+  },
+
+  "bookmarkingUIHack.menu.bookmarksToolbar": {
+    "message": "Show in Toolbar"
+  },
+  "bookmarkingUIHack.starButtonOff.tooltip2": {
+    "message": "Bookmark this page ($shortcut$)",
+    "placeholders": {
+      "shortcut": {
+        "content": "$1"
+      }
+    }
+  },
+
+  "ceTracking.accesskey": {
+    "message": "U"
+  },
+  "ceTracking.label": {
+    "message": "Allow Firefox to send data on your usage of the extensions to Mozilla, help us make further improvements."
+  },
+  "ceTracking.learnMore.label": {
+    "message": "Learn More"
+  },
+
+  "FxaSwitcher.confirm.body.switchToGlobal": {
+    "message": "You may experience connection issues when\nusing global service, switch anyway?"
+  },
+  "FxaSwitcher.confirm.body.switchToLocal": {
+    "message": "Local service should be more stable and we\nrecommend using it, click OK to continue."
+  },
+  "FxaSwitcher.confirm.title.switchService": {
+    "message": "Switch Services"
+  },
+  "FxaSwitcher.preferences.action.switchToGlobal": {
+    "message": "Switch to global services"
+  },
+  "FxaSwitcher.preferences.action.switchToLocal": {
+    "message": "Switch to local services"
+  },
+  "FxaSwitcher.preferences.brand.global": {
+    "message": "Firefox Account"
+  },
+  "FxaSwitcher.preferences.brand.local": {
+    "message": "Firefox Passport"
+  },
+  "FxaSwitcher.preferences.warning.message": {
+    "message": "Uncheck \"$engine$\" will delete all records stored on sync server, and other devices will stop syncing $engine$. This action is NOT reversible, please proceed with caution to prevent any data loss.\n\nContinue with deleting $engine$ stored on sync server?",
+    "placeholders": {
+      "engine": {
+        "content": "$1"
+      }
+    }
+  },
+  "FxaSwitcher.preferences.warning.title": {
+    "message": "Warning"
+  },
+
+  "mobileBookmarksHack.bookmarksnotsyncing.label": {
+    "message": "Bookmarks syncing disabled"
+  },
+  "mobileBookmarksHack.bookmarksnotsyncing.title": {
+    "message": "No Mobile Bookmarks"
+  },
+  "mobileBookmarksHack.enablebookmarkssync.label": {
+    "message": "Click to Enable"
+  },
+  "mobileBookmarksHack.generic.label": {
+    "message": "Sign in to view the bookmarks from your mobile devices."
+  },
+  "mobileBookmarksHack.mobilePromo.label": {
+    "message": "Download Now"
+  },
+  "mobileBookmarksHack.noclients.title": {
+    "message": "Download Firefox for Android"
+  },
+  "mobileBookmarksHack.notsignedin.title": {
+    "message": "Sync not configured"
+  },
+  "mobileBookmarksHack.signin.label": {
+    "message": "Sign in to Sync"
+  },
+
+  "ShellSvcProxy.msg": {
+    "message": "Failed to make Firefox the default browser.\n\nAnother software might be interfering with your operation,\nfind out how to fix this situation."
+  },
+  "ShellSvcProxy.openHelp": {
+    "message": "View Help"
+  },
+
+  "TrackingNotificationInfoBar.button.accessKey": {
+    "message": "C"
+  },
+  "TrackingNotificationInfoBar.button.label": {
+    "message": "Choose What I Share"
+  },
+  "TrackingNotificationInfoBar.message": {
+    "message": "$appname$ automatically sends some data to us so that we can improve your experience.",
+    "placeholders": {
+      "appname": {
+        "content": "$1"
+      }
+    }
+  },
+
+  "URL2QR.generateQR": {
+    "message": "Generate QR Code of current page"
+  },
+  "URL2QR.instructions": {
+    "message": "Scan with your phone to open it"
+  }
+}

@@ -16,7 +16,8 @@
     switch (message.type) {
       case "trackingEnabled":
         message.dir = "bg2legacy";
-        return browser.runtime.sendMessage(message);
+        return browser.mozillaonline.
+          chinaPackManager.sendLegacyMessage(message);
       default:
         return Promise.reject("Unknown message type");
     }
