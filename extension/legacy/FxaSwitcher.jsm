@@ -134,9 +134,7 @@ let FxaSwitcher = {
     // for https://bugzil.la/1182397
     let selector = 'checkbox[preference^="engine."]';
     [].filter.call(doc.querySelectorAll(selector), checkbox => {
-      // Since Fx 59, https://bugzil.la/1379338
-      return (doc.getElementById(checkbox.getAttribute("preference")) ||
-              subject.Preferences.get(checkbox.getAttribute("preference"))).
+      return subject.Preferences.get(checkbox.getAttribute("preference")).
         name.startsWith("services.sync.engine.");
     }).forEach(checkbox => {
       if (checkbox.hasAttribute("onsynctopreference")) {

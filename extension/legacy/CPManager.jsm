@@ -408,8 +408,7 @@ this.mobileBookmarksHack = {
     let winUtils = this.getWinUtils(win);
     winUtils.loadSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
-    let parent = doc.getElementById("appMenu-multiView") ||
-                 doc.getElementById("PanelUI-multiView");
+    let parent = doc.getElementById("appMenu-multiView");
 
     let panelview = doc.createElement("panelview");
     panelview.id = this.viewId;
@@ -437,7 +436,7 @@ this.mobileBookmarksHack = {
       titleKey: "noclients",
       labelKey: "generic",
       buttonKey: "mobilePromo",
-      // openWebLinkIn introduced in https://bugzil.la/1374741 to provide the mandatory (null) principal
+      // openWebLinkIn introduced in https://bugzil.la/1374741 (Fx 61) to provide the mandatory (null) principal
       command: "(window.openWebLinkIn || window.openUILinkIn)('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"
     }]) {
       let pane = doc.createElement("hbox");
