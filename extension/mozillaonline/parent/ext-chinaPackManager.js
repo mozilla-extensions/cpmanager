@@ -14,8 +14,17 @@ XPCOMUtils.defineLazyServiceGetter(this, "resProto",
 const RESOURCE_HOST = "cpmanager";
 
 this.chinaPackManager = class extends ExtensionAPI {
+  onStartup() {
+    let {extension} = this;
+    resProto.setSubstitution(RESOURCE_HOST,
+      Services.io.newURI("legacy/", null, extension.rootURI));
+
+    ChromeUtils.import("resource://cpmanager/CPManager.jsm", this);
+    this.mozCNGuard.init({ extension });
+  }
+
   onShutdown(reason) {
-    console.log(`chinaPackManager onShutdown with reason: ${reason}`);
+    this.mozCNGuard.uninit(reason === "APP_SHUTDOWN");
 
     resProto.setSubstitution(RESOURCE_HOST, null);
   }
@@ -62,15 +71,7 @@ this.chinaPackManager = class extends ExtensionAPI {
     }
   }
 
-  startup(context) {
-    resProto.setSubstitution(RESOURCE_HOST,
-      Services.io.newURI("legacy/", null, context.extension.rootURI));
-
-    ChromeUtils.import("resource://cpmanager/CPManager.jsm", this);
-    this.mozCNGuard.init(undefined, context);
-  }
-
-  getAPI(context) {
+  getAPI() {
     let chinaPackManager = this;
 
     return {
@@ -78,11 +79,7 @@ this.chinaPackManager = class extends ExtensionAPI {
         chinaPackManager: {
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
-          },
-
-          async startup() {
-            return chinaPackManager.startup(context);
-          },
+          }
         },
       },
     };

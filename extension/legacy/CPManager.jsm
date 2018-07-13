@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* globals APP_SHUTDOWN, APP_STARTUP */
-
 this.EXPORTED_SYMBOLS = ["mozCNGuard"];
 
 const {
@@ -953,7 +951,8 @@ this.mozCNGuard = {
     this.factories = new Map();
   },
 
-  init(isAppStartup, context) {
+  init(context) {
+    let isAppStartup = context.extension.startupReason === "APP_STARTUP";
     strings.init(context);
 
     if (isAppStartup) {
@@ -1073,12 +1072,3 @@ this.mozCNGuard = {
     }
   }
 };
-
-/*
-  async startup({ resourceURI, webExtension }, reason) {
-    mozCNGuard.init(reason === APP_STARTUP);
-  },
-  shutdown(data, reason) {
-    mozCNGuard.uninit(reason === APP_SHUTDOWN);
-  }
-*/

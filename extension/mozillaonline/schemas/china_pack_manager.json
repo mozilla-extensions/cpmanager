@@ -24,13 +24,6 @@
             }
           ],
           "async": "callback"
-        },
-        {
-          "name": "startup",
-          "type": "function",
-          "description": "(Kinda) replaces bootstrap method startup",
-          "parameters": [],
-          "async": true
         }
       ]
     }
