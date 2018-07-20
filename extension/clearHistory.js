@@ -77,7 +77,7 @@
 
     browser.history.deleteRange({
       startTime: 0,
-      endTime: (Date.now() - daysToClear * 86400e3) * 1e3
+      endTime: Date.now() - daysToClear * 86400e3
     });
   }
 
