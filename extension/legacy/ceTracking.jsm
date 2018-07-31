@@ -112,6 +112,7 @@ function sendUsageData(data) {
 let TrackingNotificationInfoBar = {
   _DATA_CHOICES_NOTIFICATION: "cp-data-tracking",
   _prefKey: "extensions.cpmanager.tracking.notification.show",
+  _strings: null,
   _win: null,
 
   get _notificationBox() {
@@ -121,7 +122,7 @@ let TrackingNotificationInfoBar = {
   },
 
   _(key, args) {
-    return this._strings._(key, args);
+    return this._strings ? this._strings._(key, args) : "";
   },
 
   init(win, strings) {
@@ -193,7 +194,9 @@ let TrackingNotificationInfoBar = {
     }
 
     this._clearNotification();
-    delete this._strings;
+
+    this._strings = null;
+    this._win = null;
   }
 };
 

@@ -912,7 +912,7 @@ this.mozCNGuard = {
     URL2QR.uninit(win);
   },
 
-  initFactories(isAppStartup) {
+  initFactories() {
     Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
     let constructors = [ceTracking, ceTrackingOld];
@@ -935,7 +935,7 @@ this.mozCNGuard = {
       }
     });
 
-    ShellSvcStartup.init(isAppStartup);
+    ShellSvcStartup.init();
   },
 
   uninitFactories(isAppShutdown) {
@@ -961,8 +961,7 @@ this.mozCNGuard = {
     Services.obs.addObserver(this, "prefservice:after-app-defaults");
 
     this.initDefaultPrefs();
-    this.initFactories(isAppStartup);
-    this.initWindowListener();
+    this.initFactories();
 
     mozCNSafeBrowsing.init();
     userJSDetection.detect();
@@ -976,8 +975,11 @@ this.mozCNGuard = {
     amoDiscoPaneHack.init();
 
     CETracking.init(strings);
-    CETrackingLegacy.init();
+    CETrackingLegacy.init(isAppStartup);
     FxaSwitcher.init(strings);
+
+    // this needs to run after CETracking.init for default prefs
+    this.initWindowListener();
   },
 
   uninit(isAppShutdown, context) {

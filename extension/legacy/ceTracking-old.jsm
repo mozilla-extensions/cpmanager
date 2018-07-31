@@ -17,6 +17,8 @@ const CHANNEL_PREF = "app.chinaedition.channel"
 const DISTRIBUTION_PREF = "distribution.version"
 
 Cu.import("resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "ProfileAge",
+  "resource://gre/modules/ProfileAge.jsm");
 
 function getPrefStr(name, defValue) {
   try {
@@ -149,20 +151,9 @@ function getLocale() {
 }
 
 var profileAge = -1;
-function getAge() {
-  function onSuccess(times) {
-    if (times && times.created) {
-      var days = (new Date() - times.created) / ONEDAY;
-      profileAge = parseInt(days);
-    }
-  }
-  try {
-    Components.utils.import("resource://services-common/utils.js");
-    var file = Services.dirsvc.get("ProfD", Ci.nsIFile);
-    file.append("times.json");
-    CommonUtils.readJSON(file.path).then(onSuccess);
-  } catch (e) {
-  }
+async function getAge() {
+  let created = await (new ProfileAge()).created;
+  profileAge = Math.floor((Date.now() - created) / ONEDAY);
 }
 
 function getPluginVersion(name) {
@@ -272,11 +263,17 @@ ceTrackingOld.prototype = {
   },
 
   init() {
-    getAge();
-    Services.obs.addObserver(this, "final-ui-startup", true);
+    let promise = getAge();
+    if (Services.startup.startingUp) {
+      Services.obs.addObserver(this, "final-ui-startup", true);
+    } else {
+      promise.then(() => sendADU(0));
+    }
   },
 
   uninit() {
-    Services.obs.removeObserver(this, "final-ui-startup");
+    try {
+      Services.obs.removeObserver(this, "final-ui-startup");
+    } catch (ex) {}
   }
 }
