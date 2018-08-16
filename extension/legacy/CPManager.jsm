@@ -865,14 +865,6 @@ this.mozCNGuard = {
 
       defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", true);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
-
-      let exceptions = defBranch.getCharPref("extensions.legacy.exceptions", "");
-      exceptions = new Set(exceptions.split(","));
-      ["cehomepage", "cpmanager", "tabtweak"].forEach(prefix => {
-        exceptions.add(`${prefix}@mozillaonline.com`);
-      });
-      exceptions = Array.from(exceptions).join(",");
-      defBranch.setCharPref("extensions.legacy.exceptions", exceptions);
     } catch (ex) {
       Cu.reportError(ex);
     }
