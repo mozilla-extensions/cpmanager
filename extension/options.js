@@ -43,8 +43,8 @@ window.addEventListener("DOMContentLoaded", async evt => {
     });
   createCheckboxesWithOptions(initLegacyOptions, handleLegacyOptionChange);
 
-  let initStorageOptions = await browser.storage.local.get([
-    "clearHistory.enabled"
-  ]);
+  let initStorageOptions = await browser.storage.local.get({
+    "clearHistory.enabled": true // defaults display to true
+  });
   createCheckboxesWithOptions(initStorageOptions, handleStorageOptionChange);
 });

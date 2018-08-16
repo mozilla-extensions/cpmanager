@@ -1,6 +1,6 @@
 (async function() {
   const DEBUG = false;
-  const DEFAULT_DAYS_TO_CLEAR = 90;
+  const DEFAULT_DAYS_TO_KEEP = 91;
   const DAYS_KEY = "clearHistory.days";
   const ENABLED_KEY = "clearHistory.enabled";
   const LEGACY_PREF_KEY = "extensions.cpmanager@mozillaonline.com.sanitize.timeout";
@@ -9,21 +9,21 @@
     "-1": 1,
     "-2": 7,
     "-3": 30,
-    "-4": 90,
+    "-4": DEFAULT_DAYS_TO_KEEP,
     "-6": 365
   };
 
-  async function getDaysToClear() {
+  async function getDaysToKeep() {
     let {
-      [DAYS_KEY]: daysToClear,
+      [DAYS_KEY]: daysToKeep,
       [ENABLED_KEY]: enabled
     } = await browser.storage.local.get([DAYS_KEY, ENABLED_KEY]);
 
     if (enabled !== undefined) {
-      return enabled ? Math.max(daysToClear, DEFAULT_DAYS_TO_CLEAR) : 0;
+      return enabled ? DEFAULT_DAYS_TO_KEEP : 0;
     }
     if (DEBUG) {
-      console.log(`"${DAYS_KEY}" missing from storage.local`);
+      console.log(`"${ENABLED_KEY}" missing from storage.local`);
     }
 
     let {
@@ -37,25 +37,27 @@
       console.log(`"${LEGACY_PREF_KEY}" is ${legacyPrefVal}`);
     }
 
-    daysToClear = LEGACY_PREF_TO_DAYS[legacyPrefVal] || legacyPrefVal;
-    enabled = true;
+    daysToKeep = LEGACY_PREF_TO_DAYS[legacyPrefVal] || legacyPrefVal;
 
-    if (isNaN(daysToClear) || daysToClear < 0) {
-      daysToClear = DEFAULT_DAYS_TO_CLEAR;
-    } else if (daysToClear === 0) {
-      daysToClear = DEFAULT_DAYS_TO_CLEAR;
+    if (isNaN(daysToKeep) || daysToKeep < 0) {
+      daysToKeep = DEFAULT_DAYS_TO_KEEP;
+      enabled = true;
+    } else if (daysToKeep === 0) {
+      daysToKeep = DEFAULT_DAYS_TO_KEEP;
       enabled = false;
+    } else {
+      enabled = daysToKeep <= DEFAULT_DAYS_TO_KEEP;
     }
     if (DEBUG) {
-      console.log(`Initial value of ${DAYS_KEY} is ${daysToClear}`);
+      console.log(`Initial value of ${DAYS_KEY} is ${daysToKeep}`);
       console.log(`Initial value of ${ENABLED_KEY} is ${enabled}`);
     }
 
     await browser.storage.local.set({
-      [DAYS_KEY]: daysToClear,
+      [DAYS_KEY]: daysToKeep,
       [ENABLED_KEY]: enabled
     });
-    return enabled ? Math.max(daysToClear, DEFAULT_DAYS_TO_CLEAR) : 0;
+    return enabled ? DEFAULT_DAYS_TO_KEEP : 0;
   }
 
   async function handleIdleStateChanged(idleState) {
@@ -67,17 +69,17 @@
       return;
     }
 
-    let daysToClear = await getDaysToClear();
-    if (!daysToClear) {
+    let daysToKeep = await getDaysToKeep();
+    if (!daysToKeep) {
       return;
     }
     if (DEBUG) {
-      console.log(`Only keep ${daysToClear} days of history`);
+      console.log(`Only keep ${daysToKeep} days of history`);
     }
 
     browser.history.deleteRange({
       startTime: 0,
-      endTime: Date.now() - daysToClear * 86400e3
+      endTime: Date.now() - daysToKeep * 86400e3
     });
   }
 
