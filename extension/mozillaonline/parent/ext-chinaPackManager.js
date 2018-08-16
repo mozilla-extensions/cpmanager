@@ -4,12 +4,15 @@
 
 "use strict";
 
-/* global ExtensionAPI, Services, XPCOMUtils */
+/* global Cc, ExtensionAPI, Services, XPCOMUtils */
 ChromeUtils.import("resource://gre/modules/Services.jsm");
 ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "@mozilla.org/network/protocol;1?name=resource",
   "nsISubstitutingProtocolHandler");
+XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
+  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+});
 
 const RESOURCE_HOST = "cpmanager";
 
@@ -58,7 +61,7 @@ this.chinaPackManager = class extends ExtensionAPI {
         return prefsToMigrate;
       case "trackingEnabled":
         return {
-          "trackingEnabled": false // CETracking.ude
+          "trackingEnabled": CETracking.ude
         };
       case "updateOptions":
         for (let option in message.detail) {
