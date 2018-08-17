@@ -724,7 +724,7 @@ this.distributorChannelHack = {
   QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
                                          Ci.nsISupportsWeakReference]),
 
-  _maybeOverrideDistributorChannel(prefKey) {
+  _maybeOverrideDistributorChannel() {
     // wait until both prefs are set by distribution.ini
     // also do nothing if it's already something other than "chinaedition"
     if (this.prefs.getPrefType(this.prefSource) !== this.prefs.PREF_STRING ||
@@ -739,8 +739,13 @@ this.distributorChannelHack = {
   },
 
   defaultPrefTweak() {
-    Services.obs.addObserver(this, this.distributionTopic);
-    this.prefs.addObserver("", this, true);
+    let observers = Services.obs.enumerateObservers(this.distributionTopic);
+    if (observers.hasMoreElements()) {
+      Services.obs.addObserver(this, this.distributionTopic);
+      this.prefs.addObserver("", this, true);
+    } else {
+      this._maybeOverrideDistributorChannel();
+    }
   },
 
   observe(subject, topic, data) {
@@ -752,7 +757,7 @@ this.distributorChannelHack = {
       case "nsPref:changed":
         if (data === this.prefSource ||
             data === this.prefTarget) {
-          this._maybeOverrideDistributorChannel(data);
+          this._maybeOverrideDistributorChannel();
         }
         break;
       default:
