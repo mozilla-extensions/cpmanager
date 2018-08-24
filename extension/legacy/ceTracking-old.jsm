@@ -19,6 +19,13 @@ const DISTRIBUTION_PREF = "distribution.version"
 Cu.import("resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ProfileAge",
   "resource://gre/modules/ProfileAge.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "TelemetryReportingPolicy",
+  "resource://gre/modules/TelemetryReportingPolicy.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "TelemetryUtils",
+  "resource://gre/modules/TelemetryUtils.jsm");
+XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
+  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+});
 
 function getPrefStr(name, defValue) {
   try {
@@ -190,6 +197,20 @@ function getActive() {
 }
 var activeStr = getActive();
 
+function getTrackingStatus() {
+  let telemetryPrefs = TelemetryUtils.Preferences;
+  let isUnified = Services.prefs.getBoolPref(telemetryPrefs.Unified, false);
+
+  let telemetrySendingEnabled = isUnified ?
+    Services.prefs.getBoolPref(telemetryPrefs.FhrUploadEnabled, false) :
+    Services.prefs.getBoolPref(telemetryPrefs.TelemetryEnabled, false);
+  let telemetryPolicyNotified = TelemetryReportingPolicy.canUpload();
+
+  let status = telemetrySendingEnabled && telemetryPolicyNotified ? 2 : 0;
+  status += CETracking.ude ? 1 : 0;
+  return status;
+}
+
 function getADUData() {
   let channelidstr = "?channelid=";
   let channelid = getPrefStr(CHANNEL_PREF, "www.firefox.com.cn");
@@ -210,6 +231,7 @@ function getADUData() {
        + "&default=" + isDefaultBrowser(true)
        + "&defaultHttp=" + isDefaultBrowser(false)
        + "&flash=" + getPluginVersion("Shockwave Flash")
+       + "&tracking=" + getTrackingStatus()
 }
 
 const RETRY_DELAY = 20 * 1000;
