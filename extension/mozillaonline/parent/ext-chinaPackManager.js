@@ -14,7 +14,7 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
-const RESOURCE_HOST = "cpmanager";
+const RESOURCE_HOST = "cpmanager-legacy";
 
 this.chinaPackManager = class extends ExtensionAPI {
   onStartup() {
@@ -22,7 +22,7 @@ this.chinaPackManager = class extends ExtensionAPI {
     resProto.setSubstitution(RESOURCE_HOST,
       Services.io.newURI("legacy/", null, extension.rootURI));
 
-    ChromeUtils.import("resource://cpmanager/CPManager.jsm", this);
+    ChromeUtils.import("resource://cpmanager-legacy/CPManager.jsm", this);
     this.mozCNGuard.init({ extension });
   }
 

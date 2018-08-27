@@ -22,17 +22,17 @@ XPCOMUtils.defineLazyModuleGetter(this, "Weave",
 XPCOMUtils.defineLazyModuleGetter(this, "Utils",
   "resource://gre/modules/sessionstore/Utils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "URL2QR",
-  "resource://cpmanager/URL2QR.jsm");
+  "resource://cpmanager-legacy/URL2QR.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "TrackingNotificationInfoBar",
-  "resource://cpmanager/ceTracking.jsm");
+  "resource://cpmanager-legacy/ceTracking.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "strings",
-  "resource://cpmanager/ShellSvc.jsm");
+  "resource://cpmanager-legacy/ShellSvc.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShortcutUtils",
   "resource://gre/modules/ShortcutUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShellSvcStartup",
-  "resource://cpmanager/ShellSvcStartup.jsm");
+  "resource://cpmanager-legacy/ShellSvcStartup.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ShellSvcProxy",
-  "resource://cpmanager/ShellSvc.jsm");
+  "resource://cpmanager-legacy/ShellSvc.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
@@ -42,17 +42,17 @@ XPCOMUtils.defineLazyModuleGetter(this, "PlacesUIUtils",
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
-  "resource://cpmanager/CNSafeBrowsingRegister.jsm");
+  "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
-  "resource://cpmanager/FxaSwitcher.jsm");
+  "resource://cpmanager-legacy/FxaSwitcher.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ExtensionSettingsStore",
   "resource://gre/modules/ExtensionSettingsStore.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
   "resource:///modules/CustomizableUI.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ceTracking",
-  "resource://cpmanager/ceTracking.jsm");
+  "resource://cpmanager-legacy/ceTracking.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "ceTrackingOld",
-  "resource://cpmanager/ceTracking-old.jsm");
+  "resource://cpmanager-legacy/ceTracking-old.jsm");
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -232,7 +232,7 @@ this.screenshotButtonRemoval = Object.create(buttonRemoval, {
 });
 
 this.dragAndDrop = {
-  _frameScript: "resource://cpmanager/gesture-dragdrop.js",
+  _frameScript: "resource://cpmanager-legacy/gesture-dragdrop.js",
   _listening: false,
   _messageName: "cpmanager@mozillaonline.com:dragAndDrop",
   _prefKey: "extensions.cmimprove.gesture.enabled",
@@ -620,7 +620,7 @@ this.mobileBookmarksHack = {
       })[0];
   },
   get styleSheet() {
-    let spec = "resource://cpmanager/skin/mobile_bookmarks.css";
+    let spec = "resource://cpmanager-legacy/skin/mobile_bookmarks.css";
     delete this.styleSheet;
     return this.styleSheet = Services.io.newURI(spec);
   },

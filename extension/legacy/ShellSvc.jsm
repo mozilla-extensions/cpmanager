@@ -25,7 +25,7 @@ const origShellSvc = CD[origShellSvcID].getService(Ci.nsIShellService);
 try {
   origShellSvc.QueryInterface(Ci.nsIClassInfo);
 } catch (e) {}
-const workerURL = "resource://cpmanager/getExitCode.js";
+const workerURL = "resource://cpmanager-legacy/getExitCode.js";
 const exeName = "helper.exe";
 const helpURI = Services.io.newURI(
   "http://firefox.com.cn/help/default-browser/");

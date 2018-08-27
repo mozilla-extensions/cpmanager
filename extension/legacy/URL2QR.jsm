@@ -43,7 +43,7 @@ this.URL2QR = {
   prefKey: "extensions.cmimprove.url2qr.enabled",
 
   get styleSheet() {
-    let spec = "resource://cpmanager/skin/url2qr.css";
+    let spec = "resource://cpmanager-legacy/skin/url2qr.css";
     delete this.styleSheet;
     return this.styleSheet = Services.io.newURI(spec);
   },
