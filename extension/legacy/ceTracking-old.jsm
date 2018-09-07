@@ -26,6 +26,12 @@ XPCOMUtils.defineLazyModuleGetter(this, "TelemetryUtils",
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
+XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
+  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
+  return XPCOMUtils.generateQI ?
+    XPCOMUtils.generateQI.bind(XPCOMUtils) :
+    ChromeUtils.generateQI.bind(ChromeUtils);
+});
 
 function getPrefStr(name, defValue) {
   try {
@@ -273,8 +279,8 @@ ceTrackingOld.prototype = {
   classDescription: "Tracking for Imporve Firefox",
   contractID: _CONTRACTID,
   classID: _CID,
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
-                                         Ci.nsISupportsWeakReference]),
+  QueryInterface: generateQI([Ci.nsIObserver,
+                              Ci.nsISupportsWeakReference]),
 
   observe(aSubject, aTopic, aData) {
     switch (aTopic) {

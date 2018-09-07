@@ -12,12 +12,18 @@ XPCOMUtils.defineLazyGetter(this, "require", function() {
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
+XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
+  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
+  return XPCOMUtils.generateQI ?
+    XPCOMUtils.generateQI.bind(XPCOMUtils) :
+    ChromeUtils.generateQI.bind(ChromeUtils);
+});
 
 function Listener(win) {
   this.win = win;
 }
 Listener.prototype = {
-  QueryInterface: XPCOMUtils.generateQI([
+  QueryInterface: generateQI([
     Ci.nsISupportWeakReference,
     Ci.nsIWebProgressListener
   ]),
@@ -123,7 +129,8 @@ this.URL2QR = {
   },
 
   getWinUtils(win) {
-    return win.QueryInterface(Ci.nsIInterfaceRequestor).
+    // https://bugzil.la/1476145 in Fx 63
+    return win.windowUtils || win.QueryInterface(Ci.nsIInterfaceRequestor).
       getInterface(Ci.nsIDOMWindowUtils);
   },
 

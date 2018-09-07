@@ -19,6 +19,12 @@ const PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
 
 XPCOMUtils.defineLazyModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
+  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
+  return XPCOMUtils.generateQI ?
+    XPCOMUtils.generateQI.bind(XPCOMUtils) :
+    ChromeUtils.generateQI.bind(ChromeUtils);
+});
 
 function LOG(txt) {
   Services.console.logStringMessage("tracking: " + txt);
@@ -208,8 +214,8 @@ ceTracking.prototype = {
   classDescription: "Tracking for Imporve Firefox",
   contractID: _CONTRACTID,
   classID: _CID,
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
-                                         Ci.nsISupportsWeakReference]),
+  QueryInterface: generateQI([Ci.nsIObserver,
+                              Ci.nsISupportsWeakReference]),
 
   // tracking key:count
   data: {},

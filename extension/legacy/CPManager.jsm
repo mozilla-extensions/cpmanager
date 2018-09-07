@@ -65,6 +65,12 @@ XPCOMUtils.defineLazyGetter(this, "gMM", () => {
   return Cc["@mozilla.org/globalmessagemanager;1"].
     getService(Ci.nsIMessageListenerManager || Ci.nsISupports);
 });
+XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
+  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
+  return XPCOMUtils.generateQI ?
+    XPCOMUtils.generateQI.bind(XPCOMUtils) :
+    ChromeUtils.generateQI.bind(ChromeUtils);
+});
 
 this.userJSDetection = {
   get sandbox() {
@@ -237,7 +243,7 @@ this.dragAndDrop = {
   _messageName: "cpmanager@mozillaonline.com:dragAndDrop",
   _prefKey: "extensions.cmimprove.gesture.enabled",
 
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
+  QueryInterface: generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
 
   get enabled() {
     return Services.prefs.getBoolPref(this._prefKey, false);
@@ -625,7 +631,8 @@ this.mobileBookmarksHack = {
     return this.styleSheet = Services.io.newURI(spec);
   },
   getWinUtils(win) {
-    return win.QueryInterface(Ci.nsIInterfaceRequestor).
+    // https://bugzil.la/1476145 in Fx 63
+    return win.windowUtils || win.QueryInterface(Ci.nsIInterfaceRequestor).
       getInterface(Ci.nsIDOMWindowUtils);
   },
   handleEvent(evt) {
@@ -721,8 +728,8 @@ this.distributorChannelHack = {
   prefSource: "chinaedition.channel",
   prefTarget: "distributor.channel",
 
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver,
-                                         Ci.nsISupportsWeakReference]),
+  QueryInterface: generateQI([Ci.nsIObserver,
+                              Ci.nsISupportsWeakReference]),
 
   _maybeOverrideDistributorChannel() {
     // wait until both prefs are set by distribution.ini
@@ -831,7 +838,7 @@ this.amoDiscoPaneHack = {
 };
 
 this.mozCNGuard = {
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIObserver]),
+  QueryInterface: generateQI([Ci.nsIObserver]),
 
   // nsIObserver
   observe: function MCG_observe(aSubject, aTopic, aData) {
