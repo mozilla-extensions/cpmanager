@@ -71,6 +71,16 @@ XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
     XPCOMUtils.generateQI.bind(XPCOMUtils) :
     ChromeUtils.generateQI.bind(ChromeUtils);
 });
+XPCOMUtils.defineLazyGetter(this, "SessionStartup", () => {
+  // Since Fx 63, https://bugzil.la/1369456
+  try {
+    let spec = "resource:///modules/sessionstore/SessionStartup.jsm";
+    return ChromeUtils.import(spec, {}).SessoinStartup;
+  } catch (ex) {
+    return Cc["@mozilla.org/browser/sessionstartup;1"].
+      getService(Ci.nsISessionStartup);
+  }
+});
 
 this.userJSDetection = {
   get sandbox() {
@@ -268,11 +278,18 @@ this.dragAndDrop = {
   },
 
   openLink(browser, link) {
-    browser.ownerGlobal.gBrowser.loadOneTab(link, {
+    let gBrowser = browser.ownerGlobal.gBrowser;
+    let params = {
       inBackground: true,
       allowThirdPartyFixup: false,
       relatedToCurrent: true
-    });
+    };
+    // Since Fx 63, https://bugzil.la/1362034
+    if (gBrowser.addWebTab) {
+      gBrowser.addWebTab(link, params);
+    } else {
+      gBrowser.loadOneTab(link, params);
+    }
   },
 
   receiveMessage(msg) {
@@ -424,7 +441,7 @@ this.mobileBookmarksHack = {
 
     let main = doc.createElement("vbox");
     main.id = "PanelUI-MOA-mobileBookmarks-main";
-    main.setAttribute("observes", "sync-syncnow-state");
+    main.setAttribute("hidden", "true");
 
     let deck = doc.createElement("deck");
     deck.id = "PanelUI-MOA-mobileBookmarks-deck";
@@ -490,19 +507,17 @@ this.mobileBookmarksHack = {
     secondary.setAttribute("pack", "center");
     secondary.setAttribute("flex", "1");
 
-    for (let { id, observes } of [{
-      id: "PanelUI-MOA-mobileBookmarks-setupsync",
-      observes: "sync-setup-state"
+    for (let { id } of [{
+      id: "PanelUI-MOA-mobileBookmarks-setupsync"
     }, {
-      id: "PanelUI-MOA-mobileBookmarks-reauthsync",
-      observes: "sync-reauth-state"
+      id: "PanelUI-MOA-mobileBookmarks-reauthsync"
     }]) {
       let vbox = doc.createElement("vbox");
       vbox.id = id;
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
       vbox.setAttribute("align", "center");
       vbox.setAttribute("flex", "1");
-      vbox.setAttribute("observes", observes);
+      vbox.setAttribute("hidden", "true");
 
       let image = doc.createElement("image");
       image.className = "fxaSyncIllustration";
@@ -565,12 +580,27 @@ this.mobileBookmarksHack = {
     var subView = evt.target;
     var win = subView.ownerGlobal;
 
+    var syncState = win.UIState.get();
+    for (let [status, boxId] of [
+      [win.UIState.STATUS_NOT_CONFIGURED,
+        "PanelUI-MOA-mobileBookmarks-setupsync"],
+      [win.UIState.STATUS_LOGIN_FAILED,
+        "PanelUI-MOA-mobileBookmarks-reauthsync"],
+      // FIXME: bug 2617
+      // [win.UIState.STATUS_NOT_VERIFIED,
+      //   "PanelUI-MOA-mobileBookmarks-unverified"],
+      [win.UIState.STATUS_SIGNED_IN,
+        "PanelUI-MOA-mobileBookmarks-main"],
+    ]) {
+      win.document.getElementById(boxId).hidden = (status != syncState.status);
+    }
+
     var deck = subView.querySelector("#PanelUI-MOA-mobileBookmarks-deck");
     if (this.isConfiguredToSyncBookmarks) {
       let prefKey = win.BookmarkingUI.MOBILE_BOOKMARKS_PREF;
       if (!Services.prefs.getBoolPref(prefKey, false)) {
         deck.setAttribute("selectedIndex", this.deckIndices.DECK_INDEX_NOCLIENTS);
-        if (win.document.getElementById("sync-syncnow-state").hidden) {
+        if (win.document.getElementById("PanelUI-MOA-mobileBookmarks-main").hidden) {
           this._track("auth", "show");
         } else {
           this._track("noclients", "show");
@@ -1013,10 +1043,8 @@ this.mozCNGuard = {
   maybeOpenStartPages: function MCG_maybeOpenStartPages(aTopic) {
     Services.obs.removeObserver(this, aTopic);
 
-    let sessionStartup = Cc["@mozilla.org/browser/sessionstartup;1"].
-      getService(Ci.nsISessionStartup);
     if (aTopic == "sessionstore-state-finalized" &&
-        sessionStartup.sessionType != sessionStartup.NO_SESSION) {
+        SessionStartup.sessionType != SessionStartup.NO_SESSION) {
       Services.obs.addObserver(this, "sessionstore-windows-restored");
       return;
     }
