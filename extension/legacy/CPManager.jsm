@@ -77,7 +77,7 @@ XPCOMUtils.defineLazyGetter(this, "SessionStartup", () => {
     let spec = "resource:///modules/sessionstore/SessionStartup.jsm";
     let temp = {};
     ChromeUtils.import(spec, temp);
-    return temp.SessoinStartup;
+    return temp.SessionStartup;
   } catch (ex) {
     return Cc["@mozilla.org/browser/sessionstartup;1"].
       getService(Ci.nsISessionStartup);
