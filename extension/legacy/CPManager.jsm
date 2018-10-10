@@ -903,7 +903,7 @@ this.mozCNGuard = {
     if (startPage === null) {
       let temp = {};
       ChromeUtils.import("resource:///modules/HomePage.jsm", temp);
-      startPage = temp.Homepage.get();
+      startPage = temp.HomePage.get();
     }
 
     delete this.startPage;
