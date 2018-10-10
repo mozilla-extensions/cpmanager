@@ -1084,7 +1084,7 @@ this.mozCNGuard = {
         externalURLs.push(uri.asciiSpec);
       }
 
-      this.browserHandler.startPage.split("|").forEach((aPage, aIndex) => {
+      this.startPage.split("|").forEach((aPage, aIndex) => {
         if (aPage === "about:blank") {
           return;
         }
