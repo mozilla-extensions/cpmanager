@@ -897,6 +897,19 @@ this.mozCNGuard = {
       getService(Ci.nsIBrowserHandler);
   },
 
+  get startPage() {
+    let startPage = this.browserHandler.startPage;
+    // Necessary since Fx 63, https://bugzil.la/721211
+    if (startPage === null) {
+      let temp = {};
+      ChromeUtils.import("resource:///modules/HomePage.jsm", temp);
+      startPage = temp.Homepage.get();
+    }
+
+    delete this.startPage;
+    return this.startPage = startPage;
+  },
+
   get startPageChoice() {
     delete this.startPageChoice;
     return this.startPageChoice = Services.prefs.
