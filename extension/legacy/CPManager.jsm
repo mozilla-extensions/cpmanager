@@ -1107,7 +1107,10 @@ this.mozCNGuard = {
         w.PlacesUtils.history.fetch(uri.spec).then(info => {
           title = info && info.title
         }).then(() => {
-          let tab = w.gBrowser.addTab();
+          // Since Fx 63, https://bugzil.la/1362034
+          let tab = w.gBrowser.addWebTab ?
+            w.gBrowser.addWebTab() :
+            w.gBrowser.addTab();
           w.gBrowser.moveTabTo(tab, aIndex);
           w.SessionStore.setTabState(tab, JSON.stringify({
             entries: [{
@@ -1116,7 +1119,7 @@ this.mozCNGuard = {
               triggeringPrincipal_base64: Utils.SERIALIZED_SYSTEMPRINCIPAL
             }]
           }));
-        });
+        }).catch(ex => Cu.reportError(ex));
       });
     }
   }
