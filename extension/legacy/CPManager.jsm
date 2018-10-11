@@ -39,6 +39,8 @@ XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
   "resource://gre/modules/PlacesUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "PlacesUIUtils",
   "resource:///modules/PlacesUIUtils.jsm");
+XPCOMUtils.defineLazyModuleGetter(this, "PageActions",
+  "resource:///modules/PageActions.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "OS",
   "resource://gre/modules/osfile.jsm");
 XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
@@ -193,27 +195,22 @@ this.buttonRemoval = {
     this.removeIt();
   },
 
-  removeIt() {
-    CustomizableUI.addListener(this);
+  observe(subject, topic, data) {
+    // PageActions initialized in the first window, wait a bit before remove it
+    Services.obs.removeObserver(this, topic);
+    Services.tm.dispatchToMainThread(() => {
+      this.removeItForReal();
+    });
   },
 
-  onAreaNodeRegistered(aArea) {
-    if (aArea !== CustomizableUI.AREA_NAVBAR) {
+  removeIt() {
+    // PageActions not initialized, potential conflict with cached addAction
+    if (PageActions._deferredAddActionCalls) {
+      Services.obs.addObserver(this, "browser-delayed-startup-finished");
       return;
     }
 
-    Services.prefs.setBoolPref(this.prefKey, true);
-    CustomizableUI.removeListener(this);
-
-    let placementArea = CustomizableUI.getPlacementOfWidget(this.id);
-    if (!placementArea || placementArea.area !== CustomizableUI.AREA_NAVBAR) {
-      return;
-    }
-
-    if (!CustomizableUI.isWidgetRemovable(this.id)) {
-      return;
-    }
-    CustomizableUI.removeWidgetFromArea(this.id);
+    this.removeItForReal();
   }
 };
 
@@ -224,7 +221,7 @@ this.pocketButtonRemoval = Object.create(buttonRemoval, {
   earlyReturn: {
     value: () => Services.prefs.getChildList("browser.pocket.settings.").length
   },
-  removeIt: {
+  removeItForReal: {
     value() {
       Services.prefs.setBoolPref("extensions.pocket.enabled", false);
       Services.prefs.setBoolPref(this.prefKey, true);
@@ -241,7 +238,7 @@ this.screenshotButtonRemoval = Object.create(buttonRemoval, {
       return Services.prefs.getBoolPref("extensions.screenshots.disabled", false);
     }
   },
-  removeIt: {
+  removeItForReal: {
     value() {
       Services.prefs.setBoolPref("extensions.screenshots.disabled", true);
       Services.prefs.setBoolPref(this.prefKey, true);
