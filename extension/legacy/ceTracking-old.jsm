@@ -157,7 +157,7 @@ const ONEDAY = 24 * 60 * 60 * 1000;
 
 function getLocale() {
   try {
-    return Services.locale.getAppLocaleAsLangTag();
+    return Services.locale.appLocaleAsLangTag || Services.locale.getAppLocaleAsLangTag();
   } catch (ex) {
     return "";
   }
@@ -165,7 +165,12 @@ function getLocale() {
 
 var profileAge = -1;
 async function getAge() {
-  let created = await (new ProfileAge()).created;
+  let created;
+  try {
+    created = await ProfileAge().then(age => age.created);
+  } catch (ex) {
+    created = await (new ProfileAge()).created;
+  }
   profileAge = Math.floor((Date.now() - created) / ONEDAY);
 }
 
