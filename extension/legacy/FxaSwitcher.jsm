@@ -202,10 +202,11 @@ let FxaSwitcher = {
     let brand = useLocalSvc ? "local" : "global";
     let brandText = this._(`fxa.preferences.brand.${brand}`);
 
+    // Since Fx 65, see https://bugzil.la/1429940,1507806
     [
       "#category-sync > .category-name",
-      "#firefoxAccountCategory > .header-name",
-      "#fxaGroup > .search-header > label"
+      "#firefoxAccountCategory > h1, #firefoxAccountCategory > .header-name",
+      "#fxaGroup > .search-header > h2, #fxaGroup > .search-header > label"
     ].forEach(selector => {
       doc.querySelector(selector).textContent = brandText;
     });

@@ -121,9 +121,10 @@ let TrackingNotificationInfoBar = {
   _strings: null,
   _win: null,
 
+  // Since Fx 65, see https://bugzil.la/1471403
   get _notificationBox() {
     delete this._notificationBox;
-    return this._notificationBox = this._win.
+    return this._notificationBox = this._win.gNotificationBox || this._win.
       document.getElementById("global-notificationbox");
   },
 
@@ -132,17 +133,21 @@ let TrackingNotificationInfoBar = {
   },
 
   init(win, strings) {
-    if (this._win) {
-      return;
-    }
-    this._strings = strings;
-    this._win = win;
+    try {
+      if (this._win) {
+        return;
+      }
+      this._strings = strings;
+      this._win = win;
 
-    if (!Services.prefs.getBoolPref(this._prefKey, false) ||
-        !Services.prefs.getBoolPref("extensions.cpmanager.tracking.enabled", false)) {
-      return;
+      if (!Services.prefs.getBoolPref(this._prefKey, false) ||
+          !Services.prefs.getBoolPref("extensions.cpmanager.tracking.enabled", false)) {
+        return;
+      }
+      this._showNotification();
+    } catch (ex) {
+      this._win.console.error(ex);
     }
-    this._showNotification();
   },
 
   _getDataChoicesNotification(name = this._DATA_CHOICES_NOTIFICATION) {

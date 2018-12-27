@@ -111,14 +111,18 @@ this.URL2QR = {
   },
 
   init(win, strings) {
-    this.createElements(win, strings);
+    try {
+      this.createElements(win, strings);
 
-    if (win.gBrowser) {
-      win.gBrowser.addProgressListener(this.listeners.get(win));
-    } else if (win._gBrowser) {
-      win._gBrowser.addProgressListener(this.listeners.get(win));
-    } else {
-      win.console.error("Neither gBrowser or _gBrowser ?");
+      if (win.gBrowser) {
+        win.gBrowser.addProgressListener(this.listeners.get(win));
+      } else if (win._gBrowser) {
+        win._gBrowser.addProgressListener(this.listeners.get(win));
+      } else {
+        win.console.error("Neither gBrowser or _gBrowser ?");
+      }
+    } catch (ex) {
+      win.console.error(ex);
     }
   },
 

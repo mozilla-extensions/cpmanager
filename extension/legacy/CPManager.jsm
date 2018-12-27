@@ -319,8 +319,10 @@ this.dragAndDrop = {
   },
 
   searchText(browser, text) {
-    var engine = Services.search.currentEngine;
+    // See https://bugzil.la/1237648,1493483
+    var engine = Services.search.defaultEngine;
     if (!engine) {
+      browser.ownerGlobal.console.error("No engine available for search");
       return;
     }
 
@@ -357,22 +359,26 @@ this.dragAndDrop = {
 
 this.bookmarkingUIHack = {
   patchBrowserWindow(win) {
-    let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
-    if (bmb_vbt) {
-      let origLabel = bmb_vbt.getAttribute("label");
-      bmb_vbt.setAttribute("label", this._getString("menu.bookmarksToolbar"));
-      bmb_vbt.setAttribute("orig-label", origLabel);
-    }
+    try {
+      let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
+      if (bmb_vbt) {
+        let origLabel = bmb_vbt.getAttribute("label");
+        bmb_vbt.setAttribute("label", this._getString("menu.bookmarksToolbar"));
+        bmb_vbt.setAttribute("orig-label", origLabel);
+      }
 
-    if (win.BookmarkingUI) {
-      let args = [ShortcutUtils.prettifyShortcut(win.document.
-        getElementById(win.BookmarkingUI.BOOKMARK_BUTTON_SHORTCUT))];
-      let unstarredTooltip = this._getString("starButtonOff.tooltip2", args);
+      if (win.BookmarkingUI) {
+        let args = [ShortcutUtils.prettifyShortcut(win.document.
+          getElementById(win.BookmarkingUI.BOOKMARK_BUTTON_SHORTCUT))];
+        let unstarredTooltip = this._getString("starButtonOff.tooltip2", args);
 
-      win.BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
-        delete this._unstarredTooltip;
-        return this._unstarredTooltip = unstarredTooltip;
-      });
+        win.BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
+          delete this._unstarredTooltip;
+          return this._unstarredTooltip = unstarredTooltip;
+        });
+      }
+    } catch (ex) {
+      win.console.error(ex);
     }
   },
   unpatchBrowserWindow(win) {
