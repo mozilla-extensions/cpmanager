@@ -22,8 +22,12 @@ this.chinaPackManager = class extends ExtensionAPI {
     resProto.setSubstitution(RESOURCE_HOST,
       Services.io.newURI("legacy/", null, extension.rootURI));
 
-    ChromeUtils.import("resource://cpmanager-legacy/CPManager.jsm", this);
-    this.mozCNGuard.init({ extension });
+    try {
+      ChromeUtils.import("resource://cpmanager-legacy/CPManager.jsm", this);
+      this.mozCNGuard.init({ extension });
+    } catch (ex) {
+      console.error(ex);
+    }
   }
 
   onShutdown(reason) {
