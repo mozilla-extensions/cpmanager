@@ -4,7 +4,7 @@
 
 "use strict";
 
-/* global Cc, ExtensionAPI, Services, XPCOMUtils */
+/* global Cc, Cu, ExtensionAPI, Services, XPCOMUtils */
 ChromeUtils.import("resource://gre/modules/Services.jsm");
 ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyServiceGetter(this, "resProto",
@@ -31,9 +31,14 @@ this.chinaPackManager = class extends ExtensionAPI {
   }
 
   onShutdown(reason) {
-    this.mozCNGuard.uninit(reason === "APP_SHUTDOWN");
+    try {
+      this.mozCNGuard.uninit(reason === "APP_SHUTDOWN");
+      Cu.unload("resource://cpmanager-legacy/CPManager.jsm");
 
-    resProto.setSubstitution(RESOURCE_HOST, null);
+      resProto.setSubstitution(RESOURCE_HOST, null);
+    } catch (ex) {
+      console.error(ex);
+    }
   }
 
   async sendLegacyMessage(message) {

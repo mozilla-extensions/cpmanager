@@ -1047,6 +1047,22 @@ this.mozCNGuard = {
     CETracking.uninit(isAppShutdown);
     CETrackingLegacy.uninit();
     FxaSwitcher.uninit();
+
+    for (let jsModule of [
+      "ceTracking-old",
+      "ceTracking",
+      "CNSafeBrowsingRegister",
+      "FxaSwitcher",
+      "ShellSvc",
+      "ShellSvcStartup",
+      "URL2QR"
+    ]) {
+      try {
+        Cu.unload(`resource://cpmanager-legacy/${jsModule}.jsm`);
+      } catch (ex) {
+        Cu.reportError(ex);
+      }
+    }
   },
 
   isCEHome: function MCG_isCEHome(aSpec) {
