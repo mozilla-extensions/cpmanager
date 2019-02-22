@@ -5,7 +5,6 @@
 this.EXPORTED_SYMBOLS = ["ShellSvcProxy", "strings"];
 
 const Cc = Components.classes;
-const CD = Components.classesByID;
 const Ci = Components.interfaces;
 const Cr = Components.results;
 const Cu = Components.utils;
@@ -21,7 +20,7 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
 });
 
 const origShellSvcID = "{63c7b9f4-0cc8-43f8-b666-0a661655cb73}";
-const origShellSvc = CD[origShellSvcID].getService(Ci.nsIShellService);
+const origShellSvc = Cc["@mozilla.org/browser/shell-service;1"].getService(Ci.nsIShellService);
 try {
   origShellSvc.QueryInterface(Ci.nsIClassInfo);
 } catch (e) {}
