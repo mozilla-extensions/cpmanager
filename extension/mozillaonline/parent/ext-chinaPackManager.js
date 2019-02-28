@@ -31,8 +31,12 @@ this.chinaPackManager = class extends ExtensionAPI {
   }
 
   onShutdown(reason) {
+    if (reason === "APP_SHUTDOWN") {
+      return;
+    }
+
     try {
-      this.mozCNGuard.uninit(reason === "APP_SHUTDOWN");
+      this.mozCNGuard.uninit();
       Cu.unload("resource://cpmanager-legacy/CPManager.jsm");
 
       resProto.setSubstitution(RESOURCE_HOST, null);

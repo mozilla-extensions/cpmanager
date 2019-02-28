@@ -938,11 +938,7 @@ this.mozCNGuard = {
     CustomizableUI.addListener(this);
   },
 
-  uninitWindowListener(isAppShutdown) {
-    if (isAppShutdown) {
-      return;
-    }
-
+  uninitWindowListener() {
     CustomizableUI.removeListener(this);
 
     for (let win of CustomizableUI.windows) {
@@ -990,11 +986,7 @@ this.mozCNGuard = {
     ShellSvcStartup.init();
   },
 
-  uninitFactories(isAppShutdown) {
-    if (isAppShutdown) {
-      return;
-    }
-
+  uninitFactories() {
     ShellSvcStartup.uninit();
 
     for (let [classID, factory] of this.factories) {
@@ -1027,24 +1019,24 @@ this.mozCNGuard = {
     amoDiscoPaneHack.init();
 
     CETracking.init(strings);
-    CETrackingLegacy.init(isAppStartup);
+    CETrackingLegacy.init();
     FxaSwitcher.init(strings);
 
     // this needs to run after CETracking.init for default prefs
     this.initWindowListener();
   },
 
-  uninit(isAppShutdown, context) {
+  uninit() {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
 
-    this.uninitFactories(isAppShutdown);
-    this.uninitWindowListener(isAppShutdown);
+    this.uninitFactories();
+    this.uninitWindowListener();
 
-    // mozCNSafeBrowsing.uninit(isAppShutdown);
+    // mozCNSafeBrowsing.uninit();
     dragAndDrop.uninit();
     mobileBookmarksHack.uninit();
 
-    CETracking.uninit(isAppShutdown);
+    CETracking.uninit();
     CETrackingLegacy.uninit();
     FxaSwitcher.uninit();
 

@@ -285,11 +285,7 @@ ceTracking.prototype = {
     }
   },
 
-  uninit(isAppShutdown) {
-    if (isAppShutdown) {
-      return;
-    }
-
+  uninit() {
     Services.obs.removeObserver(this, "quit-application");
     delete this._strings;
   },
