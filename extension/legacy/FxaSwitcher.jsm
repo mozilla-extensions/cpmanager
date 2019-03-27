@@ -2,17 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-let EXPORTED_SYMBOLS = ["FxaSwitcher"];
+this.EXPORTED_SYMBOLS = ["FxaSwitcher"];
 
-const { classes: Cc, utils: Cu } = Components;
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this,
-  "fxAccounts", "resource://gre/modules/FxAccounts.jsm");
-XPCOMUtils.defineLazyModuleGetter(this,
-  "FxAccountsConfig", "resource://gre/modules/FxAccountsConfig.jsm");
-XPCOMUtils.defineLazyModuleGetter(this,
-  "Services", "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "fxAccounts": "resource://gre/modules/FxAccounts.jsm", /* global fxAccounts */
+  "FxAccountsConfig": "resource://gre/modules/FxAccountsConfig.jsm", /* global FxAccountsConfig */
+  "Services": "resource://gre/modules/Services.jsm" /* global Services */
+});
 XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });

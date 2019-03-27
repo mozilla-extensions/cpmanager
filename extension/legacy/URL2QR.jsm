@@ -1,13 +1,10 @@
 this.EXPORTED_SYMBOLS = ["URL2QR"];
 
-const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyGetter(this, "require", function() {
-  return Cu.import("resource://devtools/shared/Loader.jsm", {}).
-    devtools.require;
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "require": "resource://devtools/shared/Loader.jsm", /* global require */
+  "Services": "resource://gre/modules/Services.jsm" /* global Services */
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;

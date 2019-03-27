@@ -4,22 +4,18 @@
 
 this.EXPORTED_SYMBOLS = ["ShellSvcProxy", "strings"];
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
-  "resource://gre/modules/PlacesUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "PlacesUtils": "resource://gre/modules/PlacesUtils.jsm", /* global PlacesUtils */
+  "Services": "resource://gre/modules/Services.jsm" /* global Services */
+});
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
-const origShellSvcID = "{63c7b9f4-0cc8-43f8-b666-0a661655cb73}";
 const origShellSvc = Cc["@mozilla.org/browser/shell-service;1"].getService(Ci.nsIShellService);
 try {
   origShellSvc.QueryInterface(Ci.nsIClassInfo);

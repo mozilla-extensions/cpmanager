@@ -1,11 +1,7 @@
 this.EXPORTED_SYMBOLS = ["ceTrackingOld"];
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
-
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{6E12E09F-1942-46F0-8D85-9C6B1D0E6448}");
@@ -13,16 +9,15 @@ const _CONTRACTID = "@mozilla.com.cn/tracking-old;1";
 
 const ACTIVE_TIME_PREF = "extensions.cpmanager@mozillaonline.com.active_time";
 const PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
-const CHANNEL_PREF = "app.chinaedition.channel"
-const DISTRIBUTION_PREF = "distribution.version"
+const CHANNEL_PREF = "app.chinaedition.channel";
+const DISTRIBUTION_PREF = "distribution.version";
 
-Cu.import("resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ProfileAge",
-  "resource://gre/modules/ProfileAge.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "TelemetryReportingPolicy",
-  "resource://gre/modules/TelemetryReportingPolicy.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "TelemetryUtils",
-  "resource://gre/modules/TelemetryUtils.jsm");
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "ProfileAge": "resource://gre/modules/ProfileAge.jsm", /* global ProfileAge */
+  "Services": "resource://gre/modules/Services.jsm", /* global Services */
+  "TelemetryReportingPolicy": "resource://gre/modules/TelemetryReportingPolicy.jsm", /* global TelemetryReportingPolicy */
+  "TelemetryUtils": "resource://gre/modules/TelemetryUtils.jsm" /* global TelemetryUtils */
+});
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
@@ -56,7 +51,7 @@ function getUK() {
   function getUKFile() {
     let file = null;
     try {
-      file = Services.dirsvc.get("DefProfRt", Ci.nsIFile)
+      file = Services.dirsvc.get("DefProfRt", Ci.nsIFile);
       file.append("profiles.log");
     } catch (e) {
       return null;
@@ -83,7 +78,7 @@ function getUK() {
         str += data.value;
       }
       cstream.close(); // this also closes fstream
-      let obj = JSON.parse(str)
+      let obj = JSON.parse(str);
       if (!isUUID(obj.uuid)) {
         throw "invalid uuid [" + obj.uuid + "]";
       }
@@ -180,7 +175,7 @@ function getPluginVersion(name) {
              .getPluginTags({});
   for (var tag of tags) {
     if (tag.name == name) {
-      return tag["version"];
+      return tag.version;
     }
   }
   return "";
@@ -189,7 +184,7 @@ function getPluginVersion(name) {
 function isDefaultBrowser(aForAllTypes) {
   try {
     return Cc["@mozilla.org/browser/shell-service;1"]
-             .getService(Components.interfaces.nsIShellService)
+             .getService(Ci.nsIShellService)
              .isDefaultBrowser(false, aForAllTypes);
   } catch (e) {
     return null;
@@ -242,7 +237,7 @@ function getADUData() {
        + "&default=" + isDefaultBrowser(true)
        + "&defaultHttp=" + isDefaultBrowser(false)
        + "&flash=" + getPluginVersion("Shockwave Flash")
-       + "&tracking=" + getTrackingStatus()
+       + "&tracking=" + getTrackingStatus();
 }
 
 const RETRY_DELAY = 20 * 1000;
@@ -309,4 +304,4 @@ ceTrackingOld.prototype = {
       Services.obs.removeObserver(this, "final-ui-startup");
     } catch (ex) {}
   }
-}
+};

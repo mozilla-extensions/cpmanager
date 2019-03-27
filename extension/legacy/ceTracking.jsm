@@ -3,21 +3,15 @@ this.EXPORTED_SYMBOLS = [
   "TrackingNotificationInfoBar"
 ];
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
-
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{C40350A8-F734-4CFF-99D9-95274D408143}");
 const _CONTRACTID = "@mozilla.com.cn/tracking;1";
 const USAGE_URI = "http://addons.g-fox.cn/tk.gif";
 
-const PK_PREF = "extensions.cpmanager@mozillaonline.com.uuid";
-
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
+ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
   // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
@@ -39,35 +33,10 @@ function usageDataEnabled() {
   }
 }
 
-function generateUUID() {
-  return Cc["@mozilla.org/uuid-generator;1"]
-          .getService(Ci.nsIUUIDGenerator)
-          .generateUUID()
-          .number;
-}
-function isUUID(str) {
-  return str.length == 38;
-}
-
-// profile key
-function getPK() {
-  let uuid = "";
-  try {
-    uuid = Services.prefs.getCharPref(PK_PREF);
-    if (!isUUID(uuid)) {
-      throw "invalid uuid [" + uuid + "]";
-    }
-  } catch (e) {
-    uuid = generateUUID();
-    Services.prefs.setCharPref(PK_PREF, uuid);
-  }
-  return encodeURIComponent(uuid);
-}
-
 function isDefaultBrowser(aForAllTypes) {
   try {
     return Cc["@mozilla.org/browser/shell-service;1"]
-             .getService(Components.interfaces.nsIShellService)
+             .getService(Ci.nsIShellService)
              .isDefaultBrowser(false, aForAllTypes);
   } catch (e) {
     return null;
@@ -235,7 +204,7 @@ ceTracking.prototype = {
 
   track(key) {
     if (typeof this.data[key] == "number") {
-      this.data[key] ++;
+      this.data[key]++;
     } else {
       this.data[key] = 1;
     }
@@ -323,4 +292,4 @@ ceTracking.prototype = {
     win.gPrivacyPane.
       _setupLearnMoreLink("extensions.cpmanager.tracking.infoURL", label.id);
   }
-}
+};

@@ -4,57 +4,39 @@
 
 this.EXPORTED_SYMBOLS = ["mozCNGuard"];
 
-const {
-  classes: Cc, interfaces: Ci, manager: Cm,
-  results: Cr, utils: Cu
-} = Components;
+const { manager: Cm } = Components;
 
 Cu.importGlobalProperties(["URL"]);
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
   return Cc["@mozilla.org/weave/service;1"]
            .getService(Ci.nsISupports)
            .wrappedJSObject;
 });
-XPCOMUtils.defineLazyModuleGetter(this, "Weave",
-  "resource://services-sync/main.js");
-XPCOMUtils.defineLazyModuleGetter(this, "Utils",
-  "resource://gre/modules/sessionstore/Utils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "URL2QR",
-  "resource://cpmanager-legacy/URL2QR.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "TrackingNotificationInfoBar",
-  "resource://cpmanager-legacy/ceTracking.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "strings",
-  "resource://cpmanager-legacy/ShellSvc.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ShortcutUtils",
-  "resource://gre/modules/ShortcutUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ShellSvcStartup",
-  "resource://cpmanager-legacy/ShellSvcStartup.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ShellSvcProxy",
-  "resource://cpmanager-legacy/ShellSvc.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PlacesUtils",
-  "resource://gre/modules/PlacesUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PlacesUIUtils",
-  "resource:///modules/PlacesUIUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "PageActions",
-  "resource:///modules/PageActions.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "OS",
-  "resource://gre/modules/osfile.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "mozCNSafeBrowsing",
-  "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "FxaSwitcher",
-  "resource://cpmanager-legacy/FxaSwitcher.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ExtensionSettingsStore",
-  "resource://gre/modules/ExtensionSettingsStore.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "CustomizableUI",
-  "resource:///modules/CustomizableUI.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ceTracking",
-  "resource://cpmanager-legacy/ceTracking.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "ceTrackingOld",
-  "resource://cpmanager-legacy/ceTracking-old.jsm");
+
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "ceTrackingOld": "resource://cpmanager-legacy/ceTracking-old.jsm", /* global ceTrackingOld */
+  "ceTracking": "resource://cpmanager-legacy/ceTracking.jsm", /* global ceTracking */
+  "CustomizableUI": "resource:///modules/CustomizableUI.jsm", /* global CustomizableUI */
+  "ExtensionSettingsStore": "resource://gre/modules/ExtensionSettingsStore.jsm", /* global ExtensionSettingsStore */
+  "FxaSwitcher": "resource://cpmanager-legacy/FxaSwitcher.jsm", /* global FxaSwitcher */
+  "mozCNSafeBrowsing": "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm", /* global mozCNSafeBrowsing */
+  "OS": "resource://gre/modules/osfile.jsm", /* global OS */
+  "PageActions": "resource:///modules/PageActions.jsm", /* global PageActions */
+  "PlacesUIUtils": "resource:///modules/PlacesUIUtils.jsm", /* global PlacesUIUtils */
+  "PlacesUtils": "resource://gre/modules/PlacesUtils.jsm", /* global PlacesUtils */
+  "Services": "resource://gre/modules/Services.jsm", /* global Services */
+  "ShellSvcProxy": "resource://cpmanager-legacy/ShellSvc.jsm", /* global ShellSvcProxy */
+  "ShellSvcStartup": "resource://cpmanager-legacy/ShellSvcStartup.jsm", /* global ShellSvcStartup */
+  "ShortcutUtils": "resource://gre/modules/ShortcutUtils.jsm", /* global ShortcutUtils */
+  "strings": "resource://cpmanager-legacy/ShellSvc.jsm", /* global strings */
+  "TrackingNotificationInfoBar": "resource://cpmanager-legacy/ceTracking.jsm", /* global TrackingNotificationInfoBar */
+  "URL2QR": "resource://cpmanager-legacy/URL2QR.jsm", /* global URL2QR */
+  "Utils": "resource://gre/modules/sessionstore/Utils.jsm", /* global Utils */
+  "Weave": "resource://services-sync/main.js" /* global Weave */
+});
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -347,7 +329,7 @@ this.dragAndDrop = {
     }
     gMM.broadcastAsyncMessage(this._messageName, {
       listening: this._listening
-    })
+    });
   },
 
   uninit() {
@@ -1116,7 +1098,7 @@ this.mozCNGuard = {
         }
 
         w.PlacesUtils.history.fetch(uri.spec).then(info => {
-          title = info && info.title
+          title = info && info.title;
         }).then(() => {
           // Since Fx 63, https://bugzil.la/1362034
           let tab = w.gBrowser.addWebTab ?

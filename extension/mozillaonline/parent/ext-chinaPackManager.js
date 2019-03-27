@@ -4,9 +4,11 @@
 
 "use strict";
 
-/* global Cc, Cu, ExtensionAPI, Services, XPCOMUtils */
-ChromeUtils.import("resource://gre/modules/Services.jsm");
-ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+/* global ExtensionAPI */
+ChromeUtils.defineModuleGetter(this, "Services",
+  "resource://gre/modules/Services.jsm");
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "@mozilla.org/network/protocol;1?name=resource",
   "nsISubstitutingProtocolHandler");

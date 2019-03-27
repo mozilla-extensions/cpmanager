@@ -3,12 +3,9 @@ this.EXPORTED_SYMBOLS = ["ShellSvcStartup"];
 
 "use strict";
 
-const Ci = Components.interfaces;
 const Cm = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
-const Cu = Components.utils;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
+ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 
 const kOrigShellSvcCid = Components.ID("{63c7b9f4-0cc8-43f8-b666-0a661655cb73}");

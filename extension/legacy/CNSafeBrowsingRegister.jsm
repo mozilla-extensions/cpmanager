@@ -2,20 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { classes: Cc, interfaces: Ci, results: Cr, utils: Cu } = Components;
-
 var EXPORTED_SYMBOLS = ["mozCNSafeBrowsing"];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
+  "resource://gre/modules/XPCOMUtils.jsm");
 
-XPCOMUtils.defineLazyModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "SafeBrowsing",
-  "resource://gre/modules/SafeBrowsing.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "setTimeout",
-  "resource://gre/modules/Timer.jsm");
-XPCOMUtils.defineLazyModuleGetter(this, "clearTimeout",
-  "resource://gre/modules/Timer.jsm");
+XPCOMUtils.defineLazyModuleGetters(this, {
+  "clearTimeout": "resource://gre/modules/Timer.jsm", /* global clearTimeout */
+  "SafeBrowsing": "resource://gre/modules/SafeBrowsing.jsm", /* global SafeBrowsing */
+  "Services": "resource://gre/modules/Services.jsm", /* global Services */
+  "setTimeout": "resource://gre/modules/Timer.jsm" /* global setTimeout */
+});
 
 XPCOMUtils.defineLazyServiceGetter(this, "dbService",
   "@mozilla.org/url-classifier/dbservice;1", "nsIUrlClassifierDBService");
@@ -54,7 +51,7 @@ let mozCNSafeBrowsing = {
     let tableForTypes = {
       "malware": "malwareTable",
       "phish": "phishTable"
-    }
+    };
     for (let type in aListsToLookup) {
       let tablePref = tableForTypes[type];
       let originalTables = this.lookupBranch.getCharPref(tablePref).split(",");
@@ -136,7 +133,7 @@ let mozCNSafeBrowsing = {
     // initialized, so the gethashurl won't be override.
     if (!SafeBrowsing.initialized) {
       this.delayTimeout = setTimeout(() => {
-        this.maybeRegister()
+        this.maybeRegister();
       }, 1e3);
       return;
     }
