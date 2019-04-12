@@ -33,6 +33,7 @@ XPCOMUtils.defineLazyModuleGetters(this, {
   "ShortcutUtils": "resource://gre/modules/ShortcutUtils.jsm", /* global ShortcutUtils */
   "strings": "resource://cpmanager-legacy/ShellSvc.jsm", /* global strings */
   "TrackingNotificationInfoBar": "resource://cpmanager-legacy/ceTracking.jsm", /* global TrackingNotificationInfoBar */
+  "UIState": "resource://services-sync/UIState.jsm", /* global UIState */
   "URL2QR": "resource://cpmanager-legacy/URL2QR.jsm", /* global URL2QR */
   "Utils": "resource://gre/modules/sessionstore/Utils.jsm", /* global Utils */
   "Weave": "resource://services-sync/main.js" /* global Weave */
@@ -567,16 +568,16 @@ this.mobileBookmarksHack = {
     var subView = evt.target;
     var win = subView.ownerGlobal;
 
-    var syncState = win.UIState.get();
+    var syncState = UIState.get();
     for (let [status, boxId] of [
-      [win.UIState.STATUS_NOT_CONFIGURED,
+      [UIState.STATUS_NOT_CONFIGURED,
         "PanelUI-MOA-mobileBookmarks-setupsync"],
-      [win.UIState.STATUS_LOGIN_FAILED,
+      [UIState.STATUS_LOGIN_FAILED,
         "PanelUI-MOA-mobileBookmarks-reauthsync"],
       // FIXME: bug 2617
-      // [win.UIState.STATUS_NOT_VERIFIED,
+      // [UIState.STATUS_NOT_VERIFIED,
       //   "PanelUI-MOA-mobileBookmarks-unverified"],
-      [win.UIState.STATUS_SIGNED_IN,
+      [UIState.STATUS_SIGNED_IN,
         "PanelUI-MOA-mobileBookmarks-main"],
     ]) {
       win.document.getElementById(boxId).hidden = (status != syncState.status);

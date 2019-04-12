@@ -241,7 +241,7 @@ ceTracking.prototype = {
     defBranch.setBoolPref("extensions.cpmanager.tracking.notification.show", true);
     defBranch.setBoolPref("extensions.cpmanager.tracking.enabled", true);
     defBranch.setCharPref("extensions.cpmanager.tracking.infoURL",
-      "http://www.firefox.com.cn/about/participate/#user-privacy");
+      "https://www.firefox.com.cn/about/participate/#user-privacy");
 
     Services.obs.addObserver(this, "privacy-pane-loaded");
     Services.obs.addObserver(this, "quit-application");
@@ -279,7 +279,10 @@ ceTracking.prototype = {
     checkbox.setAttribute("label", this._("ceTracking.label"));
     checkbox.setAttribute("accesskey", this._("ceTracking.accesskey"));
 
-    let label = doc.createElement("label");
+    // Custom Element since Fx 67, see https://bugzil.la/1527495
+    let label = doc.createXULElement ?
+      doc.createXULElement("label", { is: "text-link" }) :
+      doc.createElement("label");
     label.id = "mococnTrackingLearnMore";
     label.classList.add("learnMore");
     label.classList.add("text-link");
