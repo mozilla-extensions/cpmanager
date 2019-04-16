@@ -20,6 +20,7 @@ XPCOMUtils.defineLazyModuleGetters(this, {
   "ceTrackingOld": "resource://cpmanager-legacy/ceTracking-old.jsm", /* global ceTrackingOld */
   "ceTracking": "resource://cpmanager-legacy/ceTracking.jsm", /* global ceTracking */
   "CustomizableUI": "resource:///modules/CustomizableUI.jsm", /* global CustomizableUI */
+  "E10SUtils": "resource://gre/modules/E10SUtils.jsm", /* global E10SUtils */
   "ExtensionSettingsStore": "resource://gre/modules/ExtensionSettingsStore.jsm", /* global ExtensionSettingsStore */
   "FxaSwitcher": "resource://cpmanager-legacy/FxaSwitcher.jsm", /* global FxaSwitcher */
   "mozCNSafeBrowsing": "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm", /* global mozCNSafeBrowsing */
@@ -1110,7 +1111,9 @@ this.mozCNGuard = {
             entries: [{
               url: aPage,
               title,
-              triggeringPrincipal_base64: Utils.SERIALIZED_SYSTEMPRINCIPAL
+              // Since Fx 67, https://bugzil.la/1521549
+              triggeringPrincipal_base64: (E10SUtils.SERIALIZED_SYSTEMPRINCIPAL ||
+                                           Utils.SERIALIZED_SYSTEMPRINCIPAL)
             }]
           }));
         }).catch(ex => Cu.reportError(ex));
