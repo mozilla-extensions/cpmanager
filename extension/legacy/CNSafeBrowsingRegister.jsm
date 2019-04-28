@@ -25,6 +25,13 @@ XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
 
+// Available since Fx 62, https://bugzil.la/1464548
+if (XPCOMUtils.defineLazyGlobalGetters) {
+  XPCOMUtils.defineLazyGlobalGetters(this, ["fetch"]);
+} else {
+  Cu.importGlobalProperties(["fetch"]);
+}
+
 let mozCNSafeBrowsing = {
   providers: [],
 
@@ -65,6 +72,25 @@ let mozCNSafeBrowsing = {
     }
   },
 
+  async getRatio() {
+    let ratios = [0.1, 0.2, 0.4, 0.8, 1.0];
+    try {
+      let response = await fetch("https://safebrowsing-cache.firefox.com.cn/uptake/ratios.json");
+      let json = await response.json();
+      if (Array.isArray(json) && json.length && json.every(item => !isNaN(item))) {
+        ratios = json;
+      }
+    } catch (ex) {
+      Cu.reportError(ex);
+    }
+
+    // Increase ratios on each startup to speed this up a little bit.
+    let branch = Services.prefs.getBranch("extensions.cpmanager.safeflag.");
+    ratios = branch.getCharPref("uptake.0", ratios.join(",")).split(",").map(parseFloat);
+    let percent = 100 * ratios[branch.getIntPref("restart.0", 0)];
+    return branch.getIntPref("percent.0", (isNaN(percent) ? 100 : percent)) / 100;
+  },
+
   init() {
     let baiduBranch = Services.prefs.
       getDefaultBranch("browser.safebrowsing.provider.baidu.");
@@ -86,15 +112,13 @@ let mozCNSafeBrowsing = {
       "phish": ["baidu-phish-shavar"]
     };
 
+    // Keep it aqksb-phish-shavar only if already enabled
     let provider = {
       gethashURL: "https://sb.firefox.com.cn/gethash?pver=2.2",
-      listTypes: ["aqksb-phish-shavar"],
-      name: "anquan.org",
-      ratio: (Services.prefs.getIntPref("extensions.cpmanager.safeflag.percent.0", 10) / 100),
-      reportURL: "https://appeal.anquan.org/?domain=",
+      listTypes: (Services.prefs.getCharPref("extensions.cpmanager.safeflag.listtypes.0",
+        "aqksb-phish-shavar")).split(","),
       slug: "mozcn",
-      updateURL: "https://sb.firefox.com.cn/downloads?pver=2.2",
-      url: "https://www.anquan.org/"
+      updateURL: "https://sb.firefox.com.cn/downloads?pver=2.2"
     };
 
     // Existence of "...provider.{slug}.{last,next}updatetime" prefs will
@@ -102,13 +126,9 @@ let mozCNSafeBrowsing = {
     let prefix = "browser.safebrowsing.provider." + provider.slug + ".";
     if (Services.prefs.getChildList(prefix, {}).length > 0) {
       let providerBranch = Services.prefs.getDefaultBranch(prefix);
-      providerBranch.setCharPref("advisoryName", provider.name);
-      providerBranch.setCharPref("advisoryURL", provider.url);
       providerBranch.setCharPref("gethashURL", provider.gethashURL);
       providerBranch.setCharPref("lists", provider.listTypes.join(","));
       providerBranch.setCharPref("updateURL", provider.updateURL);
-      providerBranch.setCharPref("reportMalwareMistakeURL", provider.reportURL);
-      providerBranch.setCharPref("reportPhishMistakeURL", provider.reportURL);
 
       for (let listType of provider.listTypes) {
         let type = listType.split("-")[1];
@@ -116,6 +136,10 @@ let mozCNSafeBrowsing = {
         listsToLookup[type].push(listType);
       }
     } else {
+      // Switch to m6eb-phish-shavar if aqksb-phish-shavar not already enabled
+      Services.prefs.setCharPref("extensions.cpmanager.safeflag.listtypes.0", "m6eb-phish-shavar");
+      provider.listTypes = ["m6eb-phish-shavar"];
+
       this.providers.push(provider);
     }
 
@@ -140,13 +164,18 @@ let mozCNSafeBrowsing = {
 
     clearTimeout(this.delayTimeout);
 
-    dbService.getTables((tables) => {
+    Promise.all([new Promise(resolve => {
+      dbService.getTables(resolve);
+    }), this.getRatio()]).then(([tables, ratio]) => {
       let listsToLookup = {};
 
       for (let provider of this.providers) {
-        let enableIfNotAlready = Math.random() <= provider.ratio;
+        let enableIfNotAlready = Math.random() <= (provider.ratio || ratio);
+        let prefKey = "extensions.cpmanager.safeflag.restart.0";
+        Services.prefs.setIntPref(prefKey, Services.prefs.getIntPref(prefKey, 0) + 1);
 
         for (let listType of provider.listTypes) {
+          // Looks like this will always be false?
           let alreadyEnabled = tables.indexOf(listType) > -1;
 
           if (!alreadyEnabled && !enableIfNotAlready) {
