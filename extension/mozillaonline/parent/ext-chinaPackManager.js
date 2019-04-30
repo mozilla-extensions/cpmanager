@@ -51,7 +51,8 @@ this.chinaPackManager = class extends ExtensionAPI {
   }
 
   flushCacheOnUpgrade(extension) {
-    if (extension.startupReason !== "ADDON_UPGRADE") {
+    if (extension.startupReason !== "ADDON_UPGRADE" ||
+        Services.vc.compare(Services.appinfo.version, "67.0") < 0) {
       return;
     }
 
