@@ -116,7 +116,7 @@ let mozCNSafeBrowsing = {
     let provider = {
       gethashURL: "https://sb.firefox.com.cn/gethash?pver=2.2",
       listTypes: (Services.prefs.getCharPref("extensions.cpmanager.safeflag.listtypes.0",
-        "aqksb-phish-shavar")).split(","),
+        "aqksb-phish-shavar,m6eb-phish-shavar")).split(","),
       slug: "mozcn",
       updateURL: "https://sb.firefox.com.cn/downloads?pver=2.2"
     };
@@ -135,6 +135,8 @@ let mozCNSafeBrowsing = {
         listsToLookup[type] = listsToLookup[type] || [];
         listsToLookup[type].push(listType);
       }
+
+      this.maybeDisableAQKSB(provider);
     } else {
       // Switch to m6eb-phish-shavar if aqksb-phish-shavar not already enabled
       Services.prefs.setCharPref("extensions.cpmanager.safeflag.listtypes.0", "m6eb-phish-shavar");
@@ -150,7 +152,13 @@ let mozCNSafeBrowsing = {
     }
   },
 
-  uninit() {},
+  maybeDisableAQKSB(provider) {
+    if (!provider.listTypes.includes("aqksb-phish-shavar")) {
+      return;
+    }
+
+    Services.obs.addObserver(this, "safebrowsing-update-finished");
+  },
 
   maybeRegister() {
     // Same here, we need to make sure the internal safe browsing has been
@@ -195,5 +203,27 @@ let mozCNSafeBrowsing = {
 
       this.addListsToLookup(listsToLookup);
     });
+  },
+
+  observe(subject, topic, data) {
+    if (topic !== "safebrowsing-update-finished" || data !== "success") {
+      return;
+    }
+
+    dbService.getTables(tables => {
+      if (tables.split("\n").filter(table => table.startsWith("aqksb-")).length) {
+        return;
+      }
+
+      Services.prefs.setCharPref("extensions.cpmanager.safeflag.listtypes.0", "m6eb-phish-shavar");
+    });
+  },
+
+  uninit() {
+    try {
+      Services.obs.removeObserver(this, "safebrowsing-update-finished");
+    } catch (ex) {
+      Cu.reportError(ex);
+    }
   }
 };
