@@ -73,7 +73,7 @@ let mozCNSafeBrowsing = {
   },
 
   async getRatio() {
-    let ratios = [0.1, 0.2, 0.4, 0.8, 1.0];
+    let ratios = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
     try {
       let response = await fetch("https://safebrowsing-cache.firefox.com.cn/uptake/ratios.json");
       let json = await response.json();
