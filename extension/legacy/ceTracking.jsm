@@ -11,6 +11,8 @@ const _CID = Components.ID("{C40350A8-F734-4CFF-99D9-95274D408143}");
 const _CONTRACTID = "@mozilla.com.cn/tracking;1";
 const USAGE_URI = "http://addons.g-fox.cn/tk.gif";
 
+ChromeUtils.defineModuleGetter(this, "AsyncShutdown",
+  "resource://gre/modules/AsyncShutdown.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
@@ -19,10 +21,6 @@ XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
     XPCOMUtils.generateQI.bind(XPCOMUtils) :
     ChromeUtils.generateQI.bind(ChromeUtils);
 });
-
-function LOG(txt) {
-  Services.console.logStringMessage("tracking: " + txt);
-}
 
 function usageDataEnabled() {
   try {
@@ -43,23 +41,26 @@ function isDefaultBrowser(aForAllTypes) {
   }
 }
 
-function httpGet(url) {
-  try {
-    let xmlHttpRequest = new XMLHttpRequest();
-    xmlHttpRequest.open("GET", url, true);
-    xmlHttpRequest.send(null);
-    xmlHttpRequest.onload = function() {
-      LOG("httpGet:load");
-    };
-    xmlHttpRequest.onerror = function() {
-      LOG("httpGet:error");
-    };
-  } catch (e) {
-    LOG(e);
-  }
+async function httpGet(url) {
+  return new Promise(resolve => {
+    try {
+      let xmlHttpRequest = new XMLHttpRequest();
+      xmlHttpRequest.open("GET", url, true);
+      xmlHttpRequest.send(null);
+      xmlHttpRequest.timeout = 5e3;
+      xmlHttpRequest.onloadend = resolve;
+    } catch (ex) {
+      Cu.reportError(ex);
+      resolve();
+    }
+  });
 }
 
-function sendUsageData(data) {
+async function sendUsageData(data) {
+  if (!usageDataEnabled()) {
+    return "Tracking disabled";
+  }
+
   let str = "";
   for (let i in data) {
     str += "&" + i + "=" + data[i];
@@ -77,11 +78,12 @@ function sendUsageData(data) {
   } catch (e) {}
 
   if (str == "") {
-    return;
+    return "Nothing to track";
   }
+
   let tracking_random = Math.random();
   str = USAGE_URI + "?when=quit&r=" + tracking_random + str;
-  httpGet(str);
+  return httpGet(str);
 }
 
 let TrackingNotificationInfoBar = {
@@ -226,11 +228,6 @@ ceTracking.prototype = {
       case "privacy-pane-loaded":
         this.addPrefs(aSubject);
         break;
-      case "quit-application":
-        if (this.ude) {
-          sendUsageData(this.data);
-        }
-        break;
     }
   },
 
@@ -244,18 +241,13 @@ ceTracking.prototype = {
       "https://www.firefox.com.cn/about/participate/#user-privacy");
 
     Services.obs.addObserver(this, "privacy-pane-loaded");
-    Services.obs.addObserver(this, "quit-application");
 
-    // seems to be an attempt to cache the dns record?
-    if (this.ude) {
-      let tracking_random = Math.random();
-      let str = USAGE_URI + "?when=run&r=" + tracking_random;
-      httpGet(str);
-    }
+    AsyncShutdown.quitApplicationGranted.addBlocker(
+      "ceTracking shutdown", sendUsageData);
   },
 
   uninit() {
-    Services.obs.removeObserver(this, "quit-application");
+    AsyncShutdown.quitApplicationGranted.removeBlocker(sendUsageData);
     delete this._strings;
   },
 
