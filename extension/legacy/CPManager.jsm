@@ -834,7 +834,7 @@ this.trackingProtectionHack = {
 
 this.amoDiscoPaneHack = {
   get prefs() {
-    let branch = "extensions.webservice.";
+    let branch = "extensions.";
     delete this.prefs;
     return this.prefs = Services.prefs.getDefaultBranch(branch);
   },
@@ -845,11 +845,14 @@ this.amoDiscoPaneHack = {
 
   defaultPrefTweak() {
     try {
-      let url = new URL(this.prefs.getCharPref("discoverURL"));
+      this.prefs.setBoolPref("htmlaboutaddons.discover.enabled", false);
+      this.prefs.setBoolPref("htmlaboutaddons.recommendations.enabled", false);
+
+      let url = new URL(this.prefs.getCharPref("webservice.discoverURL"));
       if (!url.searchParams.has("edition")) {
         url.searchParams.append("edition", "china");
       }
-      this.prefs.setCharPref("discoverURL", url.href);
+      this.prefs.setCharPref("webservice.discoverURL", url.href);
     } catch (ex) {
       Cu.reportError(ex);
     }
