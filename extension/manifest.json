@@ -8,9 +8,9 @@
     },
     "background": {
       "scripts": [
-        "clearHistory.js",
-        "tracking.js",
-        "undoCloseTab.js"
+        "bg/clearHistory.js",
+        "bg/tracking.js",
+        "bg/undoCloseTab.js"
       ]
     },
     "browser_action": {
@@ -46,7 +46,7 @@
     "name": "__MSG_extensionName__",
     "options_ui": {
       "browser_style": true,
-      "page": "options.html"
+      "page": "options/options.html"
     },
     "permissions": [
       "history",
