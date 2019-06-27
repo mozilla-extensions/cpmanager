@@ -35,8 +35,9 @@ this.chinaPackManager = class extends ExtensionAPI {
     }
   }
 
-  onShutdown(reason) {
-    if (reason === "APP_SHUTDOWN") {
+  onShutdown(isAppShutdownOrReason) {
+    // Boolean isAppShutdown since Fx 68, https://bugzil.la/1549192
+    if (isAppShutdownOrReason === true || isAppShutdownOrReason === "APP_SHUTDOWN") {
       return;
     }
 
