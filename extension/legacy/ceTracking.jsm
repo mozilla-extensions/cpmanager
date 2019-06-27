@@ -22,6 +22,8 @@ XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
     ChromeUtils.generateQI.bind(ChromeUtils);
 });
 
+const keyedCount = {};
+
 function usageDataEnabled() {
   try {
     return !Services.prefs.getBoolPref("extensions.cpmanager.tracking.notification.show") &&
@@ -56,14 +58,14 @@ async function httpGet(url) {
   });
 }
 
-async function sendUsageData(data) {
+async function sendUsageData() {
   if (!usageDataEnabled()) {
     return "Tracking disabled";
   }
 
   let str = "";
-  for (let i in data) {
-    str += "&" + i + "=" + data[i];
+  for (let i in keyedCount) {
+    str += "&" + i + "=" + keyedCount[i];
   }
 
   try {
@@ -193,22 +195,19 @@ ceTracking.prototype = {
   QueryInterface: generateQI([Ci.nsIObserver,
                               Ci.nsISupportsWeakReference]),
 
-  // tracking key:count
-  data: {},
-
   _(key) {
     return this._strings._(key);
   },
 
   trackPrefs(key, value) {
-    this.data[key] = value;
+    keyedCount[key] = value;
   },
 
   track(key) {
-    if (typeof this.data[key] == "number") {
-      this.data[key]++;
+    if (typeof keyedCount[key] == "number") {
+      keyedCount[key]++;
     } else {
-      this.data[key] = 1;
+      keyedCount[key] = 1;
     }
   },
 
