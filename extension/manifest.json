@@ -42,6 +42,10 @@
       }
     },
     "homepage_url": "http://www.firefox.com.cn/",
+    "icons": {
+      "64": "icons/extensionGeneric.svg",
+      "128": "icons/extensionGeneric.svg"
+    },
     "manifest_version": 2,
     "name": "__MSG_extensionName__",
     "options_ui": {
