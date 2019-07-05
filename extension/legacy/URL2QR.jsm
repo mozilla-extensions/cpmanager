@@ -137,12 +137,15 @@ this.URL2QR = {
 
   createElements(win, strings) {
     let doc = win.document;
+    let createElement = (doc instanceof win.HTMLDocument ?
+                         doc.createXULElement :
+                         doc.createElement).bind(doc);
 
     let winUtils = this.getWinUtils(win);
     winUtils.loadSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
     let mainPopupSet = doc.getElementById("mainPopupSet");
-    let popup = doc.createElement("panel");
+    let popup = createElement("panel");
     popup.id = "mo-url2qr-popup";
     popup.setAttribute("type", "arrow");
     popup.setAttribute("noautofocus", "true");
@@ -152,10 +155,10 @@ this.URL2QR = {
     popup.addEventListener("popupshowing", this);
     popup.addEventListener("popupshown", this);
 
-    let popupImage = doc.createElement("image");
+    let popupImage = createElement("image");
 
-    let hbox = doc.createElement("hbox");
-    let label = doc.createElement("label");
+    let hbox = createElement("hbox");
+    let label = createElement("label");
     label.setAttribute("value", strings._("URL2QR.instructions"));
     hbox.appendChild(label);
 
@@ -164,7 +167,7 @@ this.URL2QR = {
     mainPopupSet.appendChild(popup);
 
     let pageActionButtons = doc.getElementById("page-action-buttons");
-    let popupAnchor = doc.createElement("image");
+    let popupAnchor = createElement("image");
     popupAnchor.id = "mo-url2qr-icon";
     popupAnchor.classList.add("urlbar-button");
     popupAnchor.classList.add("urlbar-page-action");

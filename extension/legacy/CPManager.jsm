@@ -407,6 +407,9 @@ this.mobileBookmarksHack = {
   },
   onBeforeCreated(doc) {
     let win = doc.defaultView;
+    let createElement = (doc instanceof win.HTMLDocument ?
+                         doc.createXULElement :
+                         doc.createElement).bind(doc);
 
     win.MOA = win.MOA || {};
     win.MOA.Improve = win.MOA.Improve || {};
@@ -420,19 +423,19 @@ this.mobileBookmarksHack = {
 
     let parent = doc.getElementById("appMenu-multiView");
 
-    let panelview = doc.createElement("panelview");
+    let panelview = createElement("panelview");
     panelview.id = this.viewId;
     panelview.className = "PanelUI-subView";
     panelview.setAttribute("flex", "1");
 
-    let body = doc.createElement("vbox");
+    let body = createElement("vbox");
     body.className = "panel-subview-body";
 
-    let main = doc.createElement("vbox");
+    let main = createElement("vbox");
     main.id = "PanelUI-MOA-mobileBookmarks-main";
     main.setAttribute("hidden", "true");
 
-    let deck = doc.createElement("deck");
+    let deck = createElement("deck");
     deck.id = "PanelUI-MOA-mobileBookmarks-deck";
 
     for (let { id, titleKey, labelKey, buttonKey, command } of [{
@@ -449,37 +452,37 @@ this.mobileBookmarksHack = {
       // openWebLinkIn introduced in https://bugzil.la/1374741 (Fx 61) to provide the mandatory (null) principal
       command: "(window.openWebLinkIn || window.openUILinkIn)('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"
     }]) {
-      let pane = doc.createElement("hbox");
+      let pane = createElement("hbox");
       pane.id = id;
       pane.setAttribute("pack", "center");
       pane.setAttribute("flex", "1");
 
-      let vbox = doc.createElement("vbox");
+      let vbox = createElement("vbox");
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
       vbox.setAttribute("align", "center");
 
-      let imageBox = doc.createElement("hbox");
+      let imageBox = createElement("hbox");
       imageBox.setAttribute("pack", "center");
 
-      let image = doc.createElement("image");
+      let image = createElement("image");
       image.className = "fxaSyncIllustration";
       imageBox.appendChild(image);
       vbox.appendChild(imageBox);
 
-      let title = doc.createElement("label");
+      let title = createElement("label");
       title.className = "PanelUI-MOA-mobileBookmarks-instruction-title";
       title.textContent = this._(`cp.moaMobileBookmarks.${titleKey}.title`);
       vbox.appendChild(title);
 
-      let label = doc.createElement("label");
+      let label = createElement("label");
       label.className = "PanelUI-MOA-mobileBookmarks-instruction-label";
       label.textContent = this._(`cp.moaMobileBookmarks.${labelKey}.label`);
       vbox.appendChild(label);
 
-      let buttonBox = doc.createElement("hbox");
+      let buttonBox = createElement("hbox");
       buttonBox.setAttribute("pack", "center");
 
-      let button = doc.createElement("toolbarbutton");
+      let button = createElement("toolbarbutton");
       button.className = "PanelUI-MOA-mobileBookmarks-prefs-button";
       button.setAttribute("label", this._(`cp.moaMobileBookmarks.${buttonKey}.label`));
       button.setAttribute("oncommand", command);
@@ -492,7 +495,7 @@ this.mobileBookmarksHack = {
     main.appendChild(deck);
     body.appendChild(main);
 
-    let secondary = doc.createElement("hbox");
+    let secondary = createElement("hbox");
     secondary.setAttribute("pack", "center");
     secondary.setAttribute("flex", "1");
 
@@ -501,28 +504,28 @@ this.mobileBookmarksHack = {
     }, {
       id: "PanelUI-MOA-mobileBookmarks-reauthsync"
     }]) {
-      let vbox = doc.createElement("vbox");
+      let vbox = createElement("vbox");
       vbox.id = id;
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
       vbox.setAttribute("align", "center");
       vbox.setAttribute("flex", "1");
       vbox.setAttribute("hidden", "true");
 
-      let image = doc.createElement("image");
+      let image = createElement("image");
       image.className = "fxaSyncIllustration";
       vbox.appendChild(image);
 
-      let title = doc.createElement("label");
+      let title = createElement("label");
       title.className = "PanelUI-MOA-mobileBookmarks-instruction-title";
       title.textContent = this._("cp.moaMobileBookmarks.notsignedin.title");
       vbox.appendChild(title);
 
-      let label = doc.createElement("label");
+      let label = createElement("label");
       label.className = "PanelUI-MOA-mobileBookmarks-instruction-label";
       label.textContent = this._("cp.moaMobileBookmarks.generic.label");
       vbox.appendChild(label);
 
-      let button = doc.createElement("toolbarbutton");
+      let button = createElement("toolbarbutton");
       button.className = "PanelUI-MOA-mobileBookmarks-prefs-button";
       button.setAttribute("label", this._("cp.moaMobileBookmarks.signin.label"));
       button.setAttribute("oncommand", "MOA.Improve.MobileBookmarks.openPrefs(window, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');");
@@ -535,7 +538,7 @@ this.mobileBookmarksHack = {
     parent.appendChild(panelview);
 
     let mainPopupSet = doc.getElementById("mainPopupSet");
-    let menupopup = doc.createElement("menupopup");
+    let menupopup = createElement("menupopup");
     menupopup.id = this.bookmarksPopupId;
     menupopup.setAttribute("placespopup", "true");
     menupopup.setAttribute("context", "placesContext");
