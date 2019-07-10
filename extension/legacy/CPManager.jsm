@@ -848,14 +848,22 @@ this.amoDiscoPaneHack = {
 
   defaultPrefTweak() {
     try {
-      this.prefs.setBoolPref("htmlaboutaddons.discover.enabled", false);
-      this.prefs.setBoolPref("htmlaboutaddons.recommendations.enabled", false);
-
-      let url = new URL(this.prefs.getCharPref("webservice.discoverURL"));
-      if (!url.searchParams.has("edition")) {
-        url.searchParams.append("edition", "china");
+      for (let prefKey of [
+        // Fx 68+, Introduced & enabled in https://bugzil.la/1546248,1555012
+        "getAddons.discovery.api_url",
+        "webservice.discoverURL"
+      ]) {
+        let url = new URL(this.prefs.getCharPref(prefKey));
+        if (!url.searchParams.has("edition")) {
+          // url.searchParams.append will encode %LOCALE% into %25LOCALE%25
+          if (url.search.length) {
+            url.search = `${url.search}&edition=china`;
+          } else {
+            url.search = "?edition=china";
+          }
+        }
+        this.prefs.setCharPref(prefKey, url.href);
       }
-      this.prefs.setCharPref("webservice.discoverURL", url.href);
     } catch (ex) {
       Cu.reportError(ex);
     }
