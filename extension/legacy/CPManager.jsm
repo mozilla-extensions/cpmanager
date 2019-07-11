@@ -407,8 +407,8 @@ this.mobileBookmarksHack = {
   },
   onBeforeCreated(doc) {
     let win = doc.defaultView;
-    let createElement = (doc instanceof win.HTMLDocument ?
-                         doc.createXULElement :
+    // Since Fx 69, https://bugzil.la/1551320
+    let createElement = (doc.createXULElement ||
                          doc.createElement).bind(doc);
 
     win.MOA = win.MOA || {};

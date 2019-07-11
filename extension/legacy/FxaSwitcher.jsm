@@ -115,9 +115,12 @@ let FxaSwitcher = {
     };
 
     let doc = subject.document;
+    // Since Fx 69, https://bugzil.la/1551320
+    let createElement = (doc.createXULElement ||
+                         doc.createElement).bind(doc);
 
     let noFxaAccount = doc.getElementById("noFxaAccount");
-    let label = doc.createElement("label");
+    let label = createElement("label");
     label.id = "mococnFxaSwitcher";
     label.classList.add("text-link");
     label.addEventListener("click", this);

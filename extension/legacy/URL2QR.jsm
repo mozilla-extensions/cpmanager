@@ -137,8 +137,8 @@ this.URL2QR = {
 
   createElements(win, strings) {
     let doc = win.document;
-    let createElement = (doc instanceof win.HTMLDocument ?
-                         doc.createXULElement :
+    // Since Fx 69, https://bugzil.la/1551320
+    let createElement = (doc.createXULElement ||
                          doc.createElement).bind(doc);
 
     let winUtils = this.getWinUtils(win);
