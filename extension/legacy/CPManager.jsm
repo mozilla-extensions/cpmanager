@@ -870,6 +870,40 @@ this.amoDiscoPaneHack = {
   }
 };
 
+this.fxaRelatedHack = {
+  get prefs() {
+    delete this.prefs;
+    return this.prefs = Services.prefs.getDefaultBranch("");
+  },
+
+  init() {
+    this.defaultPrefTweak();
+  },
+
+  defaultPrefTweak() {
+    for (let prefKey of [
+      // instead of setting the proper "browser.contentblocking.report.manage_devices.url"
+      "browser.contentblocking.report.lockwise.enabled",
+      "browser.contentblocking.report.monitor.enabled",
+    ]) {
+      this.prefs.setBoolPref(prefKey, false);
+    }
+
+    for (let prefKey of [
+      "signon.management.page.hideMobileFooter",
+    ]) {
+      this.prefs.setBoolPref(prefKey, true);
+    }
+
+    for (let prefKey of [
+      "identity.fxaccounts.service.monitorLoginUrl",
+      "identity.fxaccounts.service.sendLoginUrl",
+    ]) {
+      this.prefs.setCharPref(prefKey, "");
+    }
+  }
+};
+
 this.mozCNGuard = {
   QueryInterface: generateQI([Ci.nsIObserver]),
 
@@ -886,6 +920,7 @@ this.mozCNGuard = {
         onboardingTourHack.defaultPrefTweak();
         trackingProtectionHack.defaultPrefTweak();
         amoDiscoPaneHack.defaultPrefTweak();
+        fxaRelatedHack.defaultPrefTweak();
         break;
     }
   },
@@ -1015,6 +1050,7 @@ this.mozCNGuard = {
     onboardingTourHack.init();
     trackingProtectionHack.init();
     amoDiscoPaneHack.init();
+    fxaRelatedHack.init();
 
     CETracking.init(strings);
     CETrackingLegacy.init();
