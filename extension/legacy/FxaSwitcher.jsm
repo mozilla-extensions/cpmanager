@@ -195,6 +195,10 @@ let FxaSwitcher = {
   },
 
   updateStrings(doc) {
+    if (Services.vc.compare(Services.appinfo.version, "67.0") >= 0) {
+      return;
+    }
+
     let useLocalSvc = this.useLocalSvc;
 
     let action = useLocalSvc ? "switchToGlobal" : "switchToLocal";
