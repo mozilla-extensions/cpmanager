@@ -195,15 +195,15 @@ let FxaSwitcher = {
   },
 
   updateStrings(doc) {
-    if (Services.vc.compare(Services.appinfo.version, "67.0") >= 0) {
-      return;
-    }
-
     let useLocalSvc = this.useLocalSvc;
 
     let action = useLocalSvc ? "switchToGlobal" : "switchToLocal";
     let actionText = this._(`fxa.preferences.action.${action}`);
     doc.getElementById("mococnFxaSwitcher").setAttribute("value", actionText);
+
+    if (Services.vc.compare(Services.appinfo.version, "67.0") >= 0) {
+      return;
+    }
 
     let brand = useLocalSvc ? "local" : "global";
     let brandText = this._(`fxa.preferences.brand.${brand}`);
