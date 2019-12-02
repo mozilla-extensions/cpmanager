@@ -68,7 +68,6 @@ let FxaSwitcher = {
       case 0:
         if (!isSignedIn) {
           this.switchToLocal();
-          this.onlySyncBookmark();
         }
         // intentionally no break
       case 1:
@@ -146,17 +145,6 @@ let FxaSwitcher = {
       checkbox.setAttribute("onsynctopreference",
         "return mozCNSyncHack.onSyncToEnablePref(this);");
     });
-  },
-
-  onlySyncBookmark() {
-    // What about new engines like addresses, creditcards etc.?
-    let toDecline = ["addons", "history", "passwords", "prefs", "tabs"];
-
-    toDecline.forEach(aKey => {
-      Services.prefs.setBoolPref("services.sync.engine." + aKey, false);
-    });
-    toDecline = toDecline.join(",");
-    Services.prefs.setCharPref("services.sync.declinedEngines", toDecline);
   },
 
   switchService(evt) {
