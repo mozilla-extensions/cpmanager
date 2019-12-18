@@ -8,29 +8,18 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "clearTimeout": "resource://gre/modules/Timer.jsm", /* global clearTimeout */
-  "SafeBrowsing": "resource://gre/modules/SafeBrowsing.jsm", /* global SafeBrowsing */
-  "Services": "resource://gre/modules/Services.jsm", /* global Services */
-  "setTimeout": "resource://gre/modules/Timer.jsm" /* global setTimeout */
+  clearTimeout: "resource://gre/modules/Timer.jsm",
+  SafeBrowsing: "resource://gre/modules/SafeBrowsing.jsm",
+  Services: "resource://gre/modules/Services.jsm",
+  setTimeout: "resource://gre/modules/Timer.jsm",
 });
 
 XPCOMUtils.defineLazyServiceGetter(this, "dbService",
   "@mozilla.org/url-classifier/dbservice;1", "nsIUrlClassifierDBService");
-XPCOMUtils.defineLazyServiceGetter(this, "gMM",
-  "@mozilla.org/globalmessagemanager;1", "nsIMessageListenerManager");
 XPCOMUtils.defineLazyServiceGetter(this, "listManager",
   "@mozilla.org/url-classifier/listmanager;1", "nsIUrlListManager");
 
-XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
-  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
-
-// Available since Fx 62, https://bugzil.la/1464548
-if (XPCOMUtils.defineLazyGlobalGetters) {
-  XPCOMUtils.defineLazyGlobalGetters(this, ["fetch"]);
-} else {
-  Cu.importGlobalProperties(["fetch"]);
-}
+XPCOMUtils.defineLazyGlobalGetters(this, ["fetch"]);
 
 let mozCNSafeBrowsing = {
   providers: [],
@@ -57,7 +46,7 @@ let mozCNSafeBrowsing = {
     // Enable lookup of additional list types.
     let tableForTypes = {
       "malware": "malwareTable",
-      "phish": "phishTable"
+      "phish": "phishTable",
     };
     for (let type in aListsToLookup) {
       let tablePref = tableForTypes[type];
@@ -109,7 +98,7 @@ let mozCNSafeBrowsing = {
 
     let listsToLookup = {
       "malware": ["baidu-malware-shavar"],
-      "phish": ["baidu-phish-shavar"]
+      "phish": ["baidu-phish-shavar"],
     };
 
     // Keep it aqksb-phish-shavar only if already enabled
@@ -118,7 +107,7 @@ let mozCNSafeBrowsing = {
       listTypes: (Services.prefs.getCharPref("extensions.cpmanager.safeflag.listtypes.0",
         "aqksb-phish-shavar,m6eb-phish-shavar")).split(","),
       slug: "mozcn",
-      updateURL: "https://sb.firefox.com.cn/downloads?pver=2.2"
+      updateURL: "https://sb.firefox.com.cn/downloads?pver=2.2",
     };
 
     // Existence of "...provider.{slug}.{last,next}updatetime" prefs will
@@ -225,5 +214,5 @@ let mozCNSafeBrowsing = {
     } catch (ex) {
       Cu.reportError(ex);
     }
-  }
+  },
 };

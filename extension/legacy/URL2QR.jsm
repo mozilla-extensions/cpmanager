@@ -3,26 +3,20 @@ this.EXPORTED_SYMBOLS = ["URL2QR"];
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "require": "resource://devtools/shared/Loader.jsm", /* global require */
-  "Services": "resource://gre/modules/Services.jsm" /* global Services */
+  require: "resource://devtools/shared/Loader.jsm",
+  Services: "resource://gre/modules/Services.jsm",
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
-XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
-  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
-  return XPCOMUtils.generateQI ?
-    XPCOMUtils.generateQI.bind(XPCOMUtils) :
-    ChromeUtils.generateQI.bind(ChromeUtils);
 });
 
 function Listener(win) {
   this.win = win;
 }
 Listener.prototype = {
-  QueryInterface: generateQI([
+  QueryInterface: ChromeUtils.generateQI([
     Ci.nsISupportWeakReference,
-    Ci.nsIWebProgressListener
+    Ci.nsIWebProgressListener,
   ]),
   onStateChange() {},
   onProgressChange() {},
@@ -37,7 +31,7 @@ Listener.prototype = {
     popupAnchor.hidden = !(aUri.scheme == "http" ||
                            aUri.scheme == "https" ||
                            aUri.scheme == "ftp");
-  }
+  },
 };
 
 this.URL2QR = {
@@ -129,19 +123,13 @@ this.URL2QR = {
     this.destroyElements(win);
   },
 
-  getWinUtils(win) {
-    // https://bugzil.la/1476145 in Fx 63
-    return win.windowUtils || win.QueryInterface(Ci.nsIInterfaceRequestor).
-      getInterface(Ci.nsIDOMWindowUtils);
-  },
-
   createElements(win, strings) {
     let doc = win.document;
     // Since Fx 69, https://bugzil.la/1551320
     let createElement = (doc.createXULElement ||
                          doc.createElement).bind(doc);
 
-    let winUtils = this.getWinUtils(win);
+    let winUtils = win.windowUtils;
     winUtils.loadSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
     let mainPopupSet = doc.getElementById("mainPopupSet");
@@ -181,7 +169,7 @@ this.URL2QR = {
   },
 
   destroyElements(win) {
-    let winUtils = this.getWinUtils(win);
+    let winUtils = win.windowUtils;
     winUtils.removeSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
     let elements = this.elements.get(win);
@@ -196,7 +184,7 @@ this.URL2QR = {
 
     this.elements.delete(win);
     this.listeners.delete(win);
-  }
+  },
 };
 
 XPCOMUtils.defineLazyPreferenceGetter(URL2QR, "enabled", URL2QR.prefKey);

@@ -41,5 +41,5 @@ this.ShellSvcStartup = {
     // does this work?
     Cm.registerFactory(kOrigShellSvcCid, "",
                        kShellSvcContractId, null);
-  }
+  },
 };

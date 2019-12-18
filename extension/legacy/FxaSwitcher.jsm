@@ -8,9 +8,9 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "fxAccounts": "resource://gre/modules/FxAccounts.jsm", /* global fxAccounts */
-  "FxAccountsConfig": "resource://gre/modules/FxAccountsConfig.jsm", /* global FxAccountsConfig */
-  "Services": "resource://gre/modules/Services.jsm" /* global Services */
+  fxAccounts: "resource://gre/modules/FxAccounts.jsm",
+  FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.jsm",
+  Services: "resource://gre/modules/Services.jsm",
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -110,7 +110,7 @@ let FxaSwitcher = {
           checkbox.checked = true;
         }
         return undefined;
-      }
+      },
     };
 
     let doc = subject.document;
@@ -188,27 +188,5 @@ let FxaSwitcher = {
     let action = useLocalSvc ? "switchToGlobal" : "switchToLocal";
     let actionText = this._(`fxa.preferences.action.${action}`);
     doc.getElementById("mococnFxaSwitcher").setAttribute("value", actionText);
-
-    if (Services.vc.compare(Services.appinfo.version, "67.0") >= 0) {
-      return;
-    }
-
-    let brand = useLocalSvc ? "local" : "global";
-    let brandText = this._(`fxa.preferences.brand.${brand}`);
-
-    // Since Fx 65, see https://bugzil.la/1429940,1507806
-    [
-      "#category-sync > .category-name",
-      "#firefoxAccountCategory > h1, #firefoxAccountCategory > .header-name",
-      "#fxaGroup > .search-header > h2, #fxaGroup > .search-header > label"
-    ].forEach(selector => {
-      doc.querySelector(selector).textContent = brandText;
-    });
-
-    [
-      "#category-sync"
-    ].forEach(selector => {
-      doc.querySelector(selector).tooltipText = brandText;
-    });
-  }
+  },
 };

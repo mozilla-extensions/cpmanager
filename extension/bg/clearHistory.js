@@ -10,13 +10,13 @@
     "-2": 7,
     "-3": 30,
     "-4": DEFAULT_DAYS_TO_KEEP,
-    "-6": 365
+    "-6": 365,
   };
 
   async function getDaysToKeep() {
     let {
       [DAYS_KEY]: daysToKeep,
-      [ENABLED_KEY]: enabled
+      [ENABLED_KEY]: enabled,
     } = await browser.storage.local.get([DAYS_KEY, ENABLED_KEY]);
 
     if (enabled !== undefined) {
@@ -27,11 +27,11 @@
     }
 
     let {
-      [LEGACY_PREF_KEY]: legacyPrefVal
+      [LEGACY_PREF_KEY]: legacyPrefVal,
     } = await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
       dir: "bg2legacy",
       type: "migratePrefs",
-      prefKeys: [LEGACY_PREF_KEY]
+      prefKeys: [LEGACY_PREF_KEY],
     });
     if (DEBUG) {
       console.log(`"${LEGACY_PREF_KEY}" is ${legacyPrefVal}`);
@@ -55,7 +55,7 @@
 
     await browser.storage.local.set({
       [DAYS_KEY]: daysToKeep,
-      [ENABLED_KEY]: enabled
+      [ENABLED_KEY]: enabled,
     });
     return enabled ? DEFAULT_DAYS_TO_KEEP : 0;
   }
@@ -79,7 +79,7 @@
 
     browser.history.deleteRange({
       startTime: 0,
-      endTime: Date.now() - daysToKeep * 86400e3
+      endTime: Date.now() - daysToKeep * 86400e3,
     });
   }
 

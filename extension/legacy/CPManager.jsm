@@ -6,8 +6,6 @@ this.EXPORTED_SYMBOLS = ["mozCNGuard"];
 
 const { manager: Cm } = Components;
 
-Cu.importGlobalProperties(["URL"]);
-
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
@@ -17,27 +15,28 @@ XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
 });
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "ceTrackingOld": "resource://cpmanager-legacy/ceTracking-old.jsm", /* global ceTrackingOld */
-  "ceTracking": "resource://cpmanager-legacy/ceTracking.jsm", /* global ceTracking */
-  "CustomizableUI": "resource:///modules/CustomizableUI.jsm", /* global CustomizableUI */
-  "E10SUtils": "resource://gre/modules/E10SUtils.jsm", /* global E10SUtils */
-  "ExtensionSettingsStore": "resource://gre/modules/ExtensionSettingsStore.jsm", /* global ExtensionSettingsStore */
-  "FxaSwitcher": "resource://cpmanager-legacy/FxaSwitcher.jsm", /* global FxaSwitcher */
-  "mozCNSafeBrowsing": "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm", /* global mozCNSafeBrowsing */
-  "OS": "resource://gre/modules/osfile.jsm", /* global OS */
-  "PageActions": "resource:///modules/PageActions.jsm", /* global PageActions */
-  "PlacesUIUtils": "resource:///modules/PlacesUIUtils.jsm", /* global PlacesUIUtils */
-  "PlacesUtils": "resource://gre/modules/PlacesUtils.jsm", /* global PlacesUtils */
-  "Services": "resource://gre/modules/Services.jsm", /* global Services */
-  "ShellSvcProxy": "resource://cpmanager-legacy/ShellSvc.jsm", /* global ShellSvcProxy */
-  "ShellSvcStartup": "resource://cpmanager-legacy/ShellSvcStartup.jsm", /* global ShellSvcStartup */
-  "ShortcutUtils": "resource://gre/modules/ShortcutUtils.jsm", /* global ShortcutUtils */
-  "strings": "resource://cpmanager-legacy/ShellSvc.jsm", /* global strings */
-  "TrackingNotificationInfoBar": "resource://cpmanager-legacy/ceTracking.jsm", /* global TrackingNotificationInfoBar */
-  "UIState": "resource://services-sync/UIState.jsm", /* global UIState */
-  "URL2QR": "resource://cpmanager-legacy/URL2QR.jsm", /* global URL2QR */
-  "Utils": "resource://gre/modules/sessionstore/Utils.jsm", /* global Utils */
-  "Weave": "resource://services-sync/main.js" /* global Weave */
+  ceTrackingOld: "resource://cpmanager-legacy/ceTracking-old.jsm",
+  ceTracking: "resource://cpmanager-legacy/ceTracking.jsm",
+  CustomizableUI: "resource:///modules/CustomizableUI.jsm",
+  E10SUtils: "resource://gre/modules/E10SUtils.jsm",
+  ExtensionSettingsStore: "resource://gre/modules/ExtensionSettingsStore.jsm",
+  FxaSwitcher: "resource://cpmanager-legacy/FxaSwitcher.jsm",
+  HomePage: "resource:///modules/HomePage.jsm",
+  mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.jsm",
+  OS: "resource://gre/modules/osfile.jsm",
+  PageActions: "resource:///modules/PageActions.jsm",
+  PlacesUIUtils: "resource:///modules/PlacesUIUtils.jsm",
+  PlacesUtils: "resource://gre/modules/PlacesUtils.jsm",
+  Services: "resource://gre/modules/Services.jsm",
+  SessionStartup: "resource:///modules/sessionstore/SessionStartup.jsm",
+  ShellSvcProxy: "resource://cpmanager-legacy/ShellSvc.jsm",
+  ShellSvcStartup: "resource://cpmanager-legacy/ShellSvcStartup.jsm",
+  ShortcutUtils: "resource://gre/modules/ShortcutUtils.jsm",
+  strings: "resource://cpmanager-legacy/ShellSvc.jsm",
+  TrackingNotificationInfoBar: "resource://cpmanager-legacy/ceTracking.jsm",
+  UIState: "resource://services-sync/UIState.jsm",
+  URL2QR: "resource://cpmanager-legacy/URL2QR.jsm",
+  Weave: "resource://services-sync/main.js",
 });
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
@@ -50,24 +49,6 @@ XPCOMUtils.defineLazyGetter(this, "CETrackingLegacy", function() {
 XPCOMUtils.defineLazyGetter(this, "gMM", () => {
   return Cc["@mozilla.org/globalmessagemanager;1"].
     getService(Ci.nsIMessageListenerManager || Ci.nsISupports);
-});
-XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
-  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
-  return XPCOMUtils.generateQI ?
-    XPCOMUtils.generateQI.bind(XPCOMUtils) :
-    ChromeUtils.generateQI.bind(ChromeUtils);
-});
-XPCOMUtils.defineLazyGetter(this, "SessionStartup", () => {
-  // Since Fx 63, https://bugzil.la/1369456
-  try {
-    let spec = "resource:///modules/sessionstore/SessionStartup.jsm";
-    let temp = {};
-    ChromeUtils.import(spec, temp);
-    return temp.SessionStartup;
-  } catch (ex) {
-    return Cc["@mozilla.org/browser/sessionstartup;1"].
-      getService(Ci.nsISessionStartup);
-  }
 });
 
 this.userJSDetection = {
@@ -94,7 +75,7 @@ this.userJSDetection = {
       Services.scriptloader.loadSubScriptWithOptions(userJSURI.spec, {
         charset: "UTF-8",
         ignoreCache: true,
-        target: this.sandbox
+        target: this.sandbox,
       });
     } catch (ex) {
       Cu.reportError(ex);
@@ -115,7 +96,7 @@ this.userJSDetection = {
 
     return [
       /^about:cehome$/,
-      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/
+      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/,
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(spec);
     });
@@ -157,7 +138,7 @@ this.userJSDetection = {
     } catch (ex) {
       Cu.reportError(ex);
     }
-  }
+  },
 };
 
 this.buttonRemoval = {
@@ -195,39 +176,39 @@ this.buttonRemoval = {
     }
 
     this.removeItForReal();
-  }
+  },
 };
 
 this.pocketButtonRemoval = Object.create(buttonRemoval, {
   prefKey: {
-    value: "extensions.cpmanager@mozillaonline.com.pocketButtonRemoved2"
+    value: "extensions.cpmanager@mozillaonline.com.pocketButtonRemoved2",
   },
   earlyReturn: {
-    value: () => Services.prefs.getChildList("browser.pocket.settings.").length
+    value: () => Services.prefs.getChildList("browser.pocket.settings.").length,
   },
   removeItForReal: {
     value() {
       Services.prefs.setBoolPref("extensions.pocket.enabled", false);
       Services.prefs.setBoolPref(this.prefKey, true);
-    }
-  }
+    },
+  },
 });
 
 this.screenshotButtonRemoval = Object.create(buttonRemoval, {
   prefKey: {
-    value: "extensions.cpmanager@mozillaonline.com.screenshotButtonRemoved"
+    value: "extensions.cpmanager@mozillaonline.com.screenshotButtonRemoved",
   },
   earlyReturn: {
     value() {
       return Services.prefs.getBoolPref("extensions.screenshots.disabled", false);
-    }
+    },
   },
   removeItForReal: {
     value() {
       Services.prefs.setBoolPref("extensions.screenshots.disabled", true);
       Services.prefs.setBoolPref(this.prefKey, true);
-    }
-  }
+    },
+  },
 });
 
 this.dragAndDrop = {
@@ -236,7 +217,8 @@ this.dragAndDrop = {
   _messageName: "cpmanager@mozillaonline.com:dragAndDrop",
   _prefKey: "extensions.cmimprove.gesture.enabled",
 
-  QueryInterface: generateQI([Ci.nsIObserver, Ci.nsISupportsWeakReference]),
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   get enabled() {
     return Services.prefs.getBoolPref(this._prefKey, false);
@@ -265,14 +247,9 @@ this.dragAndDrop = {
     let params = {
       inBackground: true,
       allowThirdPartyFixup: false,
-      relatedToCurrent: true
+      relatedToCurrent: true,
     };
-    // Since Fx 63, https://bugzil.la/1362034
-    if (gBrowser.addWebTab) {
-      gBrowser.addWebTab(link, params);
-    } else {
-      gBrowser.loadOneTab(link, params);
-    }
+    gBrowser.addWebTab(link, params);
   },
 
   receiveMessage(msg) {
@@ -293,7 +270,7 @@ this.dragAndDrop = {
         }
         try {
           browser.messageManager.sendAsyncMessage(this._messageName, {
-            listening: this._listening
+            listening: this._listening,
           });
         } catch (ex) {
           browser.ownerGlobal.console.log(browser);
@@ -303,7 +280,6 @@ this.dragAndDrop = {
   },
 
   searchText(browser, text) {
-    // See https://bugzil.la/1237648,1493483
     var engine = Services.search.defaultEngine;
     if (!engine) {
       browser.ownerGlobal.console.error("No engine available for search");
@@ -330,7 +306,7 @@ this.dragAndDrop = {
       return;
     }
     gMM.broadcastAsyncMessage(this._messageName, {
-      listening: this._listening
+      listening: this._listening,
     });
   },
 
@@ -338,7 +314,7 @@ this.dragAndDrop = {
     Services.prefs.removeObserver(this._prefKey, this);
     this.toggleListener(false);
     gMM.removeDelayedFrameScript(this._frameScript);
-  }
+  },
 };
 
 this.bookmarkingUIHack = {
@@ -387,7 +363,7 @@ this.bookmarkingUIHack = {
   },
   _getString(id, args) {
     return strings._(`bookmarkingUIHack.${id}`, args);
-  }
+  },
 };
 
 this.mobileBookmarksHack = {
@@ -415,10 +391,10 @@ this.mobileBookmarksHack = {
     win.MOA.Improve = win.MOA.Improve || {};
     win.MOA.Improve.MobileBookmarks = win.MOA.Improve.MobileBookmarks || {
       openPrefs: this._openPrefs.bind(this),
-      track: this._track.bind(this)
+      track: this._track.bind(this),
     };
 
-    let winUtils = this.getWinUtils(win);
+    let winUtils = win.windowUtils;
     winUtils.loadSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
     let parent = doc.getElementById("appMenu-multiView");
@@ -443,14 +419,13 @@ this.mobileBookmarksHack = {
       titleKey: "bookmarksnotsyncing",
       labelKey: "bookmarksnotsyncing",
       buttonKey: "enablebookmarkssync",
-      command: "Services.prefs.setBoolPref('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');"
+      command: "Services.prefs.setBoolPref('services.sync.engine.bookmarks', true); MOA.Improve.MobileBookmarks.track('bookmarksdisabled');",
     }, {
       id: "PanelUI-MOA-mobileBookmarks-nodevicespane",
       titleKey: "noclients",
       labelKey: "generic",
       buttonKey: "mobilePromo",
-      // openWebLinkIn introduced in https://bugzil.la/1374741 (Fx 61) to provide the mandatory (null) principal
-      command: "(window.openWebLinkIn || window.openUILinkIn)('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');"
+      command: "window.openWebLinkIn('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');",
     }]) {
       let pane = createElement("hbox");
       pane.id = id;
@@ -500,9 +475,9 @@ this.mobileBookmarksHack = {
     secondary.setAttribute("flex", "1");
 
     for (let { id } of [{
-      id: "PanelUI-MOA-mobileBookmarks-setupsync"
+      id: "PanelUI-MOA-mobileBookmarks-setupsync",
     }, {
-      id: "PanelUI-MOA-mobileBookmarks-reauthsync"
+      id: "PanelUI-MOA-mobileBookmarks-reauthsync",
     }]) {
       let vbox = createElement("vbox");
       vbox.id = id;
@@ -559,7 +534,7 @@ this.mobileBookmarksHack = {
       delete win.MOA;
     }
 
-    let winUtils = this.getWinUtils(win);
+    let winUtils = win.windowUtils;
     winUtils.removeSheet(this.styleSheet, winUtils.AUTHOR_SHEET);
 
     let panelview = doc.getElementById(this.viewId);
@@ -629,7 +604,7 @@ this.mobileBookmarksHack = {
   bookmarksPopupId: "mozcn-mobile-bookmarks-popup",
   deckIndices: {
     "DECKINDEX_BOOKMARKSDISABLED": 0,
-    "DECK_INDEX_NOCLIENTS": 1
+    "DECK_INDEX_NOCLIENTS": 1,
   },
   get isConfiguredToSyncBookmarks() {
     if (!weaveXPCService.ready) {
@@ -651,11 +626,6 @@ this.mobileBookmarksHack = {
     let spec = "resource://cpmanager-legacy/skin/mobile_bookmarks.css";
     delete this.styleSheet;
     return this.styleSheet = Services.io.newURI(spec);
-  },
-  getWinUtils(win) {
-    // https://bugzil.la/1476145 in Fx 63
-    return win.windowUtils || win.QueryInterface(Ci.nsIInterfaceRequestor).
-      getInterface(Ci.nsIDOMWindowUtils);
   },
   handleEvent(evt) {
     // current/original/explicitOriginal ??
@@ -699,9 +669,7 @@ this.mobileBookmarksHack = {
     }
 
     var win = evt.target.ownerGlobal;
-    var query = Services.vc.compare(Services.appinfo.version, "61.*") > 0 ?
-                `place:parent=${PlacesUtils.bookmarks.mobileGuid}` :
-                `place:folder=${PlacesUtils.mobileFolderId}`;
+    var query = `place:parent=${PlacesUtils.bookmarks.mobileGuid}`;
     new win.PlacesMenu(evt, query);
   },
   _(strKey) {
@@ -720,7 +688,7 @@ this.mobileBookmarksHack = {
   },
   _track(type, action) {
     CETracking.track(["mbm", type, action || "click"].join("-"));
-  }
+  },
 };
 
 this.distributorChannelHack = {
@@ -741,7 +709,7 @@ this.distributorChannelHack = {
     "firefox.latest": "mainWinStubFallback",
     "firefox.xbsafe2": "xbsafe",
     "stub.firefox.xiazaiba": "xiazaiba",
-    "firefox.kis": "kingsoft"
+    "firefox.kis": "kingsoft",
   },
   get prefs() {
     delete this.prefs;
@@ -750,8 +718,8 @@ this.distributorChannelHack = {
   prefSource: "chinaedition.channel",
   prefTarget: "distributor.channel",
 
-  QueryInterface: generateQI([Ci.nsIObserver,
-                              Ci.nsISupportsWeakReference]),
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   _maybeOverrideDistributorChannel() {
     // wait until both prefs are set by distribution.ini
@@ -792,7 +760,7 @@ this.distributorChannelHack = {
       default:
         break;
     }
-  }
+  },
 };
 
 this.onboardingTourHack = {
@@ -812,7 +780,7 @@ this.onboardingTourHack = {
       tourParts = tourParts.filter(tourPart => tourPart !== "screenshots");
       this.prefs.setCharPref(tourType, tourParts.join(","));
     }
-  }
+  },
 };
 
 this.trackingProtectionHack = {
@@ -832,7 +800,7 @@ this.trackingProtectionHack = {
 
   defaultPrefTweak() {
     this.prefs.setBoolPref("pbmode.enabled", false);
-  }
+  },
 };
 
 this.amoDiscoPaneHack = {
@@ -849,9 +817,7 @@ this.amoDiscoPaneHack = {
   defaultPrefTweak() {
     try {
       for (let prefKey of [
-        // Fx 68+, Introduced & enabled in https://bugzil.la/1546248,1555012
         "getAddons.discovery.api_url",
-        "webservice.discoverURL"
       ]) {
         let url = new URL(this.prefs.getCharPref(prefKey));
         if (!url.searchParams.has("edition")) {
@@ -867,7 +833,7 @@ this.amoDiscoPaneHack = {
     } catch (ex) {
       Cu.reportError(ex);
     }
-  }
+  },
 };
 
 this.fxaRelatedHack = {
@@ -901,11 +867,11 @@ this.fxaRelatedHack = {
     ]) {
       this.prefs.setCharPref(prefKey, "");
     }
-  }
+  },
 };
 
 this.mozCNGuard = {
-  QueryInterface: generateQI([Ci.nsIObserver]),
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver]),
 
   // nsIObserver
   observe: function MCG_observe(aSubject, aTopic, aData) {
@@ -934,16 +900,8 @@ this.mozCNGuard = {
   },
 
   get startPage() {
-    let startPage = this.browserHandler.startPage;
-    // Necessary since Fx 63, https://bugzil.la/721211
-    if (startPage === null) {
-      let temp = {};
-      ChromeUtils.import("resource:///modules/HomePage.jsm", temp);
-      startPage = temp.HomePage.get();
-    }
-
     delete this.startPage;
-    return this.startPage = startPage;
+    return this.startPage = HomePage.get();
   },
 
   get startPageChoice() {
@@ -1081,7 +1039,7 @@ this.mozCNGuard = {
       "FxaSwitcher",
       "ShellSvc",
       "ShellSvcStartup",
-      "URL2QR"
+      "URL2QR",
     ]) {
       try {
         Cu.unload(`resource://cpmanager-legacy/${jsModule}.jsm`);
@@ -1094,7 +1052,7 @@ this.mozCNGuard = {
   isCEHome: function MCG_isCEHome(aSpec) {
     return [
       /^about:cehome$/,
-      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/
+      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/,
     ].some((aExpectedSpec) => {
       return aExpectedSpec.test(aSpec);
     });
@@ -1152,22 +1110,17 @@ this.mozCNGuard = {
         w.PlacesUtils.history.fetch(uri.spec).then(info => {
           title = info && info.title;
         }).then(() => {
-          // Since Fx 63, https://bugzil.la/1362034
-          let tab = w.gBrowser.addWebTab ?
-            w.gBrowser.addWebTab() :
-            w.gBrowser.addTab();
+          let tab = w.gBrowser.addWebTab();
           w.gBrowser.moveTabTo(tab, aIndex);
           w.SessionStore.setTabState(tab, JSON.stringify({
             entries: [{
               url: aPage,
               title,
-              // Since Fx 67, https://bugzil.la/1521549
-              triggeringPrincipal_base64: (E10SUtils.SERIALIZED_SYSTEMPRINCIPAL ||
-                                           Utils.SERIALIZED_SYSTEMPRINCIPAL)
-            }]
+              triggeringPrincipal_base64: E10SUtils.SERIALIZED_SYSTEMPRINCIPAL,
+            }],
           }));
         }).catch(ex => Cu.reportError(ex));
       });
     }
-  }
+  },
 };

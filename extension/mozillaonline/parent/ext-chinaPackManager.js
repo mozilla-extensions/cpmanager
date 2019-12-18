@@ -35,9 +35,8 @@ this.chinaPackManager = class extends ExtensionAPI {
     }
   }
 
-  onShutdown(isAppShutdownOrReason) {
-    // Boolean isAppShutdown since Fx 68, https://bugzil.la/1549192
-    if (isAppShutdownOrReason === true || isAppShutdownOrReason === "APP_SHUTDOWN") {
+  onShutdown(isAppShutdown) {
+    if (isAppShutdown) {
       return;
     }
 
@@ -52,8 +51,7 @@ this.chinaPackManager = class extends ExtensionAPI {
   }
 
   flushCacheOnUpgrade(extension) {
-    if (extension.startupReason !== "ADDON_UPGRADE" ||
-        Services.vc.compare(Services.appinfo.version, "67.0") < 0) {
+    if (extension.startupReason !== "ADDON_UPGRADE") {
       return;
     }
 
@@ -92,7 +90,7 @@ this.chinaPackManager = class extends ExtensionAPI {
         return prefsToMigrate;
       case "trackingEnabled":
         return {
-          "trackingEnabled": CETracking.ude
+          "trackingEnabled": CETracking.ude,
         };
       case "updateOptions":
         for (let option in message.detail) {
@@ -113,7 +111,7 @@ this.chinaPackManager = class extends ExtensionAPI {
         chinaPackManager: {
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
-          }
+          },
         },
       },
     };

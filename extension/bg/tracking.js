@@ -5,7 +5,7 @@
     "easyscreenshot@mozillaonline.com",
     "tabtweak@mozillaonline.com",
     "url2qr@mozillaonline.com",
-    "wx-assistant@mozillaonline.com"
+    "wx-assistant@mozillaonline.com",
   ];
 
   async function handleExternalMessage(message, sender) {

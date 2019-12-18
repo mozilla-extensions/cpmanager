@@ -1,11 +1,7 @@
 this.EXPORTED_SYMBOLS = [
   "ceTracking",
-  "TrackingNotificationInfoBar"
+  "TrackingNotificationInfoBar",
 ];
-
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{C40350A8-F734-4CFF-99D9-95274D408143}");
 const _CONTRACTID = "@mozilla.com.cn/tracking;1";
@@ -15,12 +11,6 @@ ChromeUtils.defineModuleGetter(this, "AsyncShutdown",
   "resource://gre/modules/AsyncShutdown.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
-XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
-  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
-  return XPCOMUtils.generateQI ?
-    XPCOMUtils.generateQI.bind(XPCOMUtils) :
-    ChromeUtils.generateQI.bind(ChromeUtils);
-});
 
 const keyedCount = {};
 
@@ -94,11 +84,9 @@ let TrackingNotificationInfoBar = {
   _strings: null,
   _win: null,
 
-  // Since Fx 65, see https://bugzil.la/1471403
   get _notificationBox() {
     delete this._notificationBox;
-    return this._notificationBox = this._win.gNotificationBox || this._win.
-      document.getElementById("global-notificationbox");
+    return this._notificationBox = this._win.gNotificationBox;
   },
 
   _(key, args) {
@@ -181,7 +169,7 @@ let TrackingNotificationInfoBar = {
 
     this._strings = null;
     this._win = null;
-  }
+  },
 };
 
 function ceTracking() {
@@ -192,8 +180,8 @@ ceTracking.prototype = {
   classDescription: "Tracking for Imporve Firefox",
   contractID: _CONTRACTID,
   classID: _CID,
-  QueryInterface: generateQI([Ci.nsIObserver,
-                              Ci.nsISupportsWeakReference]),
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   _(key) {
     return this._strings._(key);
@@ -259,7 +247,7 @@ ceTracking.prototype = {
     let id = "extensions.cpmanager.tracking.enabled";
     let type = "bool";
     win.Preferences.addAll([
-      { id, type }
+      { id, type },
     ]);
 
     let body = doc.getElementById("dataCollectionGroup");
@@ -273,11 +261,9 @@ ceTracking.prototype = {
     checkbox.setAttribute("label", this._("ceTracking.label"));
     checkbox.setAttribute("accesskey", this._("ceTracking.accesskey"));
 
-    // Custom Element since Fx 67, see https://bugzil.la/1527495
     let label = createElement("label", { is: "text-link" });
     label.id = "mococnTrackingLearnMore";
     label.classList.add("learnMore");
-    label.classList.add("text-link");
     label.textContent = this._("ceTracking.learnMore.label");
 
     hbox.appendChild(checkbox);
@@ -286,5 +272,5 @@ ceTracking.prototype = {
 
     win.gPrivacyPane.
       _setupLearnMoreLink("extensions.cpmanager.tracking.infoURL", label.id);
-  }
+  },
 };

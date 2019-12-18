@@ -78,10 +78,10 @@
       browser.menus.create({
         contexts: ["browser_action"],
         icons: {
-          "16": (session.tab.favIconUrl || "icons/defaultFavicon.svg")
+          "16": (session.tab.favIconUrl || "icons/defaultFavicon.svg"),
         },
         onclick: () => browser.sessions.restore(session.tab.sessionId),
-        title: session.tab.title
+        title: session.tab.title,
       });
     }
 
@@ -92,7 +92,7 @@
           return browser.sessions.restore(session.tab.sessionId);
         }));
       },
-      title: browser.i18n.getMessage("restoreAllTabs")
+      title: browser.i18n.getMessage("restoreAllTabs"),
     });
   }
 

@@ -24,14 +24,14 @@ async function handleLegacyOptionChange(evt) {
     dir: "bg2legacy",
     type: "updateOptions",
     detail: {
-      [evt.target.id]: evt.target.checked
-    }
+      [evt.target.id]: evt.target.checked,
+    },
   });
 }
 
 async function handleStorageOptionChange(evt) {
   return browser.storage.local.set({
-    [evt.target.id]: evt.target.checked
+    [evt.target.id]: evt.target.checked,
   });
 }
 
@@ -39,12 +39,12 @@ window.addEventListener("DOMContentLoaded", async evt => {
   let initLegacyOptions = await browser.mozillaonline.
     chinaPackManager.sendLegacyMessage({
       dir: "bg2legacy",
-      type: "initOptions"
+      type: "initOptions",
     });
   createCheckboxesWithOptions(initLegacyOptions, handleLegacyOptionChange);
 
   let initStorageOptions = await browser.storage.local.get({
-    "clearHistory.enabled": true // defaults display to true
+    "clearHistory.enabled": true, // defaults display to true
   });
   createCheckboxesWithOptions(initStorageOptions, handleStorageOptionChange);
 });

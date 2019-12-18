@@ -70,7 +70,7 @@ let reportError = function(aMessage, aCode) {
   postMessage({
     type: "error",
     message: (aMessage || "UnknownError"),
-    code: (isNaN(aCode) ? 0 : aCode)
+    code: (isNaN(aCode) ? 0 : aCode),
   });
 };
 
@@ -185,7 +185,7 @@ onmessage = function(aEvt) {
     postMessage({
       type: "exitcode",
       exeName,
-      code: exit.value.toString()
+      code: exit.value.toString(),
     });
   }
 

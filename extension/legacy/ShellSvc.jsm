@@ -8,8 +8,8 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "PlacesUtils": "resource://gre/modules/PlacesUtils.jsm", /* global PlacesUtils */
-  "Services": "resource://gre/modules/Services.jsm" /* global Services */
+  PlacesUtils: "resource://gre/modules/PlacesUtils.jsm",
+  Services: "resource://gre/modules/Services.jsm",
 });
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
@@ -95,8 +95,8 @@ this.modShellSvc = Object.create(origShellSvc, {
         origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
         Cu.reportError(ex);
       }
-    }
-  }
+    },
+  },
 });
 
 this.strings = {
@@ -117,7 +117,7 @@ this.strings = {
 
     let cloneScope = this._ctx.cloneScope;
     return this._ctx.extension.localizeMessage(name, subs, {cloneScope});
-  }
+  },
 };
 
 function ShellSvcProxy() {}
@@ -125,6 +125,7 @@ function ShellSvcProxy() {}
 ShellSvcProxy.prototype = {
   classID: Components.ID("{055d195f-168e-4d98-b18a-71bfbfd3f617}"),
   contractID: null,
+  /* eslint-disable-next-line mozilla/use-chromeutils-generateqi */
   QueryInterface(aIID) {
     if (aIID.equals(Ci.nsISupports)) {
       return modShellSvc;
@@ -142,5 +143,5 @@ ShellSvcProxy.prototype = {
     }
 
     throw Cr.NS_ERROR_NO_INTERFACE;
-  }
+  },
 };

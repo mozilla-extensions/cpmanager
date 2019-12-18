@@ -2,7 +2,6 @@ this.EXPORTED_SYMBOLS = ["ceTrackingOld"];
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
-Cu.importGlobalProperties(["XMLHttpRequest"]);
 
 const _CID = Components.ID("{6E12E09F-1942-46F0-8D85-9C6B1D0E6448}");
 const _CONTRACTID = "@mozilla.com.cn/tracking-old;1";
@@ -13,19 +12,13 @@ const CHANNEL_PREF = "app.chinaedition.channel";
 const DISTRIBUTION_PREF = "distribution.version";
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  "ProfileAge": "resource://gre/modules/ProfileAge.jsm", /* global ProfileAge */
-  "Services": "resource://gre/modules/Services.jsm", /* global Services */
-  "TelemetryReportingPolicy": "resource://gre/modules/TelemetryReportingPolicy.jsm", /* global TelemetryReportingPolicy */
-  "TelemetryUtils": "resource://gre/modules/TelemetryUtils.jsm" /* global TelemetryUtils */
+  ProfileAge: "resource://gre/modules/ProfileAge.jsm",
+  Services: "resource://gre/modules/Services.jsm",
+  TelemetryReportingPolicy: "resource://gre/modules/TelemetryReportingPolicy.jsm",
+  TelemetryUtils: "resource://gre/modules/TelemetryUtils.jsm",
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
-XPCOMUtils.defineLazyGetter(this, "generateQI", () => {
-  // ChromeUtils one introduced in Fx 61, mandatory in https://bugzil.la/1484466
-  return XPCOMUtils.generateQI ?
-    XPCOMUtils.generateQI.bind(XPCOMUtils) :
-    ChromeUtils.generateQI.bind(ChromeUtils);
 });
 
 function getPrefStr(name, defValue) {
@@ -63,7 +56,7 @@ function getUK() {
     try {
       let file = getUKFile();
       if (!file || !file.exists()) {
-        throw "Could not read file ";
+        throw Error("Could not read file");
       }
       let fstream = Cc["@mozilla.org/network/file-input-stream;1"].
           createInstance(Ci.nsIFileInputStream);
@@ -80,7 +73,7 @@ function getUK() {
       cstream.close(); // this also closes fstream
       let obj = JSON.parse(str);
       if (!isUUID(obj.uuid)) {
-        throw "invalid uuid [" + obj.uuid + "]";
+        throw Error(`invalid uuid [${obj.uuid}]`);
       }
       uuid = obj.uuid;
     } catch (e) {
@@ -126,7 +119,7 @@ function getPK() {
   try {
     uuid = Services.prefs.getCharPref(PK_PREF);
     if (!isUUID(uuid)) {
-      throw "invalid uuid [" + uuid + "]";
+      throw Error(`invalid uuid [${uuid}]`);
     }
   } catch (e) {
     uuid = generateUUID();
@@ -246,7 +239,7 @@ const ADU_Task = [
     task: "5s",
     delay: 5 * 1000,
     url: "http://adu.g-fox.cn/adu.gif",
-  }
+  },
 ];
 var ADUIndex = 0;
 const ADUTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
@@ -267,7 +260,7 @@ function _ADU(delay) {
       xhr.addEventListener("error", function(event) { _ADU(RETRY_DELAY); });
       xhr.addEventListener("load", function(event) { sendADU(++ADUIndex); });
       xhr.send(null);
-    }
+    },
   }, delay, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
@@ -279,8 +272,8 @@ ceTrackingOld.prototype = {
   classDescription: "Tracking for Imporve Firefox",
   contractID: _CONTRACTID,
   classID: _CID,
-  QueryInterface: generateQI([Ci.nsIObserver,
-                              Ci.nsISupportsWeakReference]),
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   observe(aSubject, aTopic, aData) {
     switch (aTopic) {
@@ -303,5 +296,5 @@ ceTrackingOld.prototype = {
     try {
       Services.obs.removeObserver(this, "final-ui-startup");
     } catch (ex) {}
-  }
+  },
 };

@@ -37,7 +37,7 @@ let DragDropObserver = {
 
     sendAsyncMessage(this.messageName, {
       data: "listening",
-      type: "query"
+      type: "query",
     });
   },
 
@@ -272,7 +272,7 @@ let DragDropObserver = {
         startX: this._startX,
         startY: this._startY,
         endX: evt.pageX,
-        endY: evt.pageY
+        endY: evt.pageY,
       });
     }
 
@@ -291,9 +291,9 @@ let DragDropObserver = {
 
     sendAsyncMessage(this.messageName, {
       data: event.data,
-      type: event.type
+      type: event.type,
     });
-  }
+  },
 };
 
 addMessageListener(DragDropObserver.messageName, DragDropObserver);
