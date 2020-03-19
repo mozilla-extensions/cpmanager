@@ -867,6 +867,11 @@ this.fxaRelatedHack = {
     ]) {
       this.prefs.setCharPref(prefKey, "");
     }
+
+    this.prefs.setCharPref(
+      "browser.contentblocking.report.mobile-android.url",
+      "https://www.firefox.com.cn/mobile/?utm_source=protection_report&utm_content=mobile_promotion"
+    );
   },
 };
 
