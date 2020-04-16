@@ -31,7 +31,6 @@ XPCOMUtils.defineLazyModuleGetters(this, {
   SessionStartup: "resource:///modules/sessionstore/SessionStartup.jsm",
   ShellSvcProxy: "resource://cpmanager-legacy/ShellSvc.jsm",
   ShellSvcStartup: "resource://cpmanager-legacy/ShellSvcStartup.jsm",
-  ShortcutUtils: "resource://gre/modules/ShortcutUtils.jsm",
   strings: "resource://cpmanager-legacy/ShellSvc.jsm",
   TrackingNotificationInfoBar: "resource://cpmanager-legacy/ceTracking.jsm",
   UIState: "resource://services-sync/UIState.jsm",
@@ -314,55 +313,6 @@ this.dragAndDrop = {
     Services.prefs.removeObserver(this._prefKey, this);
     this.toggleListener(false);
     gMM.removeDelayedFrameScript(this._frameScript);
-  },
-};
-
-this.bookmarkingUIHack = {
-  patchBrowserWindow(win) {
-    try {
-      let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
-      if (bmb_vbt) {
-        let origLabel = bmb_vbt.getAttribute("label");
-        bmb_vbt.setAttribute("label", this._getString("menu.bookmarksToolbar"));
-        bmb_vbt.setAttribute("orig-label", origLabel);
-      }
-
-      if (win.BookmarkingUI) {
-        let args = [ShortcutUtils.prettifyShortcut(win.document.
-          getElementById(win.BookmarkingUI.BOOKMARK_BUTTON_SHORTCUT))];
-        let unstarredTooltip = this._getString("starButtonOff.tooltip2", args);
-
-        win.BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
-          delete this._unstarredTooltip;
-          return this._unstarredTooltip = unstarredTooltip;
-        });
-      }
-    } catch (ex) {
-      win.console.error(ex);
-    }
-  },
-  unpatchBrowserWindow(win) {
-    let bmb_vbt = win.document.getElementById("BMB_viewBookmarksToolbar");
-    if (bmb_vbt) {
-      let origLabel = bmb_vbt.getAttribute("orig-label");
-      if (origLabel) {
-        bmb_vbt.setAttribute("label", origLabel);
-        bmb_vbt.removeAttribute("orig-label");
-      }
-    }
-
-    if (win.BookmarkingUI) {
-      let unstarredTooltip = win.BookmarkingUI.
-        _getFormattedTooltip("starButtonOff.tooltip2");
-
-      win.BookmarkingUI.__defineGetter__("_unstarredTooltip", function() {
-        delete this._unstarredTooltip;
-        return this._unstarredTooltip = unstarredTooltip;
-      });
-    }
-  },
-  _getString(id, args) {
-    return strings._(`bookmarkingUIHack.${id}`, args);
   },
 };
 
@@ -943,15 +893,11 @@ this.mozCNGuard = {
   },
 
   onWindowOpened(win) {
-    bookmarkingUIHack.patchBrowserWindow(win);
-
     TrackingNotificationInfoBar.init(win, strings);
     URL2QR.init(win, strings);
   },
 
   onWindowClosed(win) {
-    bookmarkingUIHack.unpatchBrowserWindow(win);
-
     TrackingNotificationInfoBar.uninit(win);
     URL2QR.uninit(win);
   },

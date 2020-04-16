@@ -21,18 +21,6 @@
     "message": "Undo Close Tab"
   },
 
-  "bookmarkingUIHack.menu.bookmarksToolbar": {
-    "message": "Show in Toolbar"
-  },
-  "bookmarkingUIHack.starButtonOff.tooltip2": {
-    "message": "Bookmark this page ($shortcut$)",
-    "placeholders": {
-      "shortcut": {
-        "content": "$1"
-      }
-    }
-  },
-
   "ceTracking.accesskey": {
     "message": "U"
   },
