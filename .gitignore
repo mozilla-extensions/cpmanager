@@ -1,14 +1,3 @@
-*.swp
-*~
-Thumbs.db
-*.o
-*.xpi
-.DS_Store
-*.mo
-*.pyc
-*.ncb
-*.idb
-*.pdb
-*.project
-*.suo
 node_modules
+dist
+*.pyc
