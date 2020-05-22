@@ -3,7 +3,10 @@
   "version": "4.77.0",
   "description": "To manage the addons package in Firefox.",
   "scripts": {
-    "build": "web-ext build",
+    "build": "npm-run-all clean build:web-ext build:finalize",
+    "build:finalize": "mv web-ext-artifacts/addons_manager-*.zip web-ext-artifacts/cpmanager.xpi",
+    "build:web-ext": "web-ext build",
+    "clean": "rimraf web-ext-artifacts",
     "lint": "eslint --ext .js,.jsm extension"
   },
   "author": "Mozilla Online Limited",
@@ -13,6 +16,7 @@
     "eslint": "5.16.0",
     "eslint-plugin-mozilla": "1.2.1",
     "eslint-plugin-no-unsanitized": "3.0.2",
+    "npm-run-all": "4.1.5",
     "web-ext": "4.2.0"
   },
   "webExt": {
