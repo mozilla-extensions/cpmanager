@@ -22,6 +22,10 @@ const FXA_PREF_KEY = "identity.fxaccounts.auth.uri";
 const FXA_PREF_VAL = "https://api-accounts.firefox.com.cn/v1";
 const INIT_STEP_KEY = "extensions.cpmanager@mozillaonline.com.fxa.initstep";
 const ONE_CHECK_PREF = "cpmanager@mozillaonline.com.switch_fxa_pref.checked";
+const PAIRING_PREF_KEY = "identity.fxaccounts.remote.pairing.uri";
+const PAIRING_PREF_VAL = "wss://channelserver.firefox.com.cn";
+const SYNC_PREF_KEY = "identity.sync.tokenserver.uri";
+const SYNC_PREF_VAL = "https://sync.firefox.com.cn/token/1.0/sync/1.5";
 
 let FxaSwitcher = {
   topic: "sync-pane-loaded",
@@ -62,29 +66,40 @@ let FxaSwitcher = {
 
     Services.obs.addObserver(this, this.topic);
 
+    let refreshStatus = "NA";
     let isSignedIn = !!(await fxAccounts.getSignedInUser());
 
-    switch (this.initStep) {
+    let initStep = this.initStep;
+    switch (initStep) {
       case 0:
         if (!isSignedIn) {
           this.switchToLocal();
         }
         // intentionally no break
       case 1:
-        if (Services.prefs.getCharPref(FXA_PREF_KEY) === FXA_PREF_VAL) {
+        if (Services.prefs.getCharPref(FXA_PREF_KEY, "") === FXA_PREF_VAL) {
           // backfill AUTO_CONFIG_KEY based on FXA_PREF_KEY
           this.switchToLocal();
         }
         break;
-      // remove 2=>3 backfill and the break above when a step 4 is added
+      // remove 2=>3 & 3=>4 backfill and the break above when a step 5 is added
       case 2:
         FxAccountsConfig.ensureConfigured();
+        break;
+      case 3:
+        refreshStatus = await this.refreshPairingUri();
         break;
       default:
         break;
     }
 
-    this.initStep = 3;
+    const currentStep = 4;
+    if (initStep >= currentStep) {
+      return;
+    }
+    this.initStep = currentStep;
+    let url = `http://addons.g-fox.cn/fxa-switch.gif?initStep=${initStep}&isSignedIn=${isSignedIn}&refreshStatus=${refreshStatus}`;
+    CETracking.send(url);
   },
 
   observe(subject, topic, data) {
@@ -145,6 +160,24 @@ let FxaSwitcher = {
       checkbox.setAttribute("onsynctopreference",
         "return mozCNSyncHack.onSyncToEnablePref(this);");
     });
+  },
+
+  async refreshPairingUri() {
+    // Only refresh for those using local FxA service
+    if (Services.prefs.getCharPref(FXA_PREF_KEY, "") !== FXA_PREF_VAL) {
+      return "notLocal";
+    }
+    // Only refresh for those w/o correct pairing url
+    if (Services.prefs.getCharPref(PAIRING_PREF_KEY, "") === PAIRING_PREF_VAL) {
+      return "localPairing";
+    }
+    // Don't run `fetchConfigURLs` for those using alternative token.
+    if (Services.prefs.getCharPref(SYNC_PREF_KEY, "") !== SYNC_PREF_VAL) {
+      return "altToken";
+    }
+
+    await FxAccountsConfig.fetchConfigURLs();
+    return "refreshed";
   },
 
   switchService(evt) {
