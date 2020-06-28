@@ -713,26 +713,6 @@ this.distributorChannelHack = {
   },
 };
 
-this.onboardingTourHack = {
-  get prefs() {
-    let branch = "browser.onboarding.";
-    delete this.prefs;
-    return this.prefs = Services.prefs.getDefaultBranch(branch);
-  },
-
-  init() {
-    this.defaultPrefTweak();
-  },
-
-  defaultPrefTweak() {
-    for (let tourType of ["newtour", "updatetour"]) {
-      let tourParts = this.prefs.getCharPref(tourType, "").split(",");
-      tourParts = tourParts.filter(tourPart => tourPart !== "screenshots");
-      this.prefs.setCharPref(tourType, tourParts.join(","));
-    }
-  },
-};
-
 this.trackingProtectionHack = {
   get prefs() {
     let branch = "privacy.trackingprotection.";
@@ -838,7 +818,6 @@ this.mozCNGuard = {
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
         distributorChannelHack.defaultPrefTweak();
-        onboardingTourHack.defaultPrefTweak();
         trackingProtectionHack.defaultPrefTweak();
         amoDiscoPaneHack.defaultPrefTweak();
         fxaRelatedHack.defaultPrefTweak();
@@ -956,7 +935,6 @@ this.mozCNGuard = {
     screenshotButtonRemoval.init();
     dragAndDrop.init();
     mobileBookmarksHack.init();
-    onboardingTourHack.init();
     trackingProtectionHack.init();
     amoDiscoPaneHack.init();
     fxaRelatedHack.init();
