@@ -107,27 +107,6 @@ let FxaSwitcher = {
       return;
     }
 
-    let self = this;
-    subject.mozCNSyncHack = {
-      onSyncToEnablePref(checkbox) {
-        if (checkbox.checked) {
-          return undefined;
-        }
-
-        let p = Services.prompt;
-        let shouldDisable = p.confirmEx(checkbox.ownerGlobal,
-          self._("fxa.preferences.warning.title"),
-          self._("fxa.preferences.warning.message", [checkbox.label]),
-          p.STD_YES_NO_BUTTONS + p.BUTTON_POS_1_DEFAULT + p.BUTTON_DELAY_ENABLE,
-          "", "", "", null, {}) === 0;
-
-        if (!shouldDisable) {
-          checkbox.checked = true;
-        }
-        return undefined;
-      },
-    };
-
     let doc = subject.document;
     // Since Fx 69, https://bugzil.la/1551320
     let createElement = (doc.createXULElement ||
@@ -146,20 +125,6 @@ let FxaSwitcher = {
         `${32 - marginOtherSide}px`, "important");
     }
     this.updateStrings(doc);
-
-    // for https://bugzil.la/1182397
-    let selector = 'checkbox[preference^="engine."]';
-    [].filter.call(doc.querySelectorAll(selector), checkbox => {
-      return subject.Preferences.get(checkbox.getAttribute("preference")).
-        name.startsWith("services.sync.engine.");
-    }).forEach(checkbox => {
-      if (checkbox.hasAttribute("onsynctopreference")) {
-        return;
-      }
-
-      checkbox.setAttribute("onsynctopreference",
-        "return mozCNSyncHack.onSyncToEnablePref(this);");
-    });
   },
 
   async refreshPairingUri() {

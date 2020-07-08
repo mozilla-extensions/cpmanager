@@ -52,17 +52,6 @@
   "FxaSwitcher.preferences.brand.local": {
     "message": "火狐通行证"
   },
-  "FxaSwitcher.preferences.warning.message": {
-    "message": "取消勾选“$engine$”将删除同步服务器中已保存的全部$engine$，用此账户登录的其他设备也将不再同步$engine$。以上操作不可撤销，为防止数据丢失，请谨慎选择。\n\n是否删除同步服务器上已保存的$engine$？",
-    "placeholders": {
-      "engine": {
-        "content": "$1"
-      }
-    }
-  },
-  "FxaSwitcher.preferences.warning.title": {
-    "message": "警告"
-  },
 
   "mobileBookmarksHack.bookmarksnotsyncing.label": {
     "message": "同步设置中书签选项未启用"

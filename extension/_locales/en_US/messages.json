@@ -52,17 +52,6 @@
   "FxaSwitcher.preferences.brand.local": {
     "message": "Firefox Passport"
   },
-  "FxaSwitcher.preferences.warning.message": {
-    "message": "Uncheck \"$engine$\" will delete all records stored on sync server, and other devices will stop syncing $engine$. This action is NOT reversible, please proceed with caution to prevent any data loss.\n\nContinue with deleting $engine$ stored on sync server?",
-    "placeholders": {
-      "engine": {
-        "content": "$1"
-      }
-    }
-  },
-  "FxaSwitcher.preferences.warning.title": {
-    "message": "Warning"
-  },
 
   "mobileBookmarksHack.bookmarksnotsyncing.label": {
     "message": "Bookmarks syncing disabled"
