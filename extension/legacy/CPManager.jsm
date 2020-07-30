@@ -17,6 +17,7 @@ XPCOMUtils.defineLazyGetter(this, "weaveXPCService", function() {
 XPCOMUtils.defineLazyModuleGetters(this, {
   ceTrackingOld: "resource://cpmanager-legacy/ceTracking-old.jsm",
   ceTracking: "resource://cpmanager-legacy/ceTracking.jsm",
+  ComponentUtils: "resource://gre/modules/ComponentUtils.jsm",
   CustomizableUI: "resource:///modules/CustomizableUI.jsm",
   E10SUtils: "resource://gre/modules/E10SUtils.jsm",
   ExtensionSettingsStore: "resource://gre/modules/ExtensionSettingsStore.jsm",
@@ -891,7 +892,11 @@ this.mozCNGuard = {
 
     constructors.forEach(targetConstructor => {
       let proto = targetConstructor.prototype;
-      let factory = XPCOMUtils._getFactory(targetConstructor);
+      // Since Fx 80, see https://bugzil.la/1649554
+      let getFactory = XPCOMUtils._getFactory
+        ? XPCOMUtils._getFactory.bind(XPCOMUtils)
+        : ComponentUtils._getFactory.bind(ComponentUtils);
+      let factory = getFactory(targetConstructor);
       this.factories.set(proto.classID, factory);
       Cm.registerFactory(proto.classID, proto.classDescription,
                          proto.contractID, factory);
