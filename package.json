@@ -1,6 +1,6 @@
 {
   "name": "cpmanager",
-  "version": "4.80.0",
+  "version": "4.81.0",
   "description": "To manage the addons package in Firefox.",
   "scripts": {
     "build": "npm-run-all clean build:web-ext build:finalize",
