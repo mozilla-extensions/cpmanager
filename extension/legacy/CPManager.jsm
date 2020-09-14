@@ -793,6 +793,7 @@ this.fxaRelatedHack = {
     }
 
     for (let prefKey of [
+      "browser.privatebrowsing.vpnpromourl",
       "identity.fxaccounts.service.monitorLoginUrl",
       "identity.fxaccounts.service.sendLoginUrl",
     ]) {
