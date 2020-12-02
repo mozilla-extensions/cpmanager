@@ -1,5 +1,5 @@
 /* eslint-env mozilla/frame-script */
-/* globals Services */
+const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 let DragDropObserver = {
   // We want to know the "true" source of the drag, which we can no longer
