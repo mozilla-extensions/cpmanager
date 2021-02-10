@@ -1,6 +1,6 @@
 {
   "name": "cpmanager",
-  "version": "4.85.0",
+  "version": "4.86.0",
   "description": "To manage the addons package in Firefox.",
   "scripts": {
     "build": "web-ext build --filename cpmanager.xpi",
