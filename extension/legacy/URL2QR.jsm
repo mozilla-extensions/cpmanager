@@ -157,7 +157,7 @@ this.URL2QR = {
     let pageActionButtons = doc.getElementById("page-action-buttons");
     let popupAnchor = createElement("image");
     popupAnchor.id = "mo-url2qr-icon";
-    popupAnchor.classList.add("urlbar-button");
+    popupAnchor.classList.add("urlbar-icon");
     popupAnchor.classList.add("urlbar-page-action");
     popupAnchor.setAttribute("hidden", "true");
     popupAnchor.setAttribute("tooltiptext", strings._("URL2QR.generateQR"));
