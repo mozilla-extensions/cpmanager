@@ -162,18 +162,6 @@ async function getAge() {
   profileAge = Math.floor((Date.now() - created) / ONEDAY);
 }
 
-function getPluginVersion(name) {
-  var tags = Cc["@mozilla.org/plugin/host;1"]
-             .getService(Ci.nsIPluginHost)
-             .getPluginTags({});
-  for (var tag of tags) {
-    if (tag.name == name) {
-      return tag.version;
-    }
-  }
-  return "";
-}
-
 function isDefaultBrowser(aForAllTypes) {
   try {
     return Cc["@mozilla.org/browser/shell-service;1"]
@@ -229,7 +217,7 @@ function getADUData() {
        + "&age=" + profileAge
        + "&default=" + isDefaultBrowser(true)
        + "&defaultHttp=" + isDefaultBrowser(false)
-       + "&flash=" + getPluginVersion("Shockwave Flash")
+       + "&flash="
        + "&tracking=" + getTrackingStatus();
 }
 
