@@ -1,20 +1,5 @@
 #mozcn-mobile-bookmarks-button {
-  list-style-image: url("./mobile-16.png") !important;
-}
-
-#mozcn-mobile-bookmarks-button[cui-areatype="menu-panel"],
-toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
-  list-style-image: url("./mobile-32.png") !important;
-}
-
-@media (-moz-mac-lion-theme) and (min-resolution: 2dppx) {
-  #mozcn-mobile-bookmarks-button {
-    list-style-image: url("./mobile-32.png") !important;
-  }
-  #mozcn-mobile-bookmarks-button[cui-areatype="menu-panel"],
-  toolbarpaletteitem[place="palette"] > #mozcn-mobile-bookmarks-button {
-    list-style-image: url("./mobile-64.png") !important;
-  }
+  list-style-image: url("chrome://browser/skin/device-phone.svg") !important;
 }
 
 /* mostly copyed from chrome://browser/skin/customizableui/panelUI.css */
