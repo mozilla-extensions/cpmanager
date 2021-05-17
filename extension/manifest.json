@@ -16,14 +16,19 @@
     "browser_action": {
       "browser_style": true,
       "default_icon": {
-        "16": "icons/undoCloseTab-16.png",
-        "32": "icons/undoCloseTab-32.png"
+        "16": "icons/undoCloseTab-dark.svg",
+        "32": "icons/undoCloseTab-dark.svg",
+        "64": "icons/undoCloseTab-dark.svg"
       },
       "default_title": "__MSG_undoCloseTabTitle__",
       "theme_icons": [{
-        "light": "icons/undoCloseTab-16.png",
-        "dark": "icons/undoCloseTab-16-inverted.png",
+        "light": "icons/undoCloseTab-light.svg",
+        "dark": "icons/undoCloseTab-dark.svg",
         "size": 16
+      }, {
+        "light": "icons/undoCloseTab-light.svg",
+        "dark": "icons/undoCloseTab-dark.svg",
+        "size": 32
       }]
     },
     "default_locale": "en_US",
