@@ -1,5 +1,7 @@
 (function() {
   const DEBUG = false;
+  const CREATED_MENU_IDS = [];
+  let rebuildBrowserActionContextTimer;
 
   async function handleBrowserActionClick(tab) {
     try {
@@ -67,7 +69,25 @@
   }
 
   async function rebuildBrowserActionContext(sessionsToRestore) {
-    await browser.menus.removeAll();
+    if (rebuildBrowserActionContextTimer) {
+      clearTimeout(rebuildBrowserActionContextTimer);
+    }
+    rebuildBrowserActionContextTimer = setTimeout(
+      rebuildBrowserActionContextForReal,
+      250,
+      sessionsToRestore
+    );
+  }
+
+  async function rebuildBrowserActionContextForReal(sessionsToRestore) {
+    if (rebuildBrowserActionContextTimer) {
+      rebuildBrowserActionContextTimer = undefined;
+    }
+
+    await Promise.all(CREATED_MENU_IDS.map(menuId => {
+      return browser.menus.remove(menuId);
+    }));
+    CREATED_MENU_IDS.length = 0;
     if (!sessionsToRestore.length) {
       return;
     }
@@ -75,17 +95,17 @@
     let mostRecentSessions = sessionsToRestore.slice(0,
       browser.menus.ACTION_MENU_TOP_LEVEL_LIMIT - 1);
     for (let session of mostRecentSessions) {
-      browser.menus.create({
+      CREATED_MENU_IDS.push(browser.menus.create({
         contexts: ["browser_action"],
         icons: {
           "16": (session.tab.favIconUrl || "icons/defaultFavicon.svg"),
         },
         onclick: () => browser.sessions.restore(session.tab.sessionId),
         title: session.tab.title,
-      });
+      }));
     }
 
-    browser.menus.create({
+    CREATED_MENU_IDS.push(browser.menus.create({
       contexts: ["browser_action"],
       onclick: () => {
         return Promise.all(sessionsToRestore.map(session => {
@@ -93,7 +113,7 @@
         }));
       },
       title: browser.i18n.getMessage("restoreAllTabs"),
-    });
+    }));
   }
 
   async function sessionsToRestoreForWindow(
