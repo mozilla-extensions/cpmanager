@@ -78,6 +78,103 @@
     "message": "立即登录"
   },
 
+  "panBaidu.contextMenu.label": {
+    "message": "保存到百度网盘"
+  },
+  "panBaidu.createDownload.savePath": {
+    "message": "Firefox 火狐浏览器"
+  },
+  "panBaidu.error.auth.generic": {
+    "message": "账号授权错误，错误参数：$param$",
+    "placeholders": {
+      "param": {
+        "content": "$1"
+      }
+    }
+  },
+  "panBaidu.error.auth.scope": {
+    "message": "账号授权错误，请确认选中“在您的百度网盘创建文件夹并读写数据”"
+  },
+  "panBaidu.error.generic": {
+    "message": "保存任务失败，故障码：$errNo$",
+    "placeholders": {
+      "errNo": {
+        "content": "$1"
+      }
+    }
+  },
+  "panBaidu.error.createdownload.-6": {
+    "message": "无效的 access token"
+  },
+  "panBaidu.error.createdownload.42689": {
+    "message": "链接地址无效"
+  },
+  "panBaidu.error.http.generic": {
+    "message": "HTTP 请求出错，状态码：$status$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "panBaidu.error.querytask.state.2": {
+    "message": "系统错误"
+  },
+  "panBaidu.error.querytask.state.3": {
+    "message": "资源不存在"
+  },
+  "panBaidu.error.querytask.state.4": {
+    "message": "操作超时"
+  },
+  "panBaidu.error.querytask.state.5": {
+    "message": "资源存在，但创建任务失败"
+  },
+  "panBaidu.error.querytask.state.6": {
+    "message": "存储空间不足"
+  },
+  "panBaidu.error.querytask.state.7": {
+    "message": "目标文件夹存在相同文件"
+  },
+  "panBaidu.error.querytask.state.8": {
+    "message": "任务取消"
+  },
+  "panBaidu.notifications.msg.completed": {
+    "message": "百度网盘已成功保存 $taskName$",
+    "placeholders": {
+      "taskName": {
+        "content": "$1"
+      }
+    }
+  },
+  "panBaidu.notifications.msg.failed": {
+    "message": "$errorMsg$，无法保存以下文件：\n$taskName$",
+    "placeholders": {
+      "taskName": {
+        "content": "$1"
+      },
+      "errorMsg": {
+        "content": "$2"
+      }
+    }
+  },
+  "panBaidu.notifications.msg.started": {
+    "message": "开始保存以下文件：\n$taskName$",
+    "placeholders": {
+      "taskName": {
+        "content": "$1"
+      }
+    }
+  },
+  "panBaidu.notifications.title": {
+    "message": "百度网盘"
+  },
+  "panBaidu.notifications.title.completed": {
+    "message": "文件已保存，您可以点击查看"
+  },
+  "panBaidu.uct.offlineDownload.label": {
+    "message": "保存到百度网盘"
+  },
+
   "ShellSvcProxy.msg": {
     "message": "设置默认浏览器失败！\n\n您的操作可能是被其它软件拦截，需手动对其进行修改。"
   },

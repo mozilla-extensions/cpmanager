@@ -4,6 +4,29 @@
       "description": "China Pack Manager",
       "functions": [
         {
+          "name": "addPermissions",
+          "type": "function",
+          "async": "callback",
+          "requireUserInput": true,
+          "description": "Like `browser.permissions.request` but without the prompts",
+          "parameters": [
+            {
+              "name": "permissions",
+              "$ref": "permissions.Permissions"
+            },
+            {
+              "name": "callback",
+              "type": "function",
+              "parameters": [
+                {
+                  "name": "granted",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "sendLegacyMessage",
           "type": "function",
           "description": "(Kinda) replaces browser.runtime.sendMessage",
@@ -24,6 +47,62 @@
             }
           ],
           "async": "callback"
+        }
+      ],
+      "events": [
+        {
+          "name": "onUCTTakenOver",
+          "type": "function",
+          "description": "Additional option(s) in the unknown content type dialog for an extension to take over the download",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Identify the selected additional option"
+                },
+                "url": {
+                  "format": "url",
+                  "type": "string",
+                  "description": "The source url to download with the extension"
+                }
+              }
+            },
+            {
+              "name": "tab",
+              "$ref": "tabs.Tab",
+              "optional": true
+            }
+          ],
+          "extraParameters": [
+            {
+              "name": "options",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Z_a-z]+$",
+                    "description": "Identify this additional option"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "The label to display in the unknown content type dialog"
+                  },
+                  "notFor": {
+                    "type": "array",
+                    "items": { "$ref": "manifest.MatchPattern" },
+                    "optional": true,
+                    "default": []
+                  }
+                }
+              },
+              "minItems": 1
+            }
+          ]
         }
       ]
     }

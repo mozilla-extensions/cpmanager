@@ -1,0 +1,7 @@
+#mode > radio {
+  height: 21px;
+}
+
+#mode > hbox {
+  margin: -2px 0;
+}
