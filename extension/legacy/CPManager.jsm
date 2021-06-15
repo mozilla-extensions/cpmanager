@@ -53,8 +53,7 @@ XPCOMUtils.defineLazyGetter(this, "gMM", () => {
 
 this.userJSDetection = {
   get sandbox() {
-    let nullprincipal = Cc["@mozilla.org/nullprincipal;1"].
-      createInstance(Ci.nsIPrincipal);
+    let nullprincipal = Services.scriptSecurityManager.createNullPrincipal({});
 
     let sandbox = Cu.Sandbox(nullprincipal);
     sandbox.user_pref = this.userPref.bind(this);
