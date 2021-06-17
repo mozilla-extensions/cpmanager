@@ -803,6 +803,19 @@ this.fxaRelatedHack = {
       "browser.contentblocking.report.mobile-android.url",
       "https://www.firefox.com.cn/mobile/?utm_source=protection_report&utm_content=mobile_promotion"
     );
+
+    let svgContextPref = "svg.context-properties.content.allowed-domains";
+    let svgContextDomains = this.prefs.getCharPref(svgContextPref, "");
+    let svgContextSet = new Set(svgContextDomains.split(",").filter(domain => {
+      return domain !== "";
+    }));
+    if (svgContextSet.size) {
+      svgContextSet.add("profile.firefox.com.cn");
+      this.prefs.setCharPref(
+        svgContextPref,
+        Array.from(svgContextSet).join(",")
+      );
+    }
   },
 };
 
