@@ -333,9 +333,6 @@ this.mobileBookmarksHack = {
   },
   onBeforeCreated(doc) {
     let win = doc.defaultView;
-    // Since Fx 69, https://bugzil.la/1551320
-    let createElement = (doc.createXULElement ||
-                         doc.createElement).bind(doc);
 
     win.MOA = win.MOA || {};
     win.MOA.Improve = win.MOA.Improve || {};
@@ -349,19 +346,19 @@ this.mobileBookmarksHack = {
 
     let parent = doc.getElementById("appMenu-multiView");
 
-    let panelview = createElement("panelview");
+    let panelview = doc.createXULElement("panelview");
     panelview.id = this.viewId;
     panelview.className = "PanelUI-subView";
     panelview.setAttribute("flex", "1");
 
-    let body = createElement("vbox");
+    let body = doc.createXULElement("vbox");
     body.className = "panel-subview-body";
 
-    let main = createElement("vbox");
+    let main = doc.createXULElement("vbox");
     main.id = "PanelUI-MOA-mobileBookmarks-main";
     main.setAttribute("hidden", "true");
 
-    let deck = createElement("deck");
+    let deck = doc.createXULElement("deck");
     deck.id = "PanelUI-MOA-mobileBookmarks-deck";
 
     for (let { id, titleKey, labelKey, buttonKey, command } of [{
@@ -377,37 +374,37 @@ this.mobileBookmarksHack = {
       buttonKey: "mobilePromo",
       command: "window.openWebLinkIn('http://www.firefox.com.cn/mobile/?utm_source=firefox-browser&utm_medium=firefox-browser&utm_campaign=moa-mobile-bookmarks', 'tab'); MOA.Improve.MobileBookmarks.track('noclients');",
     }]) {
-      let pane = createElement("hbox");
+      let pane = doc.createXULElement("hbox");
       pane.id = id;
       pane.setAttribute("pack", "center");
       pane.setAttribute("flex", "1");
 
-      let vbox = createElement("vbox");
+      let vbox = doc.createXULElement("vbox");
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
       vbox.setAttribute("align", "center");
 
-      let imageBox = createElement("hbox");
+      let imageBox = doc.createXULElement("hbox");
       imageBox.setAttribute("pack", "center");
 
-      let image = createElement("image");
+      let image = doc.createXULElement("image");
       image.className = "fxaSyncIllustration";
       imageBox.appendChild(image);
       vbox.appendChild(imageBox);
 
-      let title = createElement("label");
+      let title = doc.createXULElement("label");
       title.className = "PanelUI-MOA-mobileBookmarks-instruction-title";
       title.textContent = this._(`cp.moaMobileBookmarks.${titleKey}.title`);
       vbox.appendChild(title);
 
-      let label = createElement("label");
+      let label = doc.createXULElement("label");
       label.className = "PanelUI-MOA-mobileBookmarks-instruction-label";
       label.textContent = this._(`cp.moaMobileBookmarks.${labelKey}.label`);
       vbox.appendChild(label);
 
-      let buttonBox = createElement("hbox");
+      let buttonBox = doc.createXULElement("hbox");
       buttonBox.setAttribute("pack", "center");
 
-      let button = createElement("toolbarbutton");
+      let button = doc.createXULElement("toolbarbutton");
       button.className = "PanelUI-MOA-mobileBookmarks-prefs-button";
       button.setAttribute("label", this._(`cp.moaMobileBookmarks.${buttonKey}.label`));
       button.setAttribute("oncommand", command);
@@ -420,7 +417,7 @@ this.mobileBookmarksHack = {
     main.appendChild(deck);
     body.appendChild(main);
 
-    let secondary = createElement("hbox");
+    let secondary = doc.createXULElement("hbox");
     secondary.setAttribute("pack", "center");
     secondary.setAttribute("flex", "1");
 
@@ -429,28 +426,28 @@ this.mobileBookmarksHack = {
     }, {
       id: "PanelUI-MOA-mobileBookmarks-reauthsync",
     }]) {
-      let vbox = createElement("vbox");
+      let vbox = doc.createXULElement("vbox");
       vbox.id = id;
       vbox.className = "PanelUI-MOA-mobileBookmarks-instruction-box";
       vbox.setAttribute("align", "center");
       vbox.setAttribute("flex", "1");
       vbox.setAttribute("hidden", "true");
 
-      let image = createElement("image");
+      let image = doc.createXULElement("image");
       image.className = "fxaSyncIllustration";
       vbox.appendChild(image);
 
-      let title = createElement("label");
+      let title = doc.createXULElement("label");
       title.className = "PanelUI-MOA-mobileBookmarks-instruction-title";
       title.textContent = this._("cp.moaMobileBookmarks.notsignedin.title");
       vbox.appendChild(title);
 
-      let label = createElement("label");
+      let label = doc.createXULElement("label");
       label.className = "PanelUI-MOA-mobileBookmarks-instruction-label";
       label.textContent = this._("cp.moaMobileBookmarks.generic.label");
       vbox.appendChild(label);
 
-      let button = createElement("toolbarbutton");
+      let button = doc.createXULElement("toolbarbutton");
       button.className = "PanelUI-MOA-mobileBookmarks-prefs-button";
       button.setAttribute("label", this._("cp.moaMobileBookmarks.signin.label"));
       button.setAttribute("oncommand", "MOA.Improve.MobileBookmarks.openPrefs(window, 'moa-mobile-bookmarks'); MOA.Improve.MobileBookmarks.track('auth');");
@@ -463,7 +460,7 @@ this.mobileBookmarksHack = {
     parent.appendChild(panelview);
 
     let mainPopupSet = doc.getElementById("mainPopupSet");
-    let menupopup = createElement("menupopup");
+    let menupopup = doc.createXULElement("menupopup");
     menupopup.id = this.bookmarksPopupId;
     menupopup.setAttribute("placespopup", "true");
     menupopup.setAttribute("context", "placesContext");
@@ -733,39 +730,6 @@ this.trackingProtectionHack = {
   },
 };
 
-this.amoDiscoPaneHack = {
-  get prefs() {
-    let branch = "extensions.";
-    delete this.prefs;
-    return this.prefs = Services.prefs.getDefaultBranch(branch);
-  },
-
-  init() {
-    this.defaultPrefTweak();
-  },
-
-  defaultPrefTweak() {
-    try {
-      for (let prefKey of [
-        "getAddons.discovery.api_url",
-      ]) {
-        let url = new URL(this.prefs.getCharPref(prefKey));
-        if (!url.searchParams.has("edition")) {
-          // url.searchParams.append will encode %LOCALE% into %25LOCALE%25
-          if (url.search.length) {
-            url.search = `${url.search}&edition=china`;
-          } else {
-            url.search = "?edition=china";
-          }
-        }
-        this.prefs.setCharPref(prefKey, url.href);
-      }
-    } catch (ex) {
-      Cu.reportError(ex);
-    }
-  },
-};
-
 this.fxaRelatedHack = {
   get prefs() {
     delete this.prefs;
@@ -833,7 +797,6 @@ this.mozCNGuard = {
         mozCNSafeBrowsing.defaultPrefTweak();
         distributorChannelHack.defaultPrefTweak();
         trackingProtectionHack.defaultPrefTweak();
-        amoDiscoPaneHack.defaultPrefTweak();
         fxaRelatedHack.defaultPrefTweak();
         break;
     }
@@ -954,7 +917,6 @@ this.mozCNGuard = {
     dragAndDrop.init();
     mobileBookmarksHack.init();
     trackingProtectionHack.init();
-    amoDiscoPaneHack.init();
     fxaRelatedHack.init();
 
     CETracking.init(strings);

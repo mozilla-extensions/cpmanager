@@ -240,9 +240,6 @@ ceTracking.prototype = {
 
   addPrefs(win) {
     let doc = win.document;
-    // Since Fx 69, https://bugzil.la/1551320
-    let createElement = (doc.createXULElement ||
-                         doc.createElement).bind(doc);
 
     let id = "extensions.cpmanager.tracking.enabled";
     let type = "bool";
@@ -252,16 +249,16 @@ ceTracking.prototype = {
 
     let body = doc.getElementById("dataCollectionGroup");
     let parent = body.querySelector('[data-subcategory="reports"]') || body;
-    let hbox = createElement("hbox");
+    let hbox = doc.createXULElement("hbox");
     hbox.setAttribute("align", "center");
 
-    let checkbox = createElement("checkbox");
+    let checkbox = doc.createXULElement("checkbox");
     checkbox.classList.add("tail-with-learn-more");
     checkbox.setAttribute("preference", id);
     checkbox.setAttribute("label", this._("ceTracking.label"));
     checkbox.setAttribute("accesskey", this._("ceTracking.accesskey"));
 
-    let label = createElement("label", { is: "text-link" });
+    let label = doc.createXULElement("label", { is: "text-link" });
     label.id = "mococnTrackingLearnMore";
     label.classList.add("learnMore");
     label.textContent = this._("ceTracking.learnMore.label");
