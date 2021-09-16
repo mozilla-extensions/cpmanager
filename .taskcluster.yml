@@ -12,9 +12,7 @@ tasks:
           # `privileged` for AMO or self-hosted privileged add-on,
           # `mozillaonline-privileged` for Mozilla China add-on,
           # `normandy-privileged` for normandy add-on
-          # to enable siging on push/PR. Note, this only works for public repos
-          # for now. Release builds off shipit will get signing for both public
-          # and private repos.
+          # to enable siging on push/PR.
           xpiSigningType: "mozillaonline-privileged"
           # The below doesn't need changing on initial repo setup
           taskgraph:

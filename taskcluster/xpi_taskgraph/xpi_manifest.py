@@ -89,6 +89,14 @@ def get_manifest():
                 if target.startswith("test") or target == "lint":
                     manifest["tests"].append(target)
             manifest["name"] = package_json["name"].lower()
+            manifest[
+                "docker-image"
+            ] = "xpi.cache.level-3.docker-images.v2.node-14.latest"
+            if "docker-image" in package_json:
+                manifest["docker-image"] = (
+                    "xpi.cache.level-3.docker-images.v2.%s.latest"
+                    % package_json["docker-image"]
+                )
             manifest_list.append(ReadOnlyDict(manifest))
     check_manifest(manifest_list[:])
     return tuple(manifest_list)
