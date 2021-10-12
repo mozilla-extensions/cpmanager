@@ -750,6 +750,7 @@ this.fxaRelatedHack = {
     }
 
     for (let prefKey of [
+      "browser.newtabpage.activity-stream.asrouter.disable-captive-portal-vpn-promo",
       "signon.management.page.hideMobileFooter",
     ]) {
       this.prefs.setBoolPref(prefKey, true);
