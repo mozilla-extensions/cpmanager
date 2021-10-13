@@ -138,19 +138,36 @@ let TrackingNotificationInfoBar = {
       },
     }];
 
-    this._notificationBox.appendNotification(
-      message,
-      this._DATA_CHOICES_NOTIFICATION,
-      null,
-      this._notificationBox.PRIORITY_INFO_HIGH,
-      buttons,
-      event => {
-        Services.prefs.setBoolPref(this._prefKey, false);
-        if (event == "removed") {
-          this._clearNotification();
-        }
+    let notificationBox = this._notificationBox;
+    let eventCallback = event => {
+      Services.prefs.setBoolPref(this._prefKey, false);
+      if (event == "removed") {
+        this._clearNotification();
       }
-    );
+    };
+
+    // Since Fx 94, see https://bugzil.la/1690390
+    if (notificationBox.isShown !== undefined) {
+      notificationBox.appendNotification(
+        this._DATA_CHOICES_NOTIFICATION,
+        {
+          label: message,
+          image: null,
+          priority: notificationBox.PRIORITY_INFO_HIGH,
+          eventCallback,
+        },
+        buttons
+      );
+    } else {
+      notificationBox.appendNotification(
+        message,
+        this._DATA_CHOICES_NOTIFICATION,
+        null,
+        notificationBox.PRIORITY_INFO_HIGH,
+        buttons,
+        eventCallback
+      );
+    }
   },
 
   _clearNotification() {
