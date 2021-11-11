@@ -790,9 +790,9 @@ this.mozCNGuard = {
   // nsIObserver
   observe: function MCG_observe(aSubject, aTopic, aData) {
     switch (aTopic) {
-      case "sessionstore-state-finalized":
       case "sessionstore-windows-restored":
-        this.maybeOpenStartPages(aTopic);
+        Services.obs.removeObserver(this, aTopic);
+        this.maybeOpenStartPages();
         break;
       case "prefservice:after-app-defaults":
         mozCNSafeBrowsing.defaultPrefTweak();
@@ -903,7 +903,14 @@ this.mozCNGuard = {
     strings.init(context);
 
     if (isAppStartup) {
-      Services.obs.addObserver(this, "sessionstore-state-finalized");
+      SessionStartup.onceInitialized.then(() => {
+        if (SessionStartup.sessionType != SessionStartup.NO_SESSION) {
+          Services.obs.addObserver(this, "sessionstore-windows-restored");
+          return;
+        }
+
+        this.maybeOpenStartPages();
+      });
     }
     Services.obs.addObserver(this, "prefservice:after-app-defaults");
 
@@ -968,15 +975,7 @@ this.mozCNGuard = {
     });
   },
 
-  maybeOpenStartPages: function MCG_maybeOpenStartPages(aTopic) {
-    Services.obs.removeObserver(this, aTopic);
-
-    if (aTopic == "sessionstore-state-finalized" &&
-        SessionStartup.sessionType != SessionStartup.NO_SESSION) {
-      Services.obs.addObserver(this, "sessionstore-windows-restored");
-      return;
-    }
-
+  maybeOpenStartPages: function MCG_maybeOpenStartPages() {
     let w = Services.wm.getMostRecentWindow("navigator:browser");
 
     if (this.startPageChoice != 1) {
