@@ -17,7 +17,7 @@ this.ShellSvcStartup = {
     delete this.shouldApply;
     return this.shouldApply = Services.appinfo.OS == "WINNT" &&
       Services.vc.compare(Services.sysinfo.getProperty("version"), "6.2") < 0 &&
-      Services.vc.compare(Services.appinfo.version, "96.0") < 0;
+      Services.vc.compare(Services.appinfo.version, "97.0") < 0;
   },
 
   _init() {
