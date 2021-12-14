@@ -3,8 +3,19 @@ this.EXPORTED_SYMBOLS = ["URL2QR"];
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetters(this, {
-  require: "resource://devtools/shared/Loader.jsm",
   Services: "resource://gre/modules/Services.jsm",
+});
+// Since Fx 96, see https://bugzil.la/1741369
+XPCOMUtils.defineLazyGetter(this, "require", function() {
+  try {
+    return ChromeUtils.import(
+      "resource://devtools/shared/loader/Loader.jsm"
+    ).require;
+  } catch (ex) {
+    return ChromeUtils.import(
+      "resource://devtools/shared/Loader.jsm"
+    ).require;
+  }
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
