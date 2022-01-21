@@ -745,12 +745,14 @@ this.fxaRelatedHack = {
       // instead of setting the proper "browser.contentblocking.report.manage_devices.url"
       "browser.contentblocking.report.lockwise.enabled",
       "browser.contentblocking.report.monitor.enabled",
+      "browser.vpn_promo.enabled",
     ]) {
       this.prefs.setBoolPref(prefKey, false);
     }
 
     for (let prefKey of [
       "browser.newtabpage.activity-stream.asrouter.disable-captive-portal-vpn-promo",
+      // Deprecated since Fx 84, see https://bugzil.la/1668965
       "signon.management.page.hideMobileFooter",
     ]) {
       this.prefs.setBoolPref(prefKey, true);
@@ -759,6 +761,7 @@ this.fxaRelatedHack = {
     for (let prefKey of [
       "browser.privatebrowsing.vpnpromourl",
       "identity.fxaccounts.service.monitorLoginUrl",
+      // Deprecated since Fx 81, see https://bugzil.la/1657626
       "identity.fxaccounts.service.sendLoginUrl",
     ]) {
       this.prefs.setCharPref(prefKey, "");
