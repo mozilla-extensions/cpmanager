@@ -751,6 +751,7 @@ this.fxaRelatedHack = {
     }
 
     for (let prefKey of [
+      // Deprecated since Fx 99, see https://bugzil.la/1747149
       "browser.newtabpage.activity-stream.asrouter.disable-captive-portal-vpn-promo",
       // Deprecated since Fx 84, see https://bugzil.la/1668965
       "signon.management.page.hideMobileFooter",
@@ -759,6 +760,7 @@ this.fxaRelatedHack = {
     }
 
     for (let prefKey of [
+      // Deprecated since Fx 99, see https://bugzil.la/1747149
       "browser.privatebrowsing.vpnpromourl",
       "identity.fxaccounts.service.monitorLoginUrl",
       // Deprecated since Fx 81, see https://bugzil.la/1657626
