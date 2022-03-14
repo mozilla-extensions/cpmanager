@@ -9,7 +9,6 @@
     "background": {
       "scripts": [
         "bg/clearHistory.js",
-        "bg/panBaidu.js",
         "bg/tracking.js",
         "bg/undoCloseTab.js"
       ]
@@ -54,17 +53,12 @@
     },
     "manifest_version": 2,
     "name": "__MSG_extensionName__",
-    "optional_permissions": [
-      "https://pan.baidu.com/*",
-      "notifications"
-    ],
     "options_ui": {
       "browser_style": true,
       "page": "options/options.html"
     },
     "permissions": [
       "history",
-      "identity",
       "idle",
       "menus",
       "privacy",
