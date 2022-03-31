@@ -745,6 +745,7 @@ this.fxaRelatedHack = {
       // instead of setting the proper "browser.contentblocking.report.manage_devices.url"
       "browser.contentblocking.report.lockwise.enabled",
       "browser.contentblocking.report.monitor.enabled",
+      "browser.promo.focus.enabled",
       "browser.vpn_promo.enabled",
     ]) {
       this.prefs.setBoolPref(prefKey, false);
