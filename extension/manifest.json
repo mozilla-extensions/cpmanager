@@ -61,10 +61,11 @@
       "history",
       "idle",
       "menus",
+      "mozillaAddons",
       "privacy",
       "sessions",
       "storage",
       "tabs"
     ],
-    "version": "5.100"
+    "version": "5.101"
   }
