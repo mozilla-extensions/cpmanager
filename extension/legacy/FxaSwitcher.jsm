@@ -8,12 +8,16 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
 
 XPCOMUtils.defineLazyModuleGetters(this, {
-  fxAccounts: "resource://gre/modules/FxAccounts.jsm",
   FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.jsm",
   Services: "resource://gre/modules/Services.jsm",
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+});
+XPCOMUtils.defineLazyGetter(this, "fxAccounts", () => {
+  let obj = ChromeUtils.import("resource://gre/modules/FxAccounts.jsm");
+  // Since Fx 103, see https://bugzil.la/1771463
+  return obj.fxAccounts || obj.getFxAccountsSingleton();
 });
 
 const AUTO_CONFIG_KEY = "identity.fxaccounts.autoconfig.uri";
