@@ -1,10 +1,12 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* global globalThis */
 this.EXPORTED_SYMBOLS = ["URL2QR"];
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
-XPCOMUtils.defineLazyModuleGetters(this, {
-  Services: "resource://gre/modules/Services.jsm",
-});
 // Since Fx 96, see https://bugzil.la/1741369
 XPCOMUtils.defineLazyGetter(this, "require", function() {
   try {
@@ -20,6 +22,10 @@ XPCOMUtils.defineLazyGetter(this, "require", function() {
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 function Listener(win) {
   this.win = win;

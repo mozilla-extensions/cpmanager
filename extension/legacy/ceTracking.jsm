@@ -1,3 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* global globalThis */
 this.EXPORTED_SYMBOLS = [
   "ceTracking",
   "TrackingNotificationInfoBar",
@@ -9,10 +14,12 @@ const USAGE_URI = "http://addons.g-fox.cn/tk.gif";
 
 ChromeUtils.defineModuleGetter(this, "AsyncShutdown",
   "resource://gre/modules/AsyncShutdown.jsm");
-ChromeUtils.defineModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
 
 const keyedCount = {};
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 function usageDataEnabled() {
   try {

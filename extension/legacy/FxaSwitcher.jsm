@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global globalThis */
 this.EXPORTED_SYMBOLS = ["FxaSwitcher"];
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
@@ -9,7 +10,6 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
 
 XPCOMUtils.defineLazyModuleGetters(this, {
   FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.jsm",
-  Services: "resource://gre/modules/Services.jsm",
 });
 XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
@@ -19,6 +19,10 @@ XPCOMUtils.defineLazyGetter(this, "fxAccounts", () => {
   // Since Fx 103, see https://bugzil.la/1771463
   return obj.fxAccounts || obj.getFxAccountsSingleton();
 });
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 const AUTO_CONFIG_KEY = "identity.fxaccounts.autoconfig.uri";
 const AUTO_CONFIG_VAL = "https://accounts.firefox.com.cn";

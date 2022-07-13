@@ -1,5 +1,13 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* eslint-env mozilla/frame-script */
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+/* global globalThis */
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 let DragDropObserver = {
   // We want to know the "true" source of the drag, which we can no longer

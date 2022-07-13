@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global globalThis */
 this.EXPORTED_SYMBOLS = ["ShellSvcProxy", "strings"];
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
@@ -9,12 +10,15 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
 
 XPCOMUtils.defineLazyModuleGetters(this, {
   PlacesUtils: "resource://gre/modules/PlacesUtils.jsm",
-  Services: "resource://gre/modules/Services.jsm",
 });
 
 XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
   return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
 });
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 const origShellSvc = Cc["@mozilla.org/browser/shell-service;1"].getService(Ci.nsIShellService);
 try {

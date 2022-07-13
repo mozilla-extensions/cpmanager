@@ -2,9 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global globalThis */
 this.EXPORTED_SYMBOLS = ["mozCNGuard"];
 
 const { manager: Cm } = Components;
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
   "resource://gre/modules/XPCOMUtils.jsm");
@@ -28,7 +33,6 @@ XPCOMUtils.defineLazyModuleGetters(this, {
   PageActions: "resource:///modules/PageActions.jsm",
   PlacesUIUtils: "resource:///modules/PlacesUIUtils.jsm",
   PlacesUtils: "resource://gre/modules/PlacesUtils.jsm",
-  Services: "resource://gre/modules/Services.jsm",
   SessionStartup: "resource:///modules/sessionstore/SessionStartup.jsm",
   ShellSvcProxy: "resource://cpmanager-legacy/ShellSvc.jsm",
   ShellSvcStartup: "resource://cpmanager-legacy/ShellSvcStartup.jsm",

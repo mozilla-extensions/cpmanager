@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global globalThis */
 var EXPORTED_SYMBOLS = ["mozCNSafeBrowsing"];
 
 ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
@@ -10,7 +11,6 @@ ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
 XPCOMUtils.defineLazyModuleGetters(this, {
   clearTimeout: "resource://gre/modules/Timer.jsm",
   SafeBrowsing: "resource://gre/modules/SafeBrowsing.jsm",
-  Services: "resource://gre/modules/Services.jsm",
   setTimeout: "resource://gre/modules/Timer.jsm",
 });
 
@@ -20,6 +20,11 @@ XPCOMUtils.defineLazyServiceGetter(this, "listManager",
   "@mozilla.org/url-classifier/listmanager;1", "nsIUrlListManager");
 
 XPCOMUtils.defineLazyGlobalGetters(this, ["fetch"]);
+
+// Since Fx 104, see https://bugzil.la/1667455,1780695
+const Services =
+  globalThis.Services ||
+  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 let mozCNSafeBrowsing = {
   providers: [],
