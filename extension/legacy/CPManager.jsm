@@ -875,10 +875,10 @@ this.mozCNGuard = {
 
     constructors.forEach(targetConstructor => {
       let proto = targetConstructor.prototype;
-      // Since Fx 80, see https://bugzil.la/1649554
+      // Since Fx 80, see https://bugzil.la/1649554,1776207
       let getFactory = XPCOMUtils._getFactory
         ? XPCOMUtils._getFactory.bind(XPCOMUtils)
-        : ComponentUtils._getFactory.bind(ComponentUtils);
+        : ComponentUtils.generateSingletonFactory.bind(ComponentUtils);
       let factory = getFactory(targetConstructor);
       this.factories.set(proto.classID, factory);
       Cm.registerFactory(proto.classID, proto.classDescription,
