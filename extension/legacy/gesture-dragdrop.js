@@ -125,8 +125,8 @@ let DragDropObserver = {
 
   // Similar to nsDragAndDrop.dragDropSecurityCheck
   _securityCheck( aEvent ) {
-    let name = {};
-    return Services.droppedLinkHandler.dropLink(aEvent, name, true);
+    var links = Services.droppedLinkHandler.dropLinks(aEvent, true);
+    return (links.length && links[0].url) || "";
   },
 
   // Determine if two DOM nodes are from the same content area.
