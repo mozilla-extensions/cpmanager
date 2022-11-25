@@ -1007,7 +1007,11 @@ this.mozCNGuard = {
       }
 
       this.startPage.split("|").forEach((aPage, aIndex) => {
-        if (aPage === "about:blank") {
+        // Since Fx 108, see https://bugzil.la/1676492
+        if (
+          aPage === "chrome://browser/content/blanktab.html" ||
+          aPage === "about:blank"
+        ) {
           return;
         }
 
