@@ -72,10 +72,3 @@
                    30px + /* padding of .PanelUI-remotetabs-instruction-box */
                    11em);
 }
-
-#PersonalToolbar #mozcn-mobile-bookmarks-button {
-  -moz-box-orient: horizontal; /* necessary for macOS */
-}
-#PersonalToolbar #mozcn-mobile-bookmarks-button > .toolbarbutton-text {
-  display: initial;
-}

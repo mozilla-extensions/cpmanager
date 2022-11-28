@@ -623,6 +623,15 @@ this.mobileBookmarksHack = {
     var query = `place:parent=${PlacesUtils.bookmarks.mobileGuid}`;
     new win.PlacesMenu(evt, query);
   },
+  updateMobileBookmarks(aNode, aContainer) {
+    if (aNode.id !== this.id) {
+      return;
+    }
+
+    let isBookmarkItem = aContainer && aContainer.id == "PersonalToolbar";
+    aNode.classList.toggle("toolbarbutton-1", !isBookmarkItem);
+    aNode.classList.toggle("bookmark-item", isBookmarkItem);
+  },
   _(strKey) {
     return strings._(strKey.replace("cp.moaMobileBookmarks.",
                                     "mobileBookmarksHack."));
@@ -857,6 +866,15 @@ this.mozCNGuard = {
     for (let win of CustomizableUI.windows) {
       this.onWindowClosed(win);
     }
+  },
+
+  onWidgetBeforeDOMChange(
+    aNode,
+    aNextNode,
+    aContainer,
+    aIsRemoval
+  ) {
+    mobileBookmarksHack.updateMobileBookmarks(aNode, aIsRemoval ? null : aContainer);
   },
 
   onWindowOpened(win) {
