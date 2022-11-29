@@ -858,9 +858,11 @@ this.mozCNGuard = {
     }
 
     CustomizableUI.addListener(this);
+    mobileBookmarksHack.init();
   },
 
   uninitWindowListener() {
+    mobileBookmarksHack.uninit();
     CustomizableUI.removeListener(this);
 
     for (let win of CustomizableUI.windows) {
@@ -951,7 +953,6 @@ this.mozCNGuard = {
     pocketButtonRemoval.init();
     screenshotButtonRemoval.init();
     dragAndDrop.init();
-    mobileBookmarksHack.init();
     trackingProtectionHack.init();
     fxaRelatedHack.init();
 
@@ -971,7 +972,6 @@ this.mozCNGuard = {
 
     // mozCNSafeBrowsing.uninit();
     dragAndDrop.uninit();
-    mobileBookmarksHack.uninit();
 
     CETracking.uninit();
     CETrackingLegacy.uninit();
