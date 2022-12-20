@@ -15,6 +15,7 @@
     },
     "browser_action": {
       "browser_style": true,
+      "default_area": "navbar",
       "default_icon": {
         "16": "icons/undoCloseTab-dark.svg",
         "32": "icons/undoCloseTab-dark.svg",
