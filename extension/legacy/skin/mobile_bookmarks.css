@@ -45,8 +45,8 @@
   background-color: #003eaa;
 }
 .PanelUI-MOA-mobileBookmarks-prefs-button > .toolbarbutton-text {
-  /* `display` necessary since Fx 91, see https://bugzil.la/1698883 */
-  display: -moz-box;
+  /* `display` necessary since Fx 91, see https://bugzil.la/1698883,1790003 */
+  display: block;
   text-align: center !important;
   text-shadow: none;
 }
