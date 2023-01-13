@@ -49,7 +49,7 @@ async function httpGet(url) {
       xmlHttpRequest.timeout = 5e3;
       xmlHttpRequest.onloadend = resolve;
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
       resolve();
     }
   });

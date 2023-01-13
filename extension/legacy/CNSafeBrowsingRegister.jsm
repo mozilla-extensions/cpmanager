@@ -75,7 +75,7 @@ let mozCNSafeBrowsing = {
         ratios = json;
       }
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
     }
 
     // Increase ratios on each startup to speed this up a little bit.
@@ -217,7 +217,7 @@ let mozCNSafeBrowsing = {
     try {
       Services.obs.removeObserver(this, "safebrowsing-update-finished");
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
     }
   },
 };

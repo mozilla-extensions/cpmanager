@@ -84,7 +84,7 @@ this.URL2QR = {
       let cellSize = Math.max(2, altCellSize);
       return encoder.createImgData(cellSize);
     } catch (e) {
-      Cu.reportError(e);
+      console.error(e);
       return {};
     }
   },

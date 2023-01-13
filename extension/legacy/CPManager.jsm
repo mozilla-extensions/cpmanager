@@ -81,7 +81,7 @@ this.userJSDetection = {
         target: this.sandbox,
       });
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
       CETracking.track("userjs-detect-failure");
     }
   },
@@ -139,7 +139,7 @@ this.userJSDetection = {
       }
       await OS.File.writeAtomic(path, updatedText, { encoding: "utf-8" });
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
     }
   },
 };
@@ -848,7 +848,7 @@ this.mozCNGuard = {
       defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", true);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
     } catch (ex) {
-      Cu.reportError(ex);
+      console.error(ex);
     }
   },
 
@@ -989,7 +989,7 @@ this.mozCNGuard = {
       try {
         Cu.unload(`resource://cpmanager-legacy/${jsModule}.jsm`);
       } catch (ex) {
-        Cu.reportError(ex);
+        console.error(ex);
       }
     }
   },
@@ -1060,7 +1060,7 @@ this.mozCNGuard = {
               triggeringPrincipal_base64: E10SUtils.SERIALIZED_SYSTEMPRINCIPAL,
             }],
           }));
-        }).catch(ex => Cu.reportError(ex));
+        }).catch(ex => console.error(ex));
       });
     }
   },

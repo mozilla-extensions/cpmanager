@@ -92,12 +92,12 @@ this.modShellSvc = Object.create(origShellSvc, {
             // clear the visits to helpURI
             PlacesUtils.history.remove(helpURI);
           } catch (ex) {
-            Cu.reportError(ex);
+            console.error(ex);
           }
-        }, ex => Cu.reportError(ex));
+        }, ex => console.error(ex));
       } catch (ex) {
         origShellSvc.setDefaultBrowser.apply(origShellSvc, args);
-        Cu.reportError(ex);
+        console.error(ex);
       }
     },
   },
