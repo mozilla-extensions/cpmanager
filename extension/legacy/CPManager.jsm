@@ -470,6 +470,7 @@ this.mobileBookmarksHack = {
     menupopup.setAttribute("context", "placesContext");
     menupopup.setAttribute("oncommand", "BookmarksEventHandler.onCommand(event, this.parentNode._placesView);");
     menupopup.setAttribute("onclick", "BookmarksEventHandler.onClick(event, this.parentNode._placesView);");
+    menupopup.setAttribute("onpopupshowing", "if (!this.parentNode._placesView) {new PlacesMenu(event, `place:parent=${PlacesUtils.bookmarks.mobileGuid}`);} if (!this.parentNode.open) {this.parentNode.open = true;}");
     menupopup.setAttribute("tooltip", "bhTooltip");
     menupopup.setAttribute("popupsinherittooltip", "true");
     mainPopupSet.appendChild(menupopup);
@@ -595,13 +596,6 @@ this.mobileBookmarksHack = {
         }
         mainPopupSet.appendChild(evt.target);
         break;
-      case "popupshowing":
-        this.maybeAttachPlacesView(evt);
-        // set open to true prematurely will trigger unnecessary rebuild
-        if (!widget.anchor.open) {
-          widget.anchor.open = true;
-        }
-        break;
       default:
         break;
     }
@@ -613,15 +607,6 @@ this.mobileBookmarksHack = {
   },
   uninit() {
     CustomizableUI.destroyWidget(this.id);
-  },
-  maybeAttachPlacesView(evt) {
-    if (evt.target.parentNode._placesView) {
-      return;
-    }
-
-    var win = evt.target.ownerGlobal;
-    var query = `place:parent=${PlacesUtils.bookmarks.mobileGuid}`;
-    new win.PlacesMenu(evt, query);
   },
   updateMobileBookmarks(aNode, aContainer) {
     if (aNode.id !== this.id) {
@@ -643,7 +628,6 @@ this.mobileBookmarksHack = {
     var popup = widget.node.ownerDocument.getElementById(this.bookmarksPopupId);
     widget.node.appendChild(popup);
     popup.addEventListener("popuphidden", this);
-    popup.addEventListener("popupshowing", this);
     popup.openPopup(widget.anchor, "bottomright topright");
   },
   _track(type, action) {
