@@ -1,17 +1,8 @@
 (async function() {
-  const DEBUG = false;
+  const DEBUG = true;
   const DEFAULT_DAYS_TO_KEEP = 91;
   const DAYS_KEY = "clearHistory.days";
   const ENABLED_KEY = "clearHistory.enabled";
-  const LEGACY_PREF_KEY = "extensions.cpmanager@mozillaonline.com.sanitize.timeout";
-  const LEGACY_PREF_TO_DAYS = {
-    "0": 0,
-    "-1": 1,
-    "-2": 7,
-    "-3": 30,
-    "-4": DEFAULT_DAYS_TO_KEEP,
-    "-6": 365,
-  };
 
   async function getDaysToKeep() {
     let {
@@ -26,36 +17,9 @@
       console.log(`"${ENABLED_KEY}" missing from storage.local`);
     }
 
-    let {
-      [LEGACY_PREF_KEY]: legacyPrefVal,
-    } = await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
-      dir: "bg2legacy",
-      type: "migratePrefs",
-      prefKeys: [LEGACY_PREF_KEY],
-    });
-    if (DEBUG) {
-      console.log(`"${LEGACY_PREF_KEY}" is ${legacyPrefVal}`);
-    }
-
-    daysToKeep = LEGACY_PREF_TO_DAYS[legacyPrefVal] || legacyPrefVal;
-
-    if (isNaN(daysToKeep) || daysToKeep < 0) {
-      daysToKeep = DEFAULT_DAYS_TO_KEEP;
-      enabled = true;
-    } else if (daysToKeep === 0) {
-      daysToKeep = DEFAULT_DAYS_TO_KEEP;
-      enabled = false;
-    } else {
-      enabled = daysToKeep <= DEFAULT_DAYS_TO_KEEP;
-    }
-    if (DEBUG) {
-      console.log(`Initial value of ${DAYS_KEY} is ${daysToKeep}`);
-      console.log(`Initial value of ${ENABLED_KEY} is ${enabled}`);
-    }
-
     await browser.storage.local.set({
-      [DAYS_KEY]: daysToKeep,
-      [ENABLED_KEY]: enabled,
+      [DAYS_KEY]: DEFAULT_DAYS_TO_KEEP,
+      [ENABLED_KEY]: true,
     });
     return enabled ? DEFAULT_DAYS_TO_KEEP : 0;
   }
