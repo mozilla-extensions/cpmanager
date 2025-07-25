@@ -2,30 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global globalThis */
-this.EXPORTED_SYMBOLS = ["URL2QR"];
+const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
-// Since Fx 96, see https://bugzil.la/1741369
-XPCOMUtils.defineLazyGetter(this, "require", function() {
-  try {
-    return ChromeUtils.import(
-      "resource://devtools/shared/loader/Loader.jsm"
-    ).require;
-  } catch (ex) {
-    return ChromeUtils.import(
-      "resource://devtools/shared/Loader.jsm"
-    ).require;
-  }
+const lazy = {};
+
+ChromeUtils.defineESModuleGetters(lazy, {
+  require: "resource://devtools/shared/loader/Loader.sys.mjs"
 });
-XPCOMUtils.defineLazyGetter(this, "CETracking", function() {
-  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 function Listener(win) {
   this.win = win;
@@ -51,7 +34,7 @@ Listener.prototype = {
   },
 };
 
-this.URL2QR = {
+export let URL2QR = {
   elements: new Map(),
   listeners: new Map(),
   prefKey: "extensions.cmimprove.url2qr.enabled",
@@ -64,8 +47,8 @@ this.URL2QR = {
 
   generateGIFwithFx(message) {
     try {
-      let QR = require("devtools/shared/qrcode/index");
-      let Encoder = require("devtools/shared/qrcode/encoder/index").Encoder;
+      let QR = lazy.require("devtools/shared/qrcode/index");
+      let Encoder = lazy.require("devtools/shared/qrcode/encoder/index").Encoder;
 
       let quality = "L";
       let version = QR.findMinimumVersion(message, quality);
@@ -103,9 +86,7 @@ this.URL2QR = {
     elements.popupImage.src = this.generateGIFwithFx(uri.asciiSpec).src;
   },
 
-  popupShown() {
-    CETracking.track("url2qr-qrshown");
-  },
+  popupShown() {},
 
   handleEvent(evt) {
     switch (evt.type) {

@@ -2,90 +2,51 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* eslint-env mozilla/frame-script */
-/* global globalThis */
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
-
-let DragDropObserver = {
+const GestureDragDrop = {
   // We want to know the "true" source of the drag, which we can no longer
   // reliably get from the drag session in Gecko 1.9.1
   _sourceNode: null,
 
   _startX: -1,
   _startY: -1,
-
   _listening: false,
-  messageName: "cpmanager@mozillaonline.com:dragAndDrop",
 
-  receiveMessage(msg) {
-    this._listening = msg.data.listening;
-  },
+  async init() {
+    document.addEventListener("dragstart", (e) => this.dragstart(e));
+    document.addEventListener("dragover", (e) => this.dragover(e));
+    document.addEventListener("drop", (e) => this.dragdrop(e));
 
-  observe(subject, topic, data) {
-    switch (topic) {
-      case "content-document-global-created":
-        if (!content || !subject || subject.top !== content) {
-          return;
-        }
-        this.init(subject);
-        break;
-    }
-  },
-
-  init(subject) {
-    subject.addEventListener("DOMContentLoaded", this);
-    subject.addEventListener("unload", this);
-
-    if (subject.top !== subject) {
-      return;
-    }
-
-    sendAsyncMessage(this.messageName, {
-      data: "listening",
+    this._listening = await browser.runtime.sendMessage({
       type: "query",
+      data: "listening",
     });
   },
 
-  fireDragGestureEvent(event) {
-    this.onDragGesture(event);
-
-    this._startX = -1;
-    this._startY = -1;
+  _fromSameContentArea( node1, node2 ) {
+    return (
+      node1 && node2 &&
+      node1.ownerDocument?.defaultView?.top?.document === node2.ownerDocument?.defaultView?.top?.document
+    );
   },
 
-  attachWindow(event) {
-    event.target.addEventListener("dragstart", this);
-    event.target.addEventListener("dragover", this);
-    event.target.addEventListener("drop", this);
+  _canDropLink(evt) {
+    const dt = evt.dataTransfer;
+    if (!dt || !dt.types) return false;
+
+    const types = Array.from(dt.types);
+    return types.includes("application/x-moz-file") ||
+           types.includes("text/x-moz-url") ||
+           types.includes("text/uri-list") ||
+           types.includes("text/x-moz-text-internal") ||
+           types.includes("text/plain");
   },
 
-  detachWindow(event) {
-    event.target.removeEventListener("dragstart", this);
-    event.target.removeEventListener("dragover", this);
-    event.target.removeEventListener("drop", this);
-  },
-
-  handleEvent(event) {
-    switch (event.type) {
-      case "dragstart":
-        this.dragstart(event);
-        break;
-      case "dragover":
-        this.dragover(event);
-        break;
-      case "drop":
-        this.dragdrop(event);
-        break;
-      case "DOMContentLoaded":
-        this.attachWindow(event);
-        break;
-      case "unload":
-        this.detachWindow(event);
-        break;
-    }
+  _shouldHandleEvent(evt) {
+    return (
+      this._listening && this._canDropLink(evt) &&
+      ( evt.dataTransfer.mozSourceNode == null ||
+        this._fromSameContentArea(evt.dataTransfer.mozSourceNode, evt.target) )
+    );
   },
 
   /**
@@ -103,7 +64,7 @@ let DragDropObserver = {
    **/
 
   // Similar to nsDragAndDrop.js's data retrieval; see nsDragAndDrop.drop
-  _getDragData( aEvent ) {
+  _getDragData(aEvent) {
     var data = "";
     var type = "text/unicode";
 
@@ -111,7 +72,7 @@ let DragDropObserver = {
       // Gecko 1.9.1 and newer: WHATWG drag-and-drop
 
       // Try to get text/x-moz-url, if possible
-      var selection = content.getSelection();
+      let selection = window.getSelection()?.toString() ?? "";
       selection = selection ? selection.toString() : "";
       data = aEvent.dataTransfer.getData("text/x-moz-url");
 
@@ -131,49 +92,27 @@ let DragDropObserver = {
     return ({ data, type });
   },
 
-  // Similar to nsDragAndDrop.dragDropSecurityCheck
-  _securityCheck( aEvent ) {
-    var links = Services.droppedLinkHandler.dropLinks(aEvent, true);
-    return (links.length && links[0].url) || "";
+  fireDragGestureEvent(event) {
+    this.onDragGesture(event);
+
+    this._startX = -1;
+    this._startY = -1;
   },
 
-  // Determine if two DOM nodes are from the same content area.
-  _fromSameContentArea( node1, node2 ) {
-    return (
-      node1 && node1.ownerGlobal &&
-      node2 && node2.ownerGlobal &&
-      node1.ownerGlobal.top.document == node2.ownerGlobal.top.document
-    );
-  },
-
-  // Is this an event that we want to handle?
-  _shouldHandleEvent( evt ) {
-    return (
-      this._listening &&
-      Services.droppedLinkHandler.canDropLink(evt, true) &&
-      ( evt.dataTransfer.mozSourceNode == null ||
-        this._fromSameContentArea(evt.dataTransfer.mozSourceNode, evt.target) )
-    );
-  },
-
-  /**
-   * Event handlers
-   **/
-
-  dragstart( evt ) {
+  dragstart(evt) {
     this._sourceNode = evt.explicitOriginalTarget;
     this._startX = evt.pageX;
     this._startY = evt.pageY;
   },
 
-  dragover( evt ) {
+  dragover(evt) {
     if (!this._shouldHandleEvent(evt)) {
       return;
     }
     evt.preventDefault();
   },
 
-  dragdrop( evt ) {
+  dragdrop(evt) {
     if (!this._shouldHandleEvent(evt)) {
       return;
     }
@@ -237,14 +176,15 @@ let DragDropObserver = {
       // that match a valid domain or IP address pattern
       str = str.replace(/^(?:t?t|h[tx]{2,})p(s?:\/\/)/i, "http$1");
 
-      // Call dragDropSecurityCheck
-      this._securityCheck(evt);
+      // Call dragDropSecurityCheck... maybe?
+      evt.dataTransfer.getData("text/plain");
 
       // Send the referrer only for embedded images or emulated
       // middle clicks over HTTP/HTTPS
       var referrer = null;
       if (sourceNode) {
-        referrer = Services.io.newURI(sourceNode.ownerDocument.location.href);
+        referrer = sourceNode?.ownerDocument?.location?.href || "";
+        if (!referrer) return;
 
         if (!(isImage && /^https?$/i.test(referrer.scheme)))
           referrer = null;
@@ -297,12 +237,12 @@ let DragDropObserver = {
       return;
     }
 
-    sendAsyncMessage(this.messageName, {
-      data: event.data,
+    browser.runtime.sendMessage({
       type: event.type,
+      data: event.data,
     });
   },
+
 };
 
-addMessageListener(DragDropObserver.messageName, DragDropObserver);
-Services.obs.addObserver(DragDropObserver, "content-document-global-created");
+GestureDragDrop.init();

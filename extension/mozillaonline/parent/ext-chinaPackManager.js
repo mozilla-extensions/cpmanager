@@ -4,19 +4,11 @@
 
 "use strict";
 
-/* global ExtensionAPI, globalThis */
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
+const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
+
 XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "@mozilla.org/network/protocol;1?name=resource",
   "nsISubstitutingProtocolHandler");
-XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
-  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
 
 const RESOURCE_HOST = "cpmanager-legacy";
 
@@ -26,12 +18,13 @@ this.chinaPackManager = class extends ExtensionAPI {
 
     this.flushCacheOnUpgrade(extension);
 
-    resProto.setSubstitution(RESOURCE_HOST,
-      Services.io.newURI("legacy/", null, extension.rootURI));
+    resProto.setSubstitutionWithFlags(RESOURCE_HOST,
+      Services.io.newURI("legacy/", null, extension.rootURI), Ci.nsISubstitutingProtocolHandler.ALLOW_CONTENT_ACCESS);
 
     try {
-      ChromeUtils.import("resource://cpmanager-legacy/CPManager.jsm", this);
-      this.mozCNGuard.init({ extension });
+      const { mozCNGuard } = ChromeUtils.importESModule("resource://cpmanager-legacy/CPManager.sys.mjs");
+      this.mozCNGuard = mozCNGuard;
+       this.mozCNGuard.init({ extension });
     } catch (ex) {
       console.error(ex);
     }
@@ -44,7 +37,6 @@ this.chinaPackManager = class extends ExtensionAPI {
 
     try {
       this.mozCNGuard.uninit();
-      Cu.unload("resource://cpmanager-legacy/CPManager.jsm");
 
       resProto.setSubstitution(RESOURCE_HOST, null);
     } catch (ex) {
@@ -72,27 +64,9 @@ this.chinaPackManager = class extends ExtensionAPI {
           initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
         }
         return initOptions;
-      case "migratePrefs":
-        let prefsToMigrate = {};
-        for (let prefKey of message.prefKeys) {
-          if (!Services.prefs.prefHasUserValue(prefKey)) {
-            continue;
-          }
-
-          switch (Services.prefs.getPrefType(prefKey)) {
-            case Services.prefs.PREF_INT:
-              prefsToMigrate[prefKey] = Services.prefs.getIntPref(prefKey);
-              break;
-            default:
-              break;
-          }
-
-          Services.prefs.clearUserPref(prefKey);
-        }
-        return prefsToMigrate;
       case "trackingEnabled":
         return {
-          "trackingEnabled": CETracking.ude,
+          "trackingEnabled": false,
         };
       case "updateOptions":
         for (let option in message.detail) {
@@ -113,6 +87,17 @@ this.chinaPackManager = class extends ExtensionAPI {
         chinaPackManager: {
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
+          },
+          async search(text) {
+            const engine = Services.search.defaultEngine;
+            if (!engine) {
+              return null;
+            }
+
+            return engine.getSubmission(text, null).uri.spec;
+          },
+          async gestureEnabled() {
+            return Services.prefs.getBoolPref("extensions.cmimprove.gesture.enabled", true);
           },
         },
       },
