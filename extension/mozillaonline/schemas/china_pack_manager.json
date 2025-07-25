@@ -24,6 +24,25 @@
             }
           ],
           "async": "callback"
+        },
+        {
+          "name": "search",
+          "type": "function",
+          "description": "Search something",
+          "parameters": [
+            {
+              "type": "string",
+              "name": "text"
+            }
+          ],
+          "async": "callback"
+        },
+        {
+          "name": "gestureEnabled",
+          "type": "function",
+          "description": "Is the gesture feature enabled?",
+          "parameters": [],
+          "async": "callback"
         }
       ]
     }

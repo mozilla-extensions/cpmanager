@@ -2,15 +2,15 @@
     "applications": {
       "gecko": {
         "id": "cpmanager@mozillaonline.com",
-        "strict_min_version": "78.0",
-        "update_url": "https://addons.firefox.com.cn/chinaedition/addons/updates.json?reqVersion=%REQ_VERSION%&id=%ITEM_ID%&version=%ITEM_VERSION%&maxAppVersion=%ITEM_MAXAPPVERSION%&status=%ITEM_STATUS%&appID=%APP_ID%&appVersion=%APP_VERSION%&appOS=%APP_OS%&appABI=%APP_ABI%&locale=%APP_LOCALE%&currentAppVersion=%CURRENT_APP_VERSION%&updateType=%UPDATE_TYPE%&compatMode=%COMPATIBILITY_MODE%"
+        "strict_min_version": "78.0"
       }
     },
     "background": {
       "scripts": [
         "bg/clearHistory.js",
         "bg/tracking.js",
-        "bg/undoCloseTab.js"
+        "bg/undoCloseTab.js",
+            "bg/gestureDragDrop.js"
       ]
     },
     "browser_action": {
@@ -67,6 +67,14 @@
       "sessions",
       "storage",
       "tabs"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["contentscripts/gesture-dragdrop.js"],
+        "all_frames": true,
+        "run_at": "document_start"
+      }
     ],
     "version": "5.114"
   }

@@ -21,16 +21,6 @@
     "message": "Undo Close Tab"
   },
 
-  "ceTracking.accesskey": {
-    "message": "U"
-  },
-  "ceTracking.label": {
-    "message": "Allow Firefox to send data on your usage of the extensions to Mozilla, help us make further improvements."
-  },
-  "ceTracking.learnMore.label": {
-    "message": "Learn More"
-  },
-
   "FxaSwitcher.confirm.body.switchToGlobal": {
     "message": "You may experience connection issues when\nusing global service, switch anyway?"
   },
@@ -76,28 +66,6 @@
   },
   "mobileBookmarksHack.signin.label": {
     "message": "Sign in to Sync"
-  },
-
-  "ShellSvcProxy.msg": {
-    "message": "Failed to make Firefox the default browser.\n\nAnother software might be interfering with your operation,\nfind out how to fix this situation."
-  },
-  "ShellSvcProxy.openHelp": {
-    "message": "View Help"
-  },
-
-  "TrackingNotificationInfoBar.button.accessKey": {
-    "message": "C"
-  },
-  "TrackingNotificationInfoBar.button.label": {
-    "message": "Choose What I Share"
-  },
-  "TrackingNotificationInfoBar.message": {
-    "message": "$appname$ automatically sends some data to us so that we can improve your experience.",
-    "placeholders": {
-      "appname": {
-        "content": "$1"
-      }
-    }
   },
 
   "URL2QR.generateQR": {

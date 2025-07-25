@@ -2,31 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global globalThis */
-var EXPORTED_SYMBOLS = ["mozCNSafeBrowsing"];
+const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
+const lazy = {};
 
-XPCOMUtils.defineLazyModuleGetters(this, {
-  clearTimeout: "resource://gre/modules/Timer.jsm",
-  SafeBrowsing: "resource://gre/modules/SafeBrowsing.jsm",
-  setTimeout: "resource://gre/modules/Timer.jsm",
+ChromeUtils.defineESModuleGetters(lazy, {
+  clearTimeout: "resource://gre/modules/Timer.sys.mjs",
+  SafeBrowsing: "resource://gre/modules/SafeBrowsing.sys.mjs",
+  setTimeout: "resource://gre/modules/Timer.sys.mjs",
 });
 
-XPCOMUtils.defineLazyServiceGetter(this, "dbService",
+XPCOMUtils.defineLazyServiceGetter(lazy, "dbService",
   "@mozilla.org/url-classifier/dbservice;1", "nsIUrlClassifierDBService");
-XPCOMUtils.defineLazyServiceGetter(this, "listManager",
+XPCOMUtils.defineLazyServiceGetter(lazy, "listManager",
   "@mozilla.org/url-classifier/listmanager;1", "nsIUrlListManager");
 
-XPCOMUtils.defineLazyGlobalGetters(this, ["fetch"]);
-
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
-
-let mozCNSafeBrowsing = {
+export let mozCNSafeBrowsing = {
   providers: [],
 
   cachedLookupTables: {},
@@ -157,17 +148,17 @@ let mozCNSafeBrowsing = {
   maybeRegister() {
     // Same here, we need to make sure the internal safe browsing has been
     // initialized, so the gethashurl won't be override.
-    if (!SafeBrowsing.initialized) {
-      this.delayTimeout = setTimeout(() => {
+    if (!lazy.SafeBrowsing.initialized) {
+      this.delayTimeout = lazy.setTimeout(() => {
         this.maybeRegister();
       }, 1e3);
       return;
     }
 
-    clearTimeout(this.delayTimeout);
+    lazy.clearTimeout(this.delayTimeout);
 
     Promise.all([new Promise(resolve => {
-      dbService.getTables(resolve);
+      lazy.dbService.getTables(resolve);
     }), this.getRatio()]).then(([tables, ratio]) => {
       let listsToLookup = {};
 
@@ -188,12 +179,12 @@ let mozCNSafeBrowsing = {
           listsToLookup[type] = listsToLookup[type] || [];
           listsToLookup[type].push(listType);
 
-          listManager.registerTable(listType, provider.slug,
+          lazy.listManager.registerTable(listType, provider.slug,
             provider.updateURL, provider.gethashURL);
-          listManager.enableUpdate(listType);
+          lazy.listManager.enableUpdate(listType);
         }
       }
-      listManager.maybeToggleUpdateChecking();
+      lazy.listManager.maybeToggleUpdateChecking();
 
       this.addListsToLookup(listsToLookup);
     });
@@ -204,7 +195,7 @@ let mozCNSafeBrowsing = {
       return;
     }
 
-    dbService.getTables(tables => {
+    lazy.dbService.getTables(tables => {
       if (tables.split("\n").filter(table => table.startsWith("aqksb-")).length) {
         return;
       }
