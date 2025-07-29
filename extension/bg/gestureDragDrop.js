@@ -22,6 +22,9 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       if (message.data !== "listening") {
         break;
       }
-      return await browser.mozillaonline.chinaPackManager.gestureEnabled();
+      return browser.mozillaonline.chinaPackManager.gestureEnabled();
   }
+
+  // This makes the linter happy.
+  return null;
 });

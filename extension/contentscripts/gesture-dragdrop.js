@@ -25,7 +25,11 @@ const GestureDragDrop = {
   _fromSameContentArea( node1, node2 ) {
     return (
       node1 && node2 &&
-      node1.ownerDocument?.defaultView?.top?.document === node2.ownerDocument?.defaultView?.top?.document
+      node1.ownerGlobal &&
+      node1.ownerGlobal.top &&
+      node2.ownerGlobal &&
+      node2.ownerGlobal.top &&
+      node1.ownerGlobal.top.document === node2.ownerGlobal.top.document
     );
   },
 
@@ -72,7 +76,15 @@ const GestureDragDrop = {
       // Gecko 1.9.1 and newer: WHATWG drag-and-drop
 
       // Try to get text/x-moz-url, if possible
-      let selection = window.getSelection()?.toString() ?? "";
+      let selection = "";
+      let sel = window.getSelection();
+      if (sel) {
+        let text = sel.toString();
+        if (text) {
+          selection = text;
+        }
+      }
+
       selection = selection ? selection.toString() : "";
       data = aEvent.dataTransfer.getData("text/x-moz-url");
 
@@ -181,13 +193,12 @@ const GestureDragDrop = {
 
       // Send the referrer only for embedded images or emulated
       // middle clicks over HTTP/HTTPS
-      var referrer = null;
       if (sourceNode) {
-        referrer = sourceNode?.ownerDocument?.location?.href || "";
+        let referrer = sourceNode &&
+                       sourceNode.ownerDocument &&
+                       sourceNode.ownerDocument.location &&
+                       sourceNode.ownerDocument.location.href || "";
         if (!referrer) return;
-
-        if (!(isImage && /^https?$/i.test(referrer.scheme)))
-          referrer = null;
       }
 
       // Turn naked e-mail addresses into mailto: links
