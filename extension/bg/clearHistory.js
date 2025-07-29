@@ -1,12 +1,11 @@
 (async function() {
-  const DEBUG = true;
+  const DEBUG = false;
   const DEFAULT_DAYS_TO_KEEP = 91;
   const DAYS_KEY = "clearHistory.days";
   const ENABLED_KEY = "clearHistory.enabled";
 
   async function getDaysToKeep() {
     let {
-      [DAYS_KEY]: daysToKeep,
       [ENABLED_KEY]: enabled,
     } = await browser.storage.local.get([DAYS_KEY, ENABLED_KEY]);
 
