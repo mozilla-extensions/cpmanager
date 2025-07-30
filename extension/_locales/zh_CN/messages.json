@@ -8,6 +8,9 @@
   "option.clearHistory.enabled": {
     "message": "启用自动清除三个月以前的历史记录"
   },
+  "option.fxa": {
+    "message": "使用本地 Firefox 账号服务登录"
+  },
   "option.gesture": {
     "message": "启用拖拽手势"
   },

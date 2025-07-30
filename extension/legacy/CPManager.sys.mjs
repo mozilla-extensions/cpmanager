@@ -630,6 +630,7 @@ export var mozCNGuard = {
 
       defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", true);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
+      defBranch.setBoolPref("extensions.cmimprove.fxa.enabled", true);
     } catch (ex) {
       console.error(ex);
     }

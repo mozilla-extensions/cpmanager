@@ -61,7 +61,7 @@ this.chinaPackManager = class extends ExtensionAPI {
     switch (message.type) {
       case "initOptions":
         let initOptions = {};
-        for (let option of ["gesture", "url2qr"]) {
+        for (let option of ["gesture", "url2qr", "fxa"]) {
           let prefKey = `extensions.cmimprove.${option}.enabled`;
           initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
         }

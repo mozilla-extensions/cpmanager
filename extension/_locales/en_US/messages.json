@@ -8,6 +8,9 @@
   "option.clearHistory.enabled": {
     "message": "Only keep browsing history of the recent three months"
   },
+  "option.fxa": {
+    "message": "Sign in using a local Firefox Account service"
+  },
   "option.gesture": {
     "message": "Enable drag and drop handling"
   },
