@@ -29,6 +29,10 @@ const SYNC_PREF_VAL = "https://sync.firefox.com.cn/token/1.0/sync/1.5";
 
 export let FxaSwitcher = {
   topic: "sync-pane-loaded",
+  prefKey: "extensions.cmimprove.fxa.enabled",
+
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   get initStep() {
     if (Services.prefs.getPrefType(INIT_STEP_KEY) === Services.prefs.PREF_INT) {
@@ -65,6 +69,7 @@ export let FxaSwitcher = {
     this._strings = strings;
 
     Services.obs.addObserver(this, this.topic);
+    Services.prefs.addObserver("", this, true);
 
     let refreshStatus = "NA";
     let isSignedIn = !!(await lazy.fxAccounts.getSignedInUser());
@@ -101,6 +106,15 @@ export let FxaSwitcher = {
   },
 
   observe(subject, topic, data) {
+    if (topic === "nsPref:changed" && data === this.prefKey) {
+      if (Services.prefs.getBoolPref(this.prefKey)) {
+        this.switchToLocal();
+      } else {
+        this.switchToGlobal();
+      }
+      return;
+    }
+
     if (topic !== this.topic) {
       return;
     }
@@ -163,11 +177,14 @@ export let FxaSwitcher = {
 
   switchToLocal() {
     Services.prefs.setCharPref(AUTO_CONFIG_KEY, AUTO_CONFIG_VAL);
+    Services.prefs.setBoolPref("identity.fxaccounts.oauth.enabled", false);
+    Services.prefs.setCharPref("identity.fxaccounts.contextParam", "fx_desktop_v3");
     lazy.FxAccountsConfig.ensureConfigured();
   },
 
   uninit() {
     Services.obs.removeObserver(this, this.topic);
+    Services.prefs.removeObserver("", this);
 
     delete this._strings;
   },
