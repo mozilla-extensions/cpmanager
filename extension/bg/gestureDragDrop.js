@@ -9,14 +9,10 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       });
       break;
     case "text":
-      const url = await browser.mozillaonline.chinaPackManager.search(message.data);
-      if (url) {
-        browser.tabs.create({
-          url,
-          windowId: sender.tab.windowId,
-          active: true,
-        });
-      }
+      browser.search.query({
+        text: message.data,
+        disposition: "NEW_TAB",
+      });
       break;
     case "query":
       if (message.data !== "listening") {
