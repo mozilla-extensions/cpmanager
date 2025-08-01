@@ -90,14 +90,6 @@ this.chinaPackManager = class extends ExtensionAPI {
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
           },
-          async search(text) {
-            const engine = Services.search.defaultEngine;
-            if (!engine) {
-              return null;
-            }
-
-            return engine.getSubmission(text, null).uri.spec;
-          },
           async gestureEnabled() {
             return Services.prefs.getBoolPref("extensions.cmimprove.gesture.enabled", true);
           },

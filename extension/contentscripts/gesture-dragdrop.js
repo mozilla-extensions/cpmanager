@@ -25,11 +25,13 @@ const GestureDragDrop = {
   _fromSameContentArea( node1, node2 ) {
     return (
       node1 && node2 &&
-      node1.ownerGlobal &&
-      node1.ownerGlobal.top &&
-      node2.ownerGlobal &&
-      node2.ownerGlobal.top &&
-      node1.ownerGlobal.top.document === node2.ownerGlobal.top.document
+      /* eslint-disable */
+      node1.ownerDocument.defaultView &&
+      node1.ownerDocument.defaultView.top &&
+      node2.ownerDocument.defaultView &&
+      node2.ownerDocument.defaultView.top &&
+      node1.ownerDocument.defaultView.top.document === node2.ownerDocument.defaultView.top.document
+      /* eslint-enable */
     );
   },
 
