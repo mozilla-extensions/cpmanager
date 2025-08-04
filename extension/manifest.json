@@ -10,7 +10,7 @@
         "bg/clearHistory.js",
         "bg/tracking.js",
         "bg/undoCloseTab.js",
-            "bg/gestureDragDrop.js"
+        "bg/gestureDragDrop.js"
       ]
     },
     "browser_action": {
