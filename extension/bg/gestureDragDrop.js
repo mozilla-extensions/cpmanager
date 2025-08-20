@@ -1,17 +1,29 @@
+let gestureStartX = -1;
+let gestureStartY = -1;
+
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {
+    case "dragstart":
+      gestureStartX = message.data.X;
+      gestureStartY = message.data.Y;
+      break;
+
     case "image":
     case "link":
-      if (!isValidURL(message.data)) break;
+      if (!validateGestureRangeAndReset(message.data.X, message.data.Y)) break;
 
-      await openTab(sender, message.data);
+      if (!isValidURL(message.data.data)) break;
+
+      await openTab(sender, message.data.data);
       break;
 
     case "text":
+      if (!validateGestureRangeAndReset(message.data.X, message.data.Y)) break;
+
       const tab = await openTab(sender, "about:blank");
 
       await browser.search.query({
-        text: message.data,
+        text: message.data.data,
         tabId: tab.id,
       });
       break;
@@ -30,9 +42,8 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 function isValidURL(data) {
   try {
     const url = new URL(data);
-    return ["https:", "http:", "mailto:"].includes(url.protocol)
-    return true;
-  } catch(e) {
+    return ["https:", "http:", "mailto:"].includes(url.protocol);
+  } catch (e) {
     return false;
   }
 }
@@ -52,4 +63,17 @@ function openTab(sender, url) {
   }
 
   return browser.tabs.create(props);
+}
+
+function validateGestureRangeAndReset(gestureStopX, gestureStopY) {
+  if (gestureStartX === -1 || gestureStartY === -1) return false;
+
+  const deltaX = gestureStopX - gestureStartX;
+  const deltaY = gestureStopY - gestureStartY;
+
+  gestureStartX = -1;
+  gestureStartY = -1;
+
+  // not drag long enough I think
+  return deltaX * deltaX + deltaY * deltaY > 25;
 }

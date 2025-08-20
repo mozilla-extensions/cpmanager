@@ -7,8 +7,6 @@ const GestureDragDrop = {
   // reliably get from the drag session in Gecko 1.9.1
   _sourceNode: null,
 
-  _startX: -1,
-  _startY: -1,
   _listening: false,
 
   async init() {
@@ -101,15 +99,15 @@ const GestureDragDrop = {
 
   fireDragGestureEvent(event) {
     this.onDragGesture(event);
-
-    this._startX = -1;
-    this._startY = -1;
   },
 
   dragstart(evt) {
     this._sourceNode = evt.explicitOriginalTarget;
-    this._startX = evt.pageX;
-    this._startY = evt.pageY;
+
+    browser.runtime.sendMessage({
+      type: "dragstart",
+      data: { X: evt.pageX, Y: evt.pageY },
+    });
   },
 
   dragover(evt) {
@@ -198,10 +196,8 @@ const GestureDragDrop = {
       }
 
       dropEvent.data = str;
-      dropEvent.startX = this._startX;
-      dropEvent.startY = this._startY;
-      dropEvent.endX = evt.pageX;
-      dropEvent.endY = evt.pageY;
+      dropEvent.X = evt.pageX;
+      dropEvent.Y = evt.pageY;
 
       // Link + Image
       this.fireDragGestureEvent(dropEvent);
@@ -210,10 +206,8 @@ const GestureDragDrop = {
       this.fireDragGestureEvent({
         type: "text",
         data: str,
-        startX: this._startX,
-        startY: this._startY,
-        endX: evt.pageX,
-        endY: evt.pageY,
+        X: evt.pageX,
+        Y: evt.pageY,
       });
     }
 
@@ -222,19 +216,9 @@ const GestureDragDrop = {
   },
 
   onDragGesture(event) {
-console.log("AA", event.endX, event.startX, event.endY, event.startY);
-
-    var deltaX = event.endX - event.startX;
-    var deltaY = event.endY - event.startY;
-
-    if (deltaX * deltaX + deltaY * deltaY <= 25) {
-      // not drag long enough I think
-      return;
-    }
-
     browser.runtime.sendMessage({
       type: event.type,
-      data: event.data,
+      data: { X: event.X, Y: event.Y, data: event.data },
     });
   },
 
