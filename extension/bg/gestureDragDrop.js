@@ -2,18 +2,20 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {
     case "image":
     case "link":
-      browser.tabs.create({
-        url: message.data,
-        windowId: sender.tab.windowId,
-        active: true,
-      });
+      if (!isValidURL(message.data)) break;
+
+      await openTab(sender, message.data);
       break;
+
     case "text":
-      browser.search.query({
+      const tab = await openTab(sender, "about:blank");
+
+      await browser.search.query({
         text: message.data,
-        disposition: "NEW_TAB",
+        tabId: tab.id,
       });
       break;
+
     case "query":
       if (message.data !== "listening") {
         break;
@@ -24,3 +26,30 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   // This makes the linter happy.
   return null;
 });
+
+function isValidURL(data) {
+  try {
+    const url = new URL(data);
+    return ["https:", "http:", "mailto:"].includes(url.protocol)
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function openTab(sender, url) {
+  const props = {
+    url,
+    windowId: sender.tab.windowId,
+    active: true,
+  };
+
+  if (!sender.tab.incognito &&
+      sender.tab.cookieStoreId &&
+      sender.tab.cookieStoreId !== "firefox-private" &&
+      sender.tab.cookieStoreId !== "firefox-default") {
+    props.cookieStoreId = sender.tab.cookieStoreId;
+  }
+
+  return browser.tabs.create(props);
+}

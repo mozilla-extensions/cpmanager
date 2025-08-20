@@ -30,7 +30,7 @@
           "type": "function",
           "description": "Is the gesture feature enabled?",
           "parameters": [],
-          "async": "callback"
+          "async": true
         }
       ]
     }
