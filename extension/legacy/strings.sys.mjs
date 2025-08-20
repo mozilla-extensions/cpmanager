@@ -3,22 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export let strings = {
-  _ctx: null,
+  _extension: null,
 
   init(context) {
-    this._ctx = context;
+    this._extension = context.extension;
   },
 
   uninit() {
-    delete this._ctx;
+    delete this._extension;
   },
 
   _(name, subs) {
-    if (!this._ctx) {
+    if (!this._extension) {
       return "";
     }
 
     let cloneScope = this._ctx.cloneScope;
-    return this._ctx.extension.localizeMessage(name, subs, {cloneScope});
+    return this._extension.localizeMessage(name, subs, {cloneScope});
   },
 };

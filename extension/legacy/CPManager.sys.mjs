@@ -18,7 +18,6 @@ ChromeUtils.defineESModuleGetters(lazy, {
   ComponentUtils: "resource://gre/modules/ComponentUtils.sys.mjs",
   CustomizableUI: "resource:///modules/CustomizableUI.sys.mjs",
   E10SUtils: "resource://gre/modules/E10SUtils.sys.mjs",
-  ExtensionSettingsStore: "resource://gre/modules/ExtensionSettingsStore.sys.mjs",
   HomePage: "resource:///modules/HomePage.sys.mjs",
   PageActions: "resource:///modules/PageActions.sys.mjs",
   PlacesUIUtils: "moz-src:///browser/components/places/PlacesUIUtils.sys.mjs",
@@ -36,67 +35,6 @@ ChromeUtils.defineESModuleGetters(lazy, {
 });
 
 const userJSDetection = {
-  get sandbox() {
-    let nullprincipal = Services.scriptSecurityManager.createNullPrincipal({});
-
-    let sandbox = Cu.Sandbox(nullprincipal);
-    sandbox.user_pref = this.userPref.bind(this);
-
-    delete this.sandbox;
-    return this.sandbox = sandbox;
-  },
-
-  detect() {
-    try {
-      let userJS = Services.dirsvc.get("ProfD", Ci.nsIFile);
-      userJS.append("user.js");
-      if (!userJS.exists()) {
-        return;
-      }
-
-      let userJSURI = Services.io.newFileURI(userJS);
-      Services.scriptloader.loadSubScriptWithOptions(userJSURI.spec, {
-        charset: "UTF-8",
-        ignoreCache: true,
-        target: this.sandbox,
-      });
-    } catch (ex) {
-      console.error(ex);
-    }
-  },
-
-  isCEHome(aURL) {
-    let spec = aURL;
-    try {
-      spec = Services.io.newURI(spec).asciiSpec;
-    } catch (e) {
-      try {
-        spec = Services.uriFixup.getFixupURIInfo(spec,
-          Ci.nsIURIFixup.FIXUP_FLAG_NONE).preferredURI.asciiSpec;
-      } catch (e) {}
-    }
-
-    return [
-      /^about:cehome$/,
-      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/,
-    ].some((aExpectedSpec) => {
-      return aExpectedSpec.test(spec);
-    });
-  },
-
-  userPref(key, val) {
-    switch (key) {
-      case "browser.startup.homepage":
-        if (val.split("|").some(this.isCEHome)) {
-          break;
-        }
-
-        break;
-      default:
-        break;
-    }
-  },
-
   async removeHomepage() {
     try {
       let profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile).path;
@@ -120,61 +58,6 @@ const userJSDetection = {
     }
   },
 };
-
-const buttonRemoval = {
-  id: "dummy-button-id",
-  prefKey: "dummy-pref-key",
-  earlyReturn() {
-    return false;
-  },
-
-  init() {
-    if (this.earlyReturn()) {
-      return;
-    }
-
-    if (Services.prefs.getBoolPref(this.prefKey, false)) {
-      return;
-    }
-
-    this.removeIt();
-  },
-
-  observe(subject, topic, data) {
-    // PageActions initialized in the first window, wait a bit before remove it
-    Services.obs.removeObserver(this, topic);
-    Services.tm.dispatchToMainThread(() => {
-      this.removeItForReal();
-    });
-  },
-
-  removeIt() {
-    // PageActions not initialized, potential conflict with cached addAction
-    if (lazy.PageActions._deferredAddActionCalls) {
-      Services.obs.addObserver(this, "browser-delayed-startup-finished");
-      return;
-    }
-
-    this.removeItForReal();
-  },
-};
-
-const screenshotButtonRemoval = Object.create(buttonRemoval, {
-  prefKey: {
-    value: "extensions.cpmanager@mozillaonline.com.screenshotButtonRemoved",
-  },
-  earlyReturn: {
-    value() {
-      return Services.prefs.getBoolPref("extensions.screenshots.disabled", false);
-    },
-  },
-  removeItForReal: {
-    value() {
-      Services.prefs.setBoolPref("extensions.screenshots.disabled", true);
-      Services.prefs.setBoolPref(this.prefKey, true);
-    },
-  },
-});
 
 const distributorChannelHack = {
   distributionTopic: "distribution-customization-complete",
@@ -268,16 +151,6 @@ let fxaRelatedHack = {
     ]) {
       this.prefs.setBoolPref(prefKey, false);
     }
-
-    for (let prefKey of [
-      // Deprecated since Fx 99, see https://bugzil.la/1747149
-      "browser.privatebrowsing.vpnpromourl",
-      "identity.fxaccounts.service.monitorLoginUrl",
-      // Deprecated since Fx 81, see https://bugzil.la/1657626
-      "identity.fxaccounts.service.sendLoginUrl",
-    ]) {
-      this.prefs.setCharPref(prefKey, "");
-    }
   },
 };
 
@@ -334,27 +207,12 @@ export var mozCNGuard = {
     for (let win of lazy.CustomizableUI.windows) {
       this.onWindowOpened(win);
     }
-
-    lazy.CustomizableUI.addListener(this);
-    mobileBookmarksHack.init();
   },
 
   uninitWindowListener() {
-    mobileBookmarksHack.uninit();
-    lazy.CustomizableUI.removeListener(this);
-
     for (let win of lazy.CustomizableUI.windows) {
       this.onWindowClosed(win);
     }
-  },
-
-  onWidgetBeforeDOMChange(
-    aNode,
-    aNextNode,
-    aContainer,
-    aIsRemoval
-  ) {
-    mobileBookmarksHack.updateMobileBookmarks(aNode, aIsRemoval ? null : aContainer);
   },
 
   onWindowOpened(win) {
@@ -396,9 +254,7 @@ export var mozCNGuard = {
     this.initFactories();
 
     lazy.mozCNSafeBrowsing.init();
-    userJSDetection.detect();
     userJSDetection.removeHomepage();
-    screenshotButtonRemoval.init();
     fxaRelatedHack.init();
     lazy.FxaSwitcher.init(lazy.strings);
 
@@ -411,7 +267,7 @@ export var mozCNGuard = {
     this.uninitFactories();
     this.uninitWindowListener();
 
-    // lazy.mozCNSafeBrowsing.uninit();
+    lazy.mozCNSafeBrowsing.uninit();
 
     lazy.FxaSwitcher.uninit();
   },

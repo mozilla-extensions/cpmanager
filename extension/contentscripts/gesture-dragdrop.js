@@ -48,8 +48,8 @@ const GestureDragDrop = {
   },
 
   _shouldHandleEvent(evt) {
-    return (
-      this._listening && this._canDropLink(evt) &&
+   return (
+      this._listening && this._canDropLink(evt) && evt.isTrusted &&
       ( evt.dataTransfer.mozSourceNode == null ||
         this._fromSameContentArea(evt.dataTransfer.mozSourceNode, evt.target) )
     );
@@ -78,16 +78,9 @@ const GestureDragDrop = {
       // Gecko 1.9.1 and newer: WHATWG drag-and-drop
 
       // Try to get text/x-moz-url, if possible
-      let selection = "";
-      let sel = window.getSelection();
-      if (sel) {
-        let text = sel.toString();
-        if (text) {
-          selection = text;
-        }
-      }
-
+      let selection = window.getSelection();
       selection = selection ? selection.toString() : "";
+
       data = aEvent.dataTransfer.getData("text/x-moz-url");
 
       if (data.length != 0) {
@@ -190,19 +183,6 @@ const GestureDragDrop = {
       // that match a valid domain or IP address pattern
       str = str.replace(/^(?:t?t|h[tx]{2,})p(s?:\/\/)/i, "http$1");
 
-      // Call dragDropSecurityCheck... maybe?
-      evt.dataTransfer.getData("text/plain");
-
-      // Send the referrer only for embedded images or emulated
-      // middle clicks over HTTP/HTTPS
-      if (sourceNode) {
-        let referrer = sourceNode &&
-                       sourceNode.ownerDocument &&
-                       sourceNode.ownerDocument.location &&
-                       sourceNode.ownerDocument.location.href || "";
-        if (!referrer) return;
-      }
-
       // Turn naked e-mail addresses into mailto: links
       if (/^[\w\.\+\-]+@[\w\.\-]+\.[\w\-]{2,}$/.test(str))
         str = "mailto:" + str;
@@ -242,6 +222,8 @@ const GestureDragDrop = {
   },
 
   onDragGesture(event) {
+console.log("AA", event.endX, event.startX, event.endY, event.startY);
+
     var deltaX = event.endX - event.startX;
     var deltaY = event.endY - event.startY;
 
