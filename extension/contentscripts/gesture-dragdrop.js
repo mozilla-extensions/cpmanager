@@ -7,17 +7,10 @@ const GestureDragDrop = {
   // reliably get from the drag session in Gecko 1.9.1
   _sourceNode: null,
 
-  _listening: false,
-
   async init() {
     document.addEventListener("dragstart", (e) => this.dragstart(e));
     document.addEventListener("dragover", (e) => this.dragover(e));
     document.addEventListener("drop", (e) => this.dragdrop(e));
-
-    this._listening = await browser.runtime.sendMessage({
-      type: "query",
-      data: "listening",
-    });
   },
 
   _fromSameContentArea( node1, node2 ) {
@@ -47,7 +40,7 @@ const GestureDragDrop = {
 
   _shouldHandleEvent(evt) {
    return (
-      this._listening && this._canDropLink(evt) && evt.isTrusted &&
+      this._canDropLink(evt) && evt.isTrusted &&
       ( evt.dataTransfer.mozSourceNode == null ||
         this._fromSameContentArea(evt.dataTransfer.mozSourceNode, evt.target) )
     );

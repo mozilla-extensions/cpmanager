@@ -1,6 +1,33 @@
 let gestureStartX = -1;
 let gestureStartY = -1;
 
+const GESTURE_SCRIPT_ID = "gesture-script";
+
+async function registerOrUnregisterScript(enabled) {
+  try {
+    if (enabled) {
+      await browser.scripting.registerContentScripts([{
+        id: GESTURE_SCRIPT_ID,
+        matches: ["<all_urls>"],
+        matchOriginAsFallback: true,
+        js: ["/contentscripts/gesture-dragdrop.js"],
+        allFrames: true,
+        runAt: "document_start",
+      }]);
+    } else {
+      await browser.scripting.unregisterContentScripts({ids: [ GESTURE_SCRIPT_ID ]});
+    }
+  } catch (e) {
+    console.error(`failed to register/unregister content scripts: ${e}`);
+  }
+}
+
+browser.mozillaonline.chinaPackManager.onGesturePrefChange.addListener(enabled => {
+  registerOrUnregisterScript(enabled);
+});
+
+browser.mozillaonline.chinaPackManager.gestureEnabled().then(enabled => registerOrUnregisterScript(enabled));
+
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {
     case "dragstart":
@@ -27,12 +54,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         tabId: tab.id,
       });
       break;
-
-    case "query":
-      if (message.data !== "listening") {
-        break;
-      }
-      return browser.mozillaonline.chinaPackManager.gestureEnabled();
   }
 
   // This makes the linter happy.

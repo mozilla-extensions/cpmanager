@@ -2,6 +2,19 @@
     {
       "namespace": "mozillaonline.chinaPackManager",
       "description": "China Pack Manager",
+      "events": [
+        {
+          "name": "onGesturePrefChange",
+          "type": "function",
+          "parameters": [
+            {
+              "name": "enabled",
+              "type": "boolean",
+              "description": "The preference value"
+            }
+          ]
+        }
+      ],
       "functions": [
         {
           "name": "sendLegacyMessage",

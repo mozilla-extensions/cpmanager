@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global Services, ExtensionAPI, XPCOMUtils */
+/* global Services, ExtensionAPI, ExtensionCommon, XPCOMUtils */
 
 "use strict";
 
@@ -11,6 +11,7 @@ XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "nsISubstitutingProtocolHandler");
 
 const RESOURCE_HOST = "cpmanager-legacy";
+const GESTURE_PREF = "extensions.cmimprove.gesture.enabled";
 
 this.chinaPackManager = class extends ExtensionAPI {
   onStartup() {
@@ -79,12 +80,25 @@ this.chinaPackManager = class extends ExtensionAPI {
     }
   }
 
-  getAPI() {
+  getAPI(context) {
     let chinaPackManager = this;
 
     return {
       mozillaonline: {
         chinaPackManager: {
+          onGesturePrefChange: new ExtensionCommon.EventManager({
+            context,
+            name: "mozillaonline.chinaPackManager.onGesturePrefChange",
+            register: (fire, name) => {
+              const callback = () => {
+                fire.async(Services.prefs.getBoolPref(GESTURE_PREF)).catch(() => {});
+              };
+              Services.prefs.addObserver(GESTURE_PREF, callback);
+              return () => {
+                Services.prefs.removeObserver(GESTURE_PREF, callback);
+              };
+            },
+          }).api(),
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
           },

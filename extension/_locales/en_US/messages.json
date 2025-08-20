@@ -9,7 +9,7 @@
     "message": "Only keep browsing history of the recent three months"
   },
   "option.fxa": {
-    "message": "Sign in using a local Firefox Account service"
+    "message": "Sign in using a local Firefox Accounts service"
   },
   "option.gesture": {
     "message": "Enable drag and drop handling"
@@ -40,7 +40,7 @@
     "message": "Switch to local services"
   },
   "FxaSwitcher.preferences.brand.global": {
-    "message": "Firefox Account"
+    "message": "Firefox Accounts"
   },
   "FxaSwitcher.preferences.brand.local": {
     "message": "Firefox Passport"
