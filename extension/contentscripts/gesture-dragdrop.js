@@ -106,7 +106,7 @@ const GestureDragDrop = {
 
     browser.runtime.sendMessage({
       type: "dragstart",
-      data: { X: evt.pageX, Y: evt.pageY },
+      data: { X: evt.screenX, Y: evt.screenY },
     });
   },
 
@@ -196,8 +196,8 @@ const GestureDragDrop = {
       }
 
       dropEvent.data = str;
-      dropEvent.X = evt.pageX;
-      dropEvent.Y = evt.pageY;
+      dropEvent.X = evt.screenX;
+      dropEvent.Y = evt.screenY;
 
       // Link + Image
       this.fireDragGestureEvent(dropEvent);
@@ -206,8 +206,8 @@ const GestureDragDrop = {
       this.fireDragGestureEvent({
         type: "text",
         data: str,
-        X: evt.pageX,
-        Y: evt.pageY,
+        X: evt.screenX,
+        Y: evt.screenY,
       });
     }
 
