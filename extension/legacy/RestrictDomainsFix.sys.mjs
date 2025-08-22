@@ -6,20 +6,11 @@ const PREF = "extensions.webextensions.restrictedDomains";
 const DOMAINS = [
   "accounts.firefox.com.cn",
   "api-accounts.firefox.com.cn",
-  "channelserver.firefox.com.cn",
-  "firefox.com.cn",
-  "full.firefox.com.cn",
-  "safebrowsing-cache.firefox.com.cn",
-  "sb.firefox.com.cn",
-  "stub.esr.firefox.com.cn"
-  "stub.firefox.com.cn",
-  "sync.firefox.com.cn",
-  "www.firefox.com.cn",
 ];
 
 export let RestrictDomainsFix = {
   init() {
-    const restrictedDomains = Services.prefs.getStringPref(PREF, "").split(",");
+    const restrictedDomains = Services.getDefaultBranch("").prefs.getStringPref(PREF, "").split(",");
 
     const result = [...new Set([...restrictedDomains, ...DOMAINS])];
     if (result.length !== restrictedDomains.length) {
