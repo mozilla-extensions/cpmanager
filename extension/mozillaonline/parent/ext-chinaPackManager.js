@@ -22,10 +22,14 @@ this.chinaPackManager = class extends ExtensionAPI {
     resProto.setSubstitutionWithFlags(RESOURCE_HOST,
       Services.io.newURI("legacy/", null, extension.rootURI), Ci.nsISubstitutingProtocolHandler.ALLOW_CONTENT_ACCESS);
 
+    if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
+      throw new Error("This extension is not supported for this distribution!");
+    }
+
     try {
       const { mozCNGuard } = ChromeUtils.importESModule("resource://cpmanager-legacy/CPManager.sys.mjs");
       this.mozCNGuard = mozCNGuard;
-       this.mozCNGuard.init({ extension });
+      this.mozCNGuard.init({ extension });
     } catch (ex) {
       console.error(ex);
     }
