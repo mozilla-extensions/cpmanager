@@ -15,7 +15,8 @@ async function registerOrUnregisterScript(enabled) {
         runAt: "document_start",
       }]);
     } else {
-      await browser.scripting.unregisterContentScripts({ids: [ GESTURE_SCRIPT_ID ]});
+      // Unregister the only script, if any.
+      await browser.scripting.unregisterContentScripts({});
     }
   } catch (e) {
     console.error(`failed to register/unregister content scripts: ${e}`);
