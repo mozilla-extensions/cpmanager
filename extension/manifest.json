@@ -3,14 +3,15 @@
       "gecko": {
         "id": "cpmanager@mozillaonline.com",
         "strict_min_version": "78.0",
-        "update_url": "https://addons.firefox.com.cn/chinaedition/addons/updates.json?reqVersion=%REQ_VERSION%&id=%ITEM_ID%&version=%ITEM_VERSION%&maxAppVersion=%ITEM_MAXAPPVERSION%&status=%ITEM_STATUS%&appID=%APP_ID%&appVersion=%APP_VERSION%&appOS=%APP_OS%&appABI=%APP_ABI%&locale=%APP_LOCALE%&currentAppVersion=%CURRENT_APP_VERSION%&updateType=%UPDATE_TYPE%&compatMode=%COMPATIBILITY_MODE%"
+        "update_url": "https://archive.mozilla.org/pub/cn_pack/addons.json"
       }
     },
     "background": {
       "scripts": [
         "bg/clearHistory.js",
         "bg/tracking.js",
-        "bg/undoCloseTab.js"
+        "bg/undoCloseTab.js",
+        "bg/gestureDragDrop.js"
       ]
     },
     "browser_action": {
@@ -59,14 +60,18 @@
       "page": "options/options.html"
     },
     "permissions": [
+      "<all_urls>",
+      "cookies",
       "history",
       "idle",
       "menus",
       "mozillaAddons",
       "privacy",
+      "scripting",
+      "search",
       "sessions",
       "storage",
       "tabs"
     ],
-    "version": "5.114"
+    "version": "6.0"
   }

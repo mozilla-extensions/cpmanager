@@ -8,6 +8,9 @@
   "option.clearHistory.enabled": {
     "message": "Only keep browsing history of the recent three months"
   },
+  "option.fxa": {
+    "message": "Sign in using a local Firefox Accounts service"
+  },
   "option.gesture": {
     "message": "Enable drag and drop handling"
   },
@@ -19,16 +22,6 @@
   },
   "undoCloseTabTitle": {
     "message": "Undo Close Tab"
-  },
-
-  "ceTracking.accesskey": {
-    "message": "U"
-  },
-  "ceTracking.label": {
-    "message": "Allow Firefox to send data on your usage of the extensions to Mozilla, help us make further improvements."
-  },
-  "ceTracking.learnMore.label": {
-    "message": "Learn More"
   },
 
   "FxaSwitcher.confirm.body.switchToGlobal": {
@@ -47,7 +40,7 @@
     "message": "Switch to local services"
   },
   "FxaSwitcher.preferences.brand.global": {
-    "message": "Firefox Account"
+    "message": "Firefox Accounts"
   },
   "FxaSwitcher.preferences.brand.local": {
     "message": "Firefox Passport"
@@ -76,28 +69,6 @@
   },
   "mobileBookmarksHack.signin.label": {
     "message": "Sign in to Sync"
-  },
-
-  "ShellSvcProxy.msg": {
-    "message": "Failed to make Firefox the default browser.\n\nAnother software might be interfering with your operation,\nfind out how to fix this situation."
-  },
-  "ShellSvcProxy.openHelp": {
-    "message": "View Help"
-  },
-
-  "TrackingNotificationInfoBar.button.accessKey": {
-    "message": "C"
-  },
-  "TrackingNotificationInfoBar.button.label": {
-    "message": "Choose What I Share"
-  },
-  "TrackingNotificationInfoBar.message": {
-    "message": "$appname$ automatically sends some data to us so that we can improve your experience.",
-    "placeholders": {
-      "appname": {
-        "content": "$1"
-      }
-    }
   },
 
   "URL2QR.generateQR": {

@@ -2,23 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global Services, ExtensionAPI, ExtensionCommon, XPCOMUtils */
+
 "use strict";
 
-/* global ExtensionAPI, globalThis */
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "@mozilla.org/network/protocol;1?name=resource",
   "nsISubstitutingProtocolHandler");
-XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
-  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
-});
 
 const RESOURCE_HOST = "cpmanager-legacy";
+const GESTURE_PREF = "extensions.cmimprove.gesture.enabled";
 
 this.chinaPackManager = class extends ExtensionAPI {
   onStartup() {
@@ -26,12 +19,13 @@ this.chinaPackManager = class extends ExtensionAPI {
 
     this.flushCacheOnUpgrade(extension);
 
-    resProto.setSubstitution(RESOURCE_HOST,
-      Services.io.newURI("legacy/", null, extension.rootURI));
+    resProto.setSubstitutionWithFlags(RESOURCE_HOST,
+      Services.io.newURI("legacy/", null, extension.rootURI), Ci.nsISubstitutingProtocolHandler.ALLOW_CONTENT_ACCESS);
 
     try {
-      ChromeUtils.import("resource://cpmanager-legacy/CPManager.jsm", this);
-      this.mozCNGuard.init({ extension });
+      const { mozCNGuard } = ChromeUtils.importESModule("resource://cpmanager-legacy/CPManager.sys.mjs");
+      this.mozCNGuard = mozCNGuard;
+       this.mozCNGuard.init({ extension });
     } catch (ex) {
       console.error(ex);
     }
@@ -44,7 +38,6 @@ this.chinaPackManager = class extends ExtensionAPI {
 
     try {
       this.mozCNGuard.uninit();
-      Cu.unload("resource://cpmanager-legacy/CPManager.jsm");
 
       resProto.setSubstitution(RESOURCE_HOST, null);
     } catch (ex) {
@@ -67,32 +60,14 @@ this.chinaPackManager = class extends ExtensionAPI {
     switch (message.type) {
       case "initOptions":
         let initOptions = {};
-        for (let option of ["gesture", "url2qr"]) {
+        for (let option of ["gesture", "url2qr", "fxa"]) {
           let prefKey = `extensions.cmimprove.${option}.enabled`;
           initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
         }
         return initOptions;
-      case "migratePrefs":
-        let prefsToMigrate = {};
-        for (let prefKey of message.prefKeys) {
-          if (!Services.prefs.prefHasUserValue(prefKey)) {
-            continue;
-          }
-
-          switch (Services.prefs.getPrefType(prefKey)) {
-            case Services.prefs.PREF_INT:
-              prefsToMigrate[prefKey] = Services.prefs.getIntPref(prefKey);
-              break;
-            default:
-              break;
-          }
-
-          Services.prefs.clearUserPref(prefKey);
-        }
-        return prefsToMigrate;
       case "trackingEnabled":
         return {
-          "trackingEnabled": CETracking.ude,
+          "trackingEnabled": false,
         };
       case "updateOptions":
         for (let option in message.detail) {
@@ -105,14 +80,30 @@ this.chinaPackManager = class extends ExtensionAPI {
     }
   }
 
-  getAPI() {
+  getAPI(context) {
     let chinaPackManager = this;
 
     return {
       mozillaonline: {
         chinaPackManager: {
+          onGesturePrefChange: new ExtensionCommon.EventManager({
+            context,
+            name: "mozillaonline.chinaPackManager.onGesturePrefChange",
+            register: (fire, name) => {
+              const callback = () => {
+                fire.async(Services.prefs.getBoolPref(GESTURE_PREF)).catch(() => {});
+              };
+              Services.prefs.addObserver(GESTURE_PREF, callback);
+              return () => {
+                Services.prefs.removeObserver(GESTURE_PREF, callback);
+              };
+            },
+          }).api(),
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
+          },
+          async gestureEnabled() {
+            return Services.prefs.getBoolPref("extensions.cmimprove.gesture.enabled", true);
           },
         },
       },

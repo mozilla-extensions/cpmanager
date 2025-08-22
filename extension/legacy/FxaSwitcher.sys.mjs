@@ -2,27 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global globalThis */
-this.EXPORTED_SYMBOLS = ["FxaSwitcher"];
+const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 
-ChromeUtils.defineModuleGetter(this, "XPCOMUtils",
-  "resource://gre/modules/XPCOMUtils.jsm");
+const lazy = {};
 
-XPCOMUtils.defineLazyModuleGetters(this, {
-  FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.jsm",
+ChromeUtils.defineESModuleGetters(lazy, {
+  FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.sys.mjs",
 });
-XPCOMUtils.defineLazyGetter(this, "CETracking", () => {
-  return Cc["@mozilla.com.cn/tracking;1"].getService().wrappedJSObject;
+
+ChromeUtils.defineLazyGetter(lazy, "fxAccounts", () => {
+  return ChromeUtils.importESModule(
+    "resource://gre/modules/FxAccounts.sys.mjs"
+  ).getFxAccountsSingleton();
 });
-XPCOMUtils.defineLazyGetter(this, "fxAccounts", () => {
-  let obj = ChromeUtils.import("resource://gre/modules/FxAccounts.jsm");
-  // Since Fx 103, see https://bugzil.la/1771463
-  return obj.fxAccounts || obj.getFxAccountsSingleton();
-});
-// Since Fx 104, see https://bugzil.la/1667455,1780695
-const Services =
-  globalThis.Services ||
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 const AUTO_CONFIG_KEY = "identity.fxaccounts.autoconfig.uri";
 const AUTO_CONFIG_VAL = "https://accounts.firefox.com.cn";
@@ -35,8 +27,12 @@ const PAIRING_PREF_VAL = "wss://channelserver.firefox.com.cn";
 const SYNC_PREF_KEY = "identity.sync.tokenserver.uri";
 const SYNC_PREF_VAL = "https://sync.firefox.com.cn/token/1.0/sync/1.5";
 
-let FxaSwitcher = {
+export let FxaSwitcher = {
   topic: "sync-pane-loaded",
+  prefKey: "extensions.cmimprove.fxa.enabled",
+
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIObserver,
+                                          Ci.nsISupportsWeakReference]),
 
   get initStep() {
     if (Services.prefs.getPrefType(INIT_STEP_KEY) === Services.prefs.PREF_INT) {
@@ -51,7 +47,7 @@ let FxaSwitcher = {
   },
 
   get useLocalSvc() {
-    return FxAccountsConfig.getAutoConfigURL() === AUTO_CONFIG_VAL;
+    return lazy.FxAccountsConfig.getAutoConfigURL() === AUTO_CONFIG_VAL;
   },
 
   _(key, args) {
@@ -73,9 +69,10 @@ let FxaSwitcher = {
     this._strings = strings;
 
     Services.obs.addObserver(this, this.topic);
+    Services.prefs.addObserver("", this, true);
 
     let refreshStatus = "NA";
-    let isSignedIn = !!(await fxAccounts.getSignedInUser());
+    let isSignedIn = !!(await lazy.fxAccounts.getSignedInUser());
 
     let initStep = this.initStep;
     switch (initStep) {
@@ -92,7 +89,7 @@ let FxaSwitcher = {
         break;
       // remove 2=>3 & 3=>4 backfill and the break above when a step 5 is added
       case 2:
-        FxAccountsConfig.ensureConfigured();
+        lazy.FxAccountsConfig.ensureConfigured();
         break;
       case 3:
         refreshStatus = await this.refreshPairingUri();
@@ -106,11 +103,18 @@ let FxaSwitcher = {
       return;
     }
     this.initStep = currentStep;
-    let url = `http://addons.g-fox.cn/fxa-switch.gif?initStep=${initStep}&isSignedIn=${isSignedIn}&refreshStatus=${refreshStatus}`;
-    CETracking.send(url);
   },
 
   observe(subject, topic, data) {
+    if (topic === "nsPref:changed" && data === this.prefKey) {
+      if (Services.prefs.getBoolPref(this.prefKey)) {
+        this.switchToLocal();
+      } else {
+        this.switchToGlobal();
+      }
+      return;
+    }
+
     if (topic !== this.topic) {
       return;
     }
@@ -146,7 +150,7 @@ let FxaSwitcher = {
       return "altToken";
     }
 
-    await FxAccountsConfig.fetchConfigURLs();
+    await lazy.FxAccountsConfig.fetchConfigURLs();
     return "refreshed";
   },
 
@@ -162,25 +166,25 @@ let FxaSwitcher = {
     this[action]();
 
     this.updateStrings(evt.target.ownerDocument);
-
-    let url = `http://addons.g-fox.cn/fxa-switch.gif?fxa=${this.useLocalSvc}`;
-    CETracking.send(url);
   },
 
   switchToGlobal() {
     // Set the pref to ensure resetConfigURLs works
     Services.prefs.setCharPref(AUTO_CONFIG_KEY, AUTO_CONFIG_VAL);
-    FxAccountsConfig.resetConfigURLs();
+    lazy.FxAccountsConfig.resetConfigURLs();
     Services.prefs.clearUserPref(AUTO_CONFIG_KEY);
   },
 
   switchToLocal() {
     Services.prefs.setCharPref(AUTO_CONFIG_KEY, AUTO_CONFIG_VAL);
-    FxAccountsConfig.ensureConfigured();
+    Services.prefs.setBoolPref("identity.fxaccounts.oauth.enabled", false);
+    Services.prefs.setCharPref("identity.fxaccounts.contextParam", "fx_desktop_v3");
+    lazy.FxAccountsConfig.ensureConfigured();
   },
 
   uninit() {
     Services.obs.removeObserver(this, this.topic);
+    Services.prefs.removeObserver("", this);
 
     delete this._strings;
   },

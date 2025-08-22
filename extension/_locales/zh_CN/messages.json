@@ -8,6 +8,9 @@
   "option.clearHistory.enabled": {
     "message": "启用自动清除三个月以前的历史记录"
   },
+  "option.fxa": {
+    "message": "使用本地 Firefox 账号服务登录"
+  },
   "option.gesture": {
     "message": "启用拖拽手势"
   },
@@ -19,16 +22,6 @@
   },
   "undoCloseTabTitle": {
     "message": "恢复关闭的标签页"
-  },
-
-  "ceTracking.accesskey": {
-    "message": "U"
-  },
-  "ceTracking.label": {
-    "message": "允许 Firefox 向 Mozilla 发送功能及扩展使用报告，帮助进一步改进用户体验"
-  },
-  "ceTracking.learnMore.label": {
-    "message": "详细了解"
   },
 
   "FxaSwitcher.confirm.body.switchToGlobal": {
@@ -76,28 +69,6 @@
   },
   "mobileBookmarksHack.signin.label": {
     "message": "立即登录"
-  },
-
-  "ShellSvcProxy.msg": {
-    "message": "设置默认浏览器失败！\n\n您的操作可能是被其它软件拦截，需手动对其进行修改。"
-  },
-  "ShellSvcProxy.openHelp": {
-    "message": "查看修改方法"
-  },
-
-  "TrackingNotificationInfoBar.button.accessKey": {
-    "message": "C"
-  },
-  "TrackingNotificationInfoBar.button.label": {
-    "message": "选择您要分享的数据"
-  },
-  "TrackingNotificationInfoBar.message": {
-    "message": "为提高用户体验，$appname$ 将发送部分功能的使用情况给我们，用于进一步优化火狐浏览器的易用性，您可以自由选择是否向我们分享数据。",
-    "placeholders": {
-      "appname": {
-        "content": "$1"
-      }
-    }
   },
 
   "URL2QR.generateQR": {
