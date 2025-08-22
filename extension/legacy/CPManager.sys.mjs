@@ -29,6 +29,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
   // Internal modules
   FxaSwitcher: "resource://cpmanager-legacy/FxaSwitcher.sys.mjs",
   mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.sys.mjs",
+  RestrictDomainsFix: "resource://cpmanager-legacy/RestrictDomainsFix.sys.mjs",
   strings: "resource://cpmanager-legacy/strings.sys.mjs",
   URL2QR: "resource://cpmanager-legacy/URL2QR.sys.mjs",
   GestureDragDropParent: "resource://cpmanager-legacy/GestureDragDropParent.sys.mjs",
@@ -253,6 +254,7 @@ export var mozCNGuard = {
     this.initDefaultPrefs();
     this.initFactories();
 
+    lazy.RestrictDomainsFix.init();
     lazy.mozCNSafeBrowsing.init();
     userJSDetection.removeHomepage();
     fxaRelatedHack.init();
