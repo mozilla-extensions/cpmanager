@@ -13,6 +13,10 @@ XPCOMUtils.defineLazyServiceGetter(this, "resProto",
 const RESOURCE_HOST = "cpmanager-legacy";
 const GESTURE_PREF = "extensions.cmimprove.gesture.enabled";
 
+if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
+  throw new Error("This extension is not supported for this distribution!");
+}
+
 this.chinaPackManager = class extends ExtensionAPI {
   onStartup() {
     let {extension} = this;
@@ -21,10 +25,6 @@ this.chinaPackManager = class extends ExtensionAPI {
 
     resProto.setSubstitutionWithFlags(RESOURCE_HOST,
       Services.io.newURI("legacy/", null, extension.rootURI), Ci.nsISubstitutingProtocolHandler.ALLOW_CONTENT_ACCESS);
-
-    if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
-      throw new Error("This extension is not supported for this distribution!");
-    }
 
     try {
       const { mozCNGuard } = ChromeUtils.importESModule("resource://cpmanager-legacy/CPManager.sys.mjs");
