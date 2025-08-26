@@ -10,11 +10,12 @@ const DOMAINS = [
 
 export let RestrictDomainsFix = {
   init() {
-    const restrictedDomains = Services.getDefaultBranch("").prefs.getStringPref(PREF, "").split(",");
+    const defaultPrefs = Services.prefs.getDefaultBranch("");
+    const restrictedDomains = defaultPrefs.getStringPref(PREF, "").split(",");
 
     const result = [...new Set([...restrictedDomains, ...DOMAINS])];
     if (result.length !== restrictedDomains.length) {
-      Services.prefs.setStringPref(PREF, result.join(","));
+      defaultPrefs.setStringPref(PREF, result.join(","));
     }
   }
 };
