@@ -1,3 +1,5 @@
+/* global QRCode */
+
 (async () => {
   async function getActiveTab() {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
@@ -12,10 +14,10 @@
       qr = new QRCode(qrel, {
         width: 220,
         height: 220,
-        correctLevel: QRCode.CorrectLevel.M
+        correctLevel: QRCode.CorrectLevel.M,
       });
 
-      const tip = browser.i18n.getMessage("URL2QR.instructions")
+      const tip = browser.i18n.getMessage("URL2QR.instructions");
       const node = qrel.querySelector("img") || qrel;
       node.setAttribute("title", tip);
       node.setAttribute("aria-label", tip);
