@@ -14,6 +14,16 @@
         "bg/gestureDragDrop.js"
       ]
     },
+    "page_action": {
+      "show_matches": [ "http://*/*", "https://*/*", "ftp://*/*" ],
+      "default_icon": {
+        "16": "legacy/skin/url2qr-icon.svg",
+        "32": "legacy/skin/url2qr-icon.svg",
+        "64": "legacy/skin/url2qr-icon.svg"
+      },
+      "default_title": "__MSG_url2qrTitle__",
+      "default_popup": "popup/url2qr.html"
+    },
     "browser_action": {
       "browser_style": true,
       "default_area": "navbar",

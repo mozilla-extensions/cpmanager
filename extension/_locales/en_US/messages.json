@@ -71,7 +71,7 @@
     "message": "Sign in to Sync"
   },
 
-  "URL2QR.generateQR": {
+  "url2qrTitle": {
     "message": "Generate QR Code of current page"
   },
   "URL2QR.instructions": {

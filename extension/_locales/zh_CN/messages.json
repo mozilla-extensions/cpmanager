@@ -71,7 +71,7 @@
     "message": "立即登录"
   },
 
-  "URL2QR.generateQR": {
+  "url2qrTitle": {
     "message": "生成当前网址的二维码"
   },
   "URL2QR.instructions": {
