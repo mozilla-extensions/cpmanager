@@ -1,8 +1,11 @@
 /* global QRCode */
 
 (async () => {
+  let lastWindowId;
+
   async function getActiveTab() {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    lastWindowId = tab.windowId;
     return tab;
   }
 
@@ -39,23 +42,14 @@
     }
   }
 
-  await refreshFromActiveTab();
-
-  const onUpdatedListener = (tabId, changeInfo) => {
+  browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (!changeInfo.url) return;
-    getActiveTab().then(active => {
-      if (active && active.id === tabId) render(changeInfo.url);
-    });
-  };
-  browser.tabs.onUpdated.addListener(onUpdatedListener);
-
-  const onActivatedListener = () => {
-    refreshFromActiveTab();
-  };
-  browser.tabs.onActivated.addListener(onActivatedListener);
-
-  window.addEventListener("unload", () => {
-    browser.tabs.onUpdated.removeListener(onUpdatedListener);
-    browser.tabs.onActivated.removeListener(onActivatedListener);
+    if (tab && tab.windowId === lastWindowId) render(changeInfo.url);
   });
+
+  browser.tabs.onActivated.addListener(() => {
+    refreshFromActiveTab();
+  });
+
+  await refreshFromActiveTab();
 })();

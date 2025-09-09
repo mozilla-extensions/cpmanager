@@ -243,7 +243,6 @@ export var mozCNGuard = {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
 
     this.uninitFactories();
-    this.uninitWindowListener();
 
     lazy.mozCNSafeBrowsing.uninit();
 

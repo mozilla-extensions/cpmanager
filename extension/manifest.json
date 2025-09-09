@@ -11,11 +11,12 @@
         "bg/clearHistory.js",
         "bg/tracking.js",
         "bg/undoCloseTab.js",
-        "bg/gestureDragDrop.js"
+        "bg/gestureDragDrop.js",
+        "bg/url2qr.js"
       ]
     },
     "page_action": {
-      "show_matches": [ "http://*/*", "https://*/*", "ftp://*/*" ],
+      "show_matches": [ "http://*/*", "https://*/*"],
       "default_icon": {
         "16": "legacy/skin/url2qr-icon.svg",
         "32": "legacy/skin/url2qr-icon.svg",
