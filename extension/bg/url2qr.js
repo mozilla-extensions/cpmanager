@@ -14,9 +14,9 @@ async function prefChanged(enabled) {
 }
 
 function hideOrShowPageAction(tabId) {
-  if(url2qrEnabled) {
-   browser.pageAction.show(tabId)
+  if (url2qrEnabled) {
+   browser.pageAction.show(tabId);
   } else {
-   browser.pageAction.hide(tabId)
+   browser.pageAction.hide(tabId);
   }
 }

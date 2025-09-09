@@ -1,11 +1,8 @@
 /* global QRCode */
 
 (async () => {
-  let lastWindowId;
-
   async function getActiveTab() {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    lastWindowId = tab.windowId;
     return tab;
   }
 
