@@ -43,9 +43,8 @@
   }
 
   browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (!changeInfo.url) return;
-    if (tab && tab.windowId === lastWindowId) render(changeInfo.url);
-  });
+    render(changeInfo.url);
+  }, { properties: ["url"], windowId: browser.windows.WINDOW_ID_CURRENT });
 
   browser.tabs.onActivated.addListener(() => {
     refreshFromActiveTab();
