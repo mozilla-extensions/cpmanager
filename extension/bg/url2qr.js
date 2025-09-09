@@ -1,5 +1,12 @@
 browser.mozillaonline.chinaPackManager.onURL2QRPrefChange.addListener(enabled => prefChanged(enabled));
-browser.mozillaonline.chinaPackManager.url2qrEnabled().then(enabled => prefChanged(enabled));
+browser.mozillaonline.chinaPackManager.url2qrEnabled().then(enabled => {
+  // By default, the button is shown via 
+  // page_action.show_matches in manifest.json.
+  // Dynamically hide if disabled.
+  if (!enabled) {
+    prefChanged(enabled);
+  }
+});
 
 async function prefChanged(enabled) {
   const tabs = await browser.tabs.query({});
