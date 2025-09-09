@@ -1,22 +1,38 @@
-let url2qrEnabled = true;
-
 browser.mozillaonline.chinaPackManager.onURL2QRPrefChange.addListener(enabled => prefChanged(enabled));
 browser.mozillaonline.chinaPackManager.url2qrEnabled().then(enabled => prefChanged(enabled));
-browser.tabs.onCreated.addListener((tab) => hideOrShowPageAction(tab.id));
 
 async function prefChanged(enabled) {
-  url2qrEnabled = enabled;
-
   const tabs = await browser.tabs.query({});
   for (const tab of tabs) {
-    hideOrShowPageAction(tab.id);
+    if (enabled) {
+     browser.pageAction.show(tab.id);
+    } else {
+     browser.pageAction.hide(tab.id);
+    }
   }
+
+  if (enabled) {
+    browser.tabs.onCreated.removeListener(onCreatedListener);
+    browser.tabs.onUpdated.removeListener(onUpdatedListener);
+    browser.tabs.onActivated.removeListener(onActivatedListener);
+    return;
+  }
+
+  browser.tabs.onCreated.addListener(onCreatedListener);
+  browser.tabs.onUpdated.addListener(onUpdatedListener, { properties: ["url"]});
+  browser.tabs.onActivated.addListener(onActivatedListener);
 }
 
-function hideOrShowPageAction(tabId) {
-  if (url2qrEnabled) {
-   browser.pageAction.show(tabId);
-  } else {
-   browser.pageAction.hide(tabId);
-  }
+function onCreatedListener(tab) {
+  if (!tab.active) return;
+  browser.pageAction.hide(tab.id);
+}
+
+function onUpdatedListener(tabId, changeInfo, tab) {
+  if (!tab.active) return;
+  browser.pageAction.hide(tabId);
+}
+
+async function onActivatedListener(activeInfo) {
+  await browser.pageAction.hide(activeInfo.tabId);
 }
