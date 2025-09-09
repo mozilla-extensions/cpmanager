@@ -9,7 +9,9 @@ browser.mozillaonline.chinaPackManager.url2qrEnabled().then(enabled => {
 });
 
 async function prefChanged(enabled) {
-  const tabs = await browser.tabs.query({});
+  const tabs = await browser.tabs.query({
+    url: "*://*/*", // http(s) only
+  });
   for (const tab of tabs) {
     if (enabled) {
      browser.pageAction.show(tab.id);
