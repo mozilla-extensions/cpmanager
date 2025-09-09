@@ -13,6 +13,17 @@
               "description": "The preference value"
             }
           ]
+        },
+        {
+          "name": "onURL2QRPrefChange",
+          "type": "function",
+          "parameters": [
+            {
+              "name": "enabled",
+              "type": "boolean",
+              "description": "The preference value"
+            }
+          ]
         }
       ],
       "functions": [
@@ -42,6 +53,13 @@
           "name": "gestureEnabled",
           "type": "function",
           "description": "Is the gesture feature enabled?",
+          "parameters": [],
+          "async": true
+        },
+        {
+          "name": "url2qrEnabled",
+          "type": "function",
+          "description": "Is the url2qr feature enabled?",
           "parameters": [],
           "async": true
         }

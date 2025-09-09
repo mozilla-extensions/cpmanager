@@ -12,6 +12,7 @@ XPCOMUtils.defineLazyServiceGetter(this, "resProto",
 
 const RESOURCE_HOST = "cpmanager-legacy";
 const GESTURE_PREF = "extensions.cmimprove.gesture.enabled";
+const URL2QR_PREF = "extensions.cmimprove.url2qr.enabled";
 
 if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
   throw new Error("This extension is not supported for this distribution!");
@@ -103,8 +104,24 @@ this.chinaPackManager = class extends ExtensionAPI {
               };
             },
           }).api(),
+          onURL2QRPrefChange: new ExtensionCommon.EventManager({
+            context,
+            name: "mozillaonline.chinaPackManager.onURL2QRPrefChange",
+            register: (fire, name) => {
+              const callback = () => {
+                fire.async(Services.prefs.getBoolPref(URL2QR_PREF)).catch(() => {});
+              };
+              Services.prefs.addObserver(URL2QR_PREF, callback);
+              return () => {
+                Services.prefs.removeObserver(URL2QR_PREF, callback);
+              };
+            },
+          }).api(),
           async sendLegacyMessage(message) {
             return chinaPackManager.sendLegacyMessage(message);
+          },
+          async url2qrEnabled() {
+            return Services.prefs.getBoolPref("extensions.cmimprove.url2qr.enabled", true);
           },
           async gestureEnabled() {
             return Services.prefs.getBoolPref("extensions.cmimprove.gesture.enabled", true);

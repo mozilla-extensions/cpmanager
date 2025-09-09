@@ -16,7 +16,6 @@ XPCOMUtils.defineLazyServiceGetter(lazy, "weaveXPCService", () => {
 
 ChromeUtils.defineESModuleGetters(lazy, {
   ComponentUtils: "resource://gre/modules/ComponentUtils.sys.mjs",
-  CustomizableUI: "resource:///modules/CustomizableUI.sys.mjs",
   E10SUtils: "resource://gre/modules/E10SUtils.sys.mjs",
   HomePage: "resource:///modules/HomePage.sys.mjs",
   PageActions: "resource:///modules/PageActions.sys.mjs",
@@ -31,7 +30,6 @@ ChromeUtils.defineESModuleGetters(lazy, {
   mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.sys.mjs",
   RestrictDomainsFix: "resource://cpmanager-legacy/RestrictDomainsFix.sys.mjs",
   strings: "resource://cpmanager-legacy/strings.sys.mjs",
-  URL2QR: "resource://cpmanager-legacy/URL2QR.sys.mjs",
   GestureDragDropParent: "resource://cpmanager-legacy/GestureDragDropParent.sys.mjs",
 });
 
@@ -204,26 +202,6 @@ export var mozCNGuard = {
     }
   },
 
-  initWindowListener() {
-    for (let win of lazy.CustomizableUI.windows) {
-      this.onWindowOpened(win);
-    }
-  },
-
-  uninitWindowListener() {
-    for (let win of lazy.CustomizableUI.windows) {
-      this.onWindowClosed(win);
-    }
-  },
-
-  onWindowOpened(win) {
-    lazy.URL2QR.init(win, lazy.strings);
-  },
-
-  onWindowClosed(win) {
-    lazy.URL2QR.uninit(win);
-  },
-
   initFactories() {
     Cm.QueryInterface(Ci.nsIComponentRegistrar);
   },
@@ -259,15 +237,12 @@ export var mozCNGuard = {
     userJSDetection.removeHomepage();
     fxaRelatedHack.init();
     lazy.FxaSwitcher.init(lazy.strings);
-
-    this.initWindowListener();
   },
 
   uninit() {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
 
     this.uninitFactories();
-    this.uninitWindowListener();
 
     lazy.mozCNSafeBrowsing.uninit();
 
