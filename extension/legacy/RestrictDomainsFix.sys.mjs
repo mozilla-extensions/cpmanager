@@ -13,7 +13,8 @@ export let RestrictDomainsFix = {
     const defaultPrefs = Services.prefs.getDefaultBranch("");
     const restrictedDomains = defaultPrefs.getStringPref(PREF, "").split(",");
 
-    const result = [...new Set([...restrictedDomains, ...DOMAINS])];
+    // Remove any of our DOMAINS from the current restricted list.
+    const result = restrictedDomains.filter(d => !DOMAINS.includes(d));
     if (result.length !== restrictedDomains.length) {
       defaultPrefs.setStringPref(PREF, result.join(","));
     }
