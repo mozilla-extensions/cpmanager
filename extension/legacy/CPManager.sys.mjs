@@ -242,8 +242,6 @@ export var mozCNGuard = {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
 
     this.uninitFactories();
-
-    lazy.mozCNSafeBrowsing.uninit();
   },
 
   isCEHome: function MCG_isCEHome(aSpec) {
