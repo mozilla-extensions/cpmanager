@@ -8,9 +8,6 @@
   "option.clearHistory.enabled": {
     "message": "启用自动清除三个月以前的历史记录"
   },
-  "option.fxa": {
-    "message": "使用本地 Firefox 账号服务登录"
-  },
   "option.gesture": {
     "message": "启用拖拽手势"
   },
@@ -24,27 +21,7 @@
     "message": "恢复关闭的标签页"
   },
 
-  "FxaSwitcher.confirm.body.switchToGlobal": {
-    "message": "全球服务可能会因为网络状况出现无法连接的问题，\n您是否切换到全球服务？"
-  },
-  "FxaSwitcher.confirm.body.switchToLocal": {
-    "message": "本地服务连接更稳定，推荐您使用。您是否切换到\n本地服务？"
-  },
-  "FxaSwitcher.confirm.title.switchService": {
-    "message": "切换服务"
-  },
-  "FxaSwitcher.preferences.action.switchToGlobal": {
-    "message": "切换至全球服务"
-  },
-  "FxaSwitcher.preferences.action.switchToLocal": {
-    "message": "切换至本地服务"
-  },
-  "FxaSwitcher.preferences.brand.global": {
-    "message": "Firefox 账户"
-  },
-  "FxaSwitcher.preferences.brand.local": {
-    "message": "火狐通行证"
-  },
+  
 
   "mobileBookmarksHack.bookmarksnotsyncing.label": {
     "message": "同步设置中书签选项未启用"

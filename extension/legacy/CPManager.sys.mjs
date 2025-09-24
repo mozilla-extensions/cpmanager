@@ -196,7 +196,6 @@ export var mozCNGuard = {
 
       defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", true);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
-      defBranch.setBoolPref("extensions.cmimprove.fxa.enabled", true);
     } catch (ex) {
       console.error(ex);
     }
@@ -236,7 +235,7 @@ export var mozCNGuard = {
     lazy.mozCNSafeBrowsing.init();
     userJSDetection.removeHomepage();
     fxaRelatedHack.init();
-    lazy.FxaSwitcher.init(lazy.strings);
+    lazy.FxaSwitcher.init();
   },
 
   uninit() {
@@ -245,8 +244,6 @@ export var mozCNGuard = {
     this.uninitFactories();
 
     lazy.mozCNSafeBrowsing.uninit();
-
-    lazy.FxaSwitcher.uninit();
   },
 
   isCEHome: function MCG_isCEHome(aSpec) {
