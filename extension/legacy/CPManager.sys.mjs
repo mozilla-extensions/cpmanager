@@ -2,35 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { manager: Cm } = Components;
-
 const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 
 const lazy = {};
 
-XPCOMUtils.defineLazyServiceGetter(lazy, "weaveXPCService", () => {
-  return Cc["@mozilla.org/weave/service;1"]
-           .getService(Ci.nsISupports)
-           .wrappedJSObject;
-});
-
 ChromeUtils.defineESModuleGetters(lazy, {
-  ComponentUtils: "resource://gre/modules/ComponentUtils.sys.mjs",
   E10SUtils: "resource://gre/modules/E10SUtils.sys.mjs",
   HomePage: "resource:///modules/HomePage.sys.mjs",
-  PageActions: "resource:///modules/PageActions.sys.mjs",
-  PlacesUIUtils: "moz-src:///browser/components/places/PlacesUIUtils.sys.mjs",
   PlacesUtils: "resource://gre/modules/PlacesUtils.sys.mjs",
   SessionStartup: "resource:///modules/sessionstore/SessionStartup.sys.mjs",
-  UIState: "resource://services-sync/UIState.sys.mjs",
-  Weave: "resource://services-sync/main.sys.mjs",
 
   // Internal modules
   FxaSwitcher: "resource://cpmanager-legacy/FxaSwitcher.sys.mjs",
   mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.sys.mjs",
   RestrictDomainsFix: "resource://cpmanager-legacy/RestrictDomainsFix.sys.mjs",
   strings: "resource://cpmanager-legacy/strings.sys.mjs",
-  GestureDragDropParent: "resource://cpmanager-legacy/GestureDragDropParent.sys.mjs",
 });
 
 const userJSDetection = {
@@ -171,8 +157,6 @@ export var mozCNGuard = {
     }
   },
 
-  factories: new Map(),
-
   get browserHandler() {
     delete this.browserHandler;
     return this.browserHandler = Cc["@mozilla.org/browser/clh;1"].
@@ -201,17 +185,6 @@ export var mozCNGuard = {
     }
   },
 
-  initFactories() {
-    Cm.QueryInterface(Ci.nsIComponentRegistrar);
-  },
-
-  uninitFactories() {
-    for (let [classID, factory] of this.factories) {
-      Cm.unregisterFactory(classID, factory);
-    }
-    this.factories = new Map();
-  },
-
   init(context) {
     let isAppStartup = context.extension.startupReason === "APP_STARTUP";
     lazy.strings.init(context);
@@ -229,7 +202,6 @@ export var mozCNGuard = {
     Services.obs.addObserver(this, "prefservice:after-app-defaults");
 
     this.initDefaultPrefs();
-    this.initFactories();
 
     lazy.RestrictDomainsFix.init();
     lazy.mozCNSafeBrowsing.init();
@@ -240,8 +212,6 @@ export var mozCNGuard = {
 
   uninit() {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
-
-    this.uninitFactories();
   },
 
   isCEHome: function MCG_isCEHome(aSpec) {
