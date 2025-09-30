@@ -20,11 +20,28 @@ function createCheckboxesWithOptions(options, handleOptionChange) {
 }
 
 async function handleLegacyOptionChange(evt) {
+  const { id, checked } = evt.target;
+
+  // When enabling gesture, ensure we have <all_urls> host permission.
+  if (id === "gesture" && checked) {
+    try {
+      const granted = await browser.permissions.request({ origins: ["<all_urls>"] });
+      if (!granted) {
+        evt.target.checked = false;
+        return;
+      }
+    } catch (e) {
+      console.error("Failed to request <all_urls> permission:", e);
+      evt.target.checked = false;
+      return;
+    }
+  }
+
   return browser.mozillaonline.chinaPackManager.sendLegacyMessage({
     dir: "bg2legacy",
     type: "updateOptions",
     detail: {
-      [evt.target.id]: evt.target.checked,
+      [id]: checked,
     },
   });
 }

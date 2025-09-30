@@ -71,7 +71,6 @@
       "page": "options/options.html"
     },
     "permissions": [
-      "<all_urls>",
       "cookies",
       "history",
       "idle",
@@ -83,6 +82,9 @@
       "sessions",
       "storage",
       "tabs"
+    ],
+    "optional_permissions": [
+      "<all_urls>"
     ],
     "version": "6.1"
   }
