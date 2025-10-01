@@ -1,6 +1,6 @@
 {
   "name": "cpmanager",
-  "version": "6.0",
+  "version": "6.1",
   "description": "To manage the addons package in Firefox.",
   "scripts": {
     "build": "web-ext build --filename cpmanager.xpi",
@@ -9,7 +9,7 @@
   },
   "author": "Mozilla Online Limited",
   "license": "MPL-2.0",
-  "repository": "ssh://git@git.mozilla.com.cn/repository/git/repositories/cpmanager.git",
+  "repository": "https://github.com/mozilla-extensions/cpmanager",
   "devDependencies": {
     "eslint": "5.16.0",
     "eslint-plugin-mozilla": "1.2.1",

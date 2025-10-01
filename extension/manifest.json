@@ -59,7 +59,7 @@
         }
       }
     },
-    "homepage_url": "http://www.firefox.com.cn/",
+    "homepage_url": "http://www.firefox.com/",
     "icons": {
       "64": "icons/extensionGeneric.svg",
       "128": "icons/extensionGeneric.svg"
@@ -84,5 +84,5 @@
       "storage",
       "tabs"
     ],
-    "version": "6.0"
+    "version": "6.1"
   }

@@ -8,9 +8,6 @@
   "option.clearHistory.enabled": {
     "message": "Only keep browsing history of the recent three months"
   },
-  "option.fxa": {
-    "message": "Sign in using a local Firefox Accounts service"
-  },
   "option.gesture": {
     "message": "Enable drag and drop handling"
   },
@@ -24,27 +21,7 @@
     "message": "Undo Close Tab"
   },
 
-  "FxaSwitcher.confirm.body.switchToGlobal": {
-    "message": "You may experience connection issues when\nusing global service, switch anyway?"
-  },
-  "FxaSwitcher.confirm.body.switchToLocal": {
-    "message": "Local service should be more stable and we\nrecommend using it, click OK to continue."
-  },
-  "FxaSwitcher.confirm.title.switchService": {
-    "message": "Switch Services"
-  },
-  "FxaSwitcher.preferences.action.switchToGlobal": {
-    "message": "Switch to global services"
-  },
-  "FxaSwitcher.preferences.action.switchToLocal": {
-    "message": "Switch to local services"
-  },
-  "FxaSwitcher.preferences.brand.global": {
-    "message": "Firefox Accounts"
-  },
-  "FxaSwitcher.preferences.brand.local": {
-    "message": "Firefox Passport"
-  },
+  
 
   "mobileBookmarksHack.bookmarksnotsyncing.label": {
     "message": "Bookmarks syncing disabled"

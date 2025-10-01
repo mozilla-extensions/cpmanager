@@ -2,35 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { manager: Cm } = Components;
-
 const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 
 const lazy = {};
 
-XPCOMUtils.defineLazyServiceGetter(lazy, "weaveXPCService", () => {
-  return Cc["@mozilla.org/weave/service;1"]
-           .getService(Ci.nsISupports)
-           .wrappedJSObject;
-});
-
 ChromeUtils.defineESModuleGetters(lazy, {
-  ComponentUtils: "resource://gre/modules/ComponentUtils.sys.mjs",
-  E10SUtils: "resource://gre/modules/E10SUtils.sys.mjs",
-  HomePage: "resource:///modules/HomePage.sys.mjs",
-  PageActions: "resource:///modules/PageActions.sys.mjs",
-  PlacesUIUtils: "moz-src:///browser/components/places/PlacesUIUtils.sys.mjs",
-  PlacesUtils: "resource://gre/modules/PlacesUtils.sys.mjs",
-  SessionStartup: "resource:///modules/sessionstore/SessionStartup.sys.mjs",
-  UIState: "resource://services-sync/UIState.sys.mjs",
-  Weave: "resource://services-sync/main.sys.mjs",
+  FxAccountsConfig: "resource://gre/modules/FxAccountsConfig.sys.mjs",
 
   // Internal modules
-  FxaSwitcher: "resource://cpmanager-legacy/FxaSwitcher.sys.mjs",
   mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.sys.mjs",
-  RestrictDomainsFix: "resource://cpmanager-legacy/RestrictDomainsFix.sys.mjs",
   strings: "resource://cpmanager-legacy/strings.sys.mjs",
-  GestureDragDropParent: "resource://cpmanager-legacy/GestureDragDropParent.sys.mjs",
 });
 
 const userJSDetection = {
@@ -140,7 +121,8 @@ let fxaRelatedHack = {
     this.defaultPrefTweak();
   },
 
-  defaultPrefTweak() {
+  async defaultPrefTweak() {
+    // Disable promos not relevant for this distro
     for (let prefKey of [
       // instead of setting the proper "browser.contentblocking.report.manage_devices.url"
       "browser.contentblocking.report.lockwise.enabled",
@@ -149,6 +131,36 @@ let fxaRelatedHack = {
       "browser.vpn_promo.enabled",
     ]) {
       this.prefs.setBoolPref(prefKey, false);
+    }
+
+    const PREF_ACTIVITYSTREAM = "browser.newtabpage.activity-stream.fxaccounts.endpoint";
+
+    //Resets the default FxA prefs
+    if (Services.prefs.getCharPref("identity.fxaccounts.auth.uri").includes("firefox.com.cn")) {
+      [
+        PREF_ACTIVITYSTREAM,
+        "identity.fxaccounts.auth.uri",
+        "identity.fxaccounts.autoconfig.uri",
+        "identity.fxaccounts.contextParam",
+        "identity.fxaccounts.oauth.enabled",
+        "identity.fxaccounts.remote.root",
+        "identity.fxaccounts.remote.oauth.uri",
+        "identity.fxaccounts.remote.profile.uri",
+        "identity.fxaccounts.remote.pairing.uri",
+        "identity.sync.tokenserver.uri",
+      ].forEach(key => this.prefs.clearUserPref(key));
+
+      // Reset derived config URLs to product defaults
+      lazy.FxAccountsConfig.resetConfigURLs();
+
+      // Ensure any cached/configured values re-compute using defaults
+      await lazy.FxAccountsConfig.ensureConfigured();
+    }
+
+    // A special case is for the distribution.ini prefs
+    if (Services.prefs.getCharPref(PREF_ACTIVITYSTREAM, "").includes("firefox.com.cn")) {
+      this.prefs.setCharPref(PREF_ACTIVITYSTREAM, "https://accounts.firefox.com/");
+      Services.prefs.clearUserPref(PREF_ACTIVITYSTREAM);
     }
   },
 };
@@ -159,10 +171,6 @@ export var mozCNGuard = {
   // nsIObserver
   observe: function MCG_observe(aSubject, aTopic, aData) {
     switch (aTopic) {
-      case "sessionstore-windows-restored":
-        Services.obs.removeObserver(this, aTopic);
-        this.maybeOpenStartPages();
-        break;
       case "prefservice:after-app-defaults":
         lazy.mozCNSafeBrowsing.defaultPrefTweak();
         distributorChannelHack.defaultPrefTweak();
@@ -171,152 +179,29 @@ export var mozCNGuard = {
     }
   },
 
-  factories: new Map(),
-
-  get browserHandler() {
-    delete this.browserHandler;
-    return this.browserHandler = Cc["@mozilla.org/browser/clh;1"].
-      getService(Ci.nsIBrowserHandler);
-  },
-
-  get startPage() {
-    delete this.startPage;
-    return this.startPage = lazy.HomePage.get();
-  },
-
-  get startPageChoice() {
-    delete this.startPageChoice;
-    return this.startPageChoice = Services.prefs.
-      getIntPref("browser.startup.page", "badpref");
-  },
-
   initDefaultPrefs() {
     try {
       let defBranch = Services.prefs.getDefaultBranch("");
 
       defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", true);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
-      defBranch.setBoolPref("extensions.cmimprove.fxa.enabled", true);
     } catch (ex) {
       console.error(ex);
     }
   },
 
-  initFactories() {
-    Cm.QueryInterface(Ci.nsIComponentRegistrar);
-  },
-
-  uninitFactories() {
-    for (let [classID, factory] of this.factories) {
-      Cm.unregisterFactory(classID, factory);
-    }
-    this.factories = new Map();
-  },
-
   init(context) {
-    let isAppStartup = context.extension.startupReason === "APP_STARTUP";
     lazy.strings.init(context);
-
-    if (isAppStartup) {
-      lazy.SessionStartup.onceInitialized.then(() => {
-        if (lazy.SessionStartup.sessionType != lazy.SessionStartup.NO_SESSION) {
-          Services.obs.addObserver(this, "sessionstore-windows-restored");
-          return;
-        }
-
-        this.maybeOpenStartPages();
-      });
-    }
     Services.obs.addObserver(this, "prefservice:after-app-defaults");
 
     this.initDefaultPrefs();
-    this.initFactories();
 
-    lazy.RestrictDomainsFix.init();
     lazy.mozCNSafeBrowsing.init();
     userJSDetection.removeHomepage();
     fxaRelatedHack.init();
-    lazy.FxaSwitcher.init(lazy.strings);
   },
 
   uninit() {
     Services.obs.removeObserver(this, "prefservice:after-app-defaults");
-
-    this.uninitFactories();
-
-    lazy.mozCNSafeBrowsing.uninit();
-
-    lazy.FxaSwitcher.uninit();
-  },
-
-  isCEHome: function MCG_isCEHome(aSpec) {
-    return [
-      /^about:cehome$/,
-      /^https?:\/\/[a-z]+\.firefoxchina\.cn\/?$/,
-    ].some((aExpectedSpec) => {
-      return aExpectedSpec.test(aSpec);
-    });
-  },
-
-  maybeOpenStartPages: function MCG_maybeOpenStartPages() {
-    let w = Services.wm.getMostRecentWindow("navigator:browser");
-
-    if (this.startPageChoice != 1) {
-      return;
-    }
-
-    let argumentsZero = w.arguments && w.arguments[0];
-    if (this.browserHandler.defaultArgs == argumentsZero) {
-      return;
-    }
-
-    if (argumentsZero instanceof Ci.nsIMutableArray) {
-      let len = argumentsZero.Count(), externalURLs = [];
-      for (let i = 0; i < len; i++) {
-        let urisstring = argumentsZero.GetElementAt(i)
-                                      .QueryInterface(Ci.nsISupportsString);
-        let uri = Services.io.newURI(urisstring.data);
-        externalURLs.push(uri.asciiSpec);
-      }
-
-      this.startPage.split("|").forEach((aPage, aIndex) => {
-        // Since Fx 108, see https://bugzil.la/1676492
-        if (
-          aPage === "chrome://browser/content/blanktab.html" ||
-          aPage === "about:blank"
-        ) {
-          return;
-        }
-
-        let uri = Services.io.newURI(aPage);
-        let title;
-
-        // Don't open if already in commandline argument.
-        if (externalURLs.some(function(externalURL) {
-          return externalURL.split("?")[0] == uri.asciiSpec.split("?")[0];
-        })) {
-          return;
-        }
-
-        if (this.isCEHome(aPage)) {
-          aPage = uri.asciiSpec + "?from=extra_start";
-          title = "\u706b\u72d0\u4e3b\u9875";
-        }
-
-        w.PlacesUtils.history.fetch(uri.spec).then(info => {
-          title = info && info.title;
-        }).then(() => {
-          let tab = w.gBrowser.addWebTab();
-          w.gBrowser.moveTabTo(tab, aIndex);
-          w.SessionStore.setTabState(tab, JSON.stringify({
-            entries: [{
-              url: aPage,
-              title,
-              triggeringPrincipal_base64: lazy.E10SUtils.SERIALIZED_SYSTEMPRINCIPAL,
-            }],
-          }));
-        }).catch(ex => console.error(ex));
-      });
-    }
   },
 };
