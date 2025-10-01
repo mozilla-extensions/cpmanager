@@ -11,7 +11,6 @@ ChromeUtils.defineESModuleGetters(lazy, {
 
   // Internal modules
   mozCNSafeBrowsing: "resource://cpmanager-legacy/CNSafeBrowsingRegister.sys.mjs",
-  RestrictDomainsFix: "resource://cpmanager-legacy/RestrictDomainsFix.sys.mjs",
   strings: "resource://cpmanager-legacy/strings.sys.mjs",
 });
 
@@ -134,25 +133,35 @@ let fxaRelatedHack = {
       this.prefs.setBoolPref(prefKey, false);
     }
 
+    const PREF_ACTIVITYSTREAM = "browser.newtabpage.activity-stream.fxaccounts.endpoint";
+
     //Resets the default FxA prefs
-    [
-      "browser.newtabpage.activity-stream.fxaccounts.endpoint",
-      "identity.fxaccounts.auth.uri",
-      "identity.fxaccounts.autoconfig.uri",
-      "identity.fxaccounts.contextParam",
-      "identity.fxaccounts.oauth.enabled",
-      "identity.fxaccounts.remote.root",
-      "identity.fxaccounts.remote.oauth.uri",
-      "identity.fxaccounts.remote.profile.uri",
-      "identity.fxaccounts.remote.pairing.uri",
-      "identity.sync.tokenserver.uri",
-    ].forEach(key => this.prefs.clearUserPref(key));
+    if (Services.prefs.getCharPref("identity.fxaccounts.auth.uri").includes("firefox.com.cn")) {
+      [
+        PREF_ACTIVITYSTREAM,
+        "identity.fxaccounts.auth.uri",
+        "identity.fxaccounts.autoconfig.uri",
+        "identity.fxaccounts.contextParam",
+        "identity.fxaccounts.oauth.enabled",
+        "identity.fxaccounts.remote.root",
+        "identity.fxaccounts.remote.oauth.uri",
+        "identity.fxaccounts.remote.profile.uri",
+        "identity.fxaccounts.remote.pairing.uri",
+        "identity.sync.tokenserver.uri",
+      ].forEach(key => this.prefs.clearUserPref(key));
 
-    // Reset derived config URLs to product defaults
-    lazy.FxAccountsConfig.resetConfigURLs();
+      // Reset derived config URLs to product defaults
+      lazy.FxAccountsConfig.resetConfigURLs();
 
-    // Ensure any cached/configured values re-compute using defaults
-    await lazy.FxAccountsConfig.ensureConfigured();
+      // Ensure any cached/configured values re-compute using defaults
+      await lazy.FxAccountsConfig.ensureConfigured();
+    }
+
+    // A special case is for the distribution.ini prefs
+    if (Services.prefs.getCharPref(PREF_ACTIVITYSTREAM, "").includes("firefox.com.cn")) {
+      this.prefs.setCharPref(PREF_ACTIVITYSTREAM, "https://accounts.firefox.com/");
+      Services.prefs.clearUserPref(PREF_ACTIVITYSTREAM);
+    }
   },
 };
 
@@ -187,7 +196,6 @@ export var mozCNGuard = {
 
     this.initDefaultPrefs();
 
-    lazy.RestrictDomainsFix.init();
     lazy.mozCNSafeBrowsing.init();
     userJSDetection.removeHomepage();
     fxaRelatedHack.init();
