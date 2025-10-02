@@ -59,6 +59,9 @@ this.chinaPackManager = class extends ExtensionAPI {
     Services.obs.notifyObservers(null, "startupcache-invalidate");
     Services.obs.notifyObservers(null, "message-manager-flush-caches");
     Services.mm.broadcastAsyncMessage("AddonMessageManagerCachesFlush", null);
+
+    // Let's reset the gesture feature off when updating
+    Services.prefs.setBoolPref('extensions.cmimprove.gesture.enabled', false);
   }
 
   async sendLegacyMessage(message) {
