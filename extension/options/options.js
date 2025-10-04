@@ -1,22 +1,20 @@
-function createCheckboxesWithOptions(options, handleOptionChange) {
-  for (let option in options) {
-    let p = document.createElement("p");
+function createCheckboxesWithOptions(key, value, handleOptionChange) {
+  let p = document.createElement("p");
 
-    let checkbox = document.createElement("input");
-    checkbox.checked = options[option];
-    checkbox.id = option;
-    checkbox.type = "checkbox";
-    checkbox.addEventListener("change", handleOptionChange);
-    p.appendChild(checkbox);
+  let checkbox = document.createElement("input");
+  checkbox.checked = value;
+  checkbox.id = key;
+  checkbox.type = "checkbox";
+  checkbox.addEventListener("change", handleOptionChange);
+  p.appendChild(checkbox);
 
-    let label = document.createElement("label");
-    label.setAttribute("for", option);
-    let i18nKey = `option.${option}`;
-    label.textContent = browser.i18n.getMessage(i18nKey);
-    p.appendChild(label);
+  let label = document.createElement("label");
+  label.setAttribute("for", key);
+  let i18nKey = `option.${key}`;
+  label.textContent = browser.i18n.getMessage(i18nKey);
+  p.appendChild(label);
 
-    document.body.appendChild(p);
-  }
+  document.body.appendChild(p);
 }
 
 async function handleLegacyOptionChange(evt) {
@@ -37,7 +35,7 @@ async function handleLegacyOptionChange(evt) {
     }
   }
 
-  return browser.mozillaonline.chinaPackManager.sendLegacyMessage({
+  await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
     dir: "bg2legacy",
     type: "updateOptions",
     detail: {
@@ -52,16 +50,37 @@ async function handleStorageOptionChange(evt) {
   });
 }
 
+async function hasAllUrlsPermission() {
+  try {
+    return await browser.permissions.contains({ origins: ["<all_urls>"] });
+  } catch (e) {
+    console.error(`failed to check permissions: ${e}`);
+    return false;
+  }
+}
+
 window.addEventListener("DOMContentLoaded", async evt => {
-  let initLegacyOptions = await browser.mozillaonline.
+  const initLegacyOptions = await browser.mozillaonline.
     chinaPackManager.sendLegacyMessage({
       dir: "bg2legacy",
       type: "initOptions",
     });
-  createCheckboxesWithOptions(initLegacyOptions, handleLegacyOptionChange);
 
-  let initStorageOptions = await browser.storage.local.get({
+  createCheckboxesWithOptions('gesture', initLegacyOptions['gesture'] && await hasAllUrlsPermission(), handleLegacyOptionChange);
+  createCheckboxesWithOptions('url2qr', initLegacyOptions['url2qr'], handleLegacyOptionChange);
+
+  const initStorageOptions = await browser.storage.local.get({
     "clearHistory.enabled": true, // defaults display to true
   });
-  createCheckboxesWithOptions(initStorageOptions, handleStorageOptionChange);
+  createCheckboxesWithOptions('clearHistory.enabled', initStorageOptions['clearHistory.enabled'], handleStorageOptionChange);
+
+  // Keep gesture option in sync if <all_urls> gets revoked while options is open.
+  browser.permissions.onRemoved.addListener(async (permissions) => {
+    if (permissions && Array.isArray(permissions.origins) && permissions.origins.includes("<all_urls>")) {
+      const gestureEl = document.getElementById("gesture");
+      if (gestureEl) {
+        gestureEl.checked = false;
+      }
+    }
+  });
 });
