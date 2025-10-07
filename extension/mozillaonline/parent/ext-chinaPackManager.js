@@ -72,7 +72,7 @@ this.chinaPackManager = class extends ExtensionAPI {
       case "updateOptions":
         for (let option in message.detail) {
           // Only allow known options to be updated from the panel
-          if (["url2qr"].includes(option)) {
+          if ("url2qr" == option) {
             let prefKey = `extensions.cmimprove.${option}.enabled`;
             Services.prefs.setBoolPref(prefKey, message.detail[option]);
           }
