@@ -80,7 +80,7 @@ window.addEventListener("DOMContentLoaded", async evt => {
   // Keep gesture option in sync if <all_urls> gets revoked while options is open.
   browser.permissions.onRemoved.addListener(async (permissions) => {
     if (permissions && Array.isArray(permissions.origins) && permissions.origins.includes("<all_urls>")) {
-      const gestureEl = document.getElementById("gesture");
+      const gestureEl = document.getElementById("gesture.enabled");
       if (gestureEl) {
         gestureEl.checked = false;
       }
