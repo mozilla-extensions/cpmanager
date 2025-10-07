@@ -23,11 +23,13 @@ async function registerOrUnregisterScript(enabled) {
   }
 }
 
-browser.mozillaonline.chinaPackManager.onGesturePrefChange.addListener(enabled => {
-  registerOrUnregisterScript(enabled);
-});
+browser.storage.local.get({"gesture.enabled": false}).then(data => registerOrUnregisterScript(data["gesture.enabled"]));
 
-browser.mozillaonline.chinaPackManager.gestureEnabled().then(enabled => registerOrUnregisterScript(enabled));
+browser.storage.local.onChanged.addListener(changes => {
+  const change = changes["gesture.enabled"];
+  if (!change) return;
+  registerOrUnregisterScript(change.newValue);
+});
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   switch (message.type) {

@@ -1,4 +1,4 @@
-function createCheckboxesWithOptions(key, value, handleOptionChange) {
+function createCheckboxesWithOptions(key, value, i18nKey, handleOptionChange) {
   let p = document.createElement("p");
 
   let checkbox = document.createElement("input");
@@ -10,7 +10,6 @@ function createCheckboxesWithOptions(key, value, handleOptionChange) {
 
   let label = document.createElement("label");
   label.setAttribute("for", key);
-  let i18nKey = `option.${key}`;
   label.textContent = browser.i18n.getMessage(i18nKey);
   p.appendChild(label);
 
@@ -20,8 +19,20 @@ function createCheckboxesWithOptions(key, value, handleOptionChange) {
 async function handleLegacyOptionChange(evt) {
   const { id, checked } = evt.target;
 
+  await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
+    dir: "bg2legacy",
+    type: "updateOptions",
+    detail: {
+      [id]: checked,
+    },
+  });
+}
+
+async function handleStorageOptionChange(evt) {
+  const { id, checked } = evt.target;
+
   // When enabling gesture, ensure we have <all_urls> host permission.
-  if (id === "gesture" && checked) {
+  if (id === "gesture.enabled" && checked) {
     try {
       const granted = await browser.permissions.request({ origins: ["<all_urls>"] });
       if (!granted) {
@@ -35,18 +46,8 @@ async function handleLegacyOptionChange(evt) {
     }
   }
 
-  await browser.mozillaonline.chinaPackManager.sendLegacyMessage({
-    dir: "bg2legacy",
-    type: "updateOptions",
-    detail: {
-      [id]: checked,
-    },
-  });
-}
-
-async function handleStorageOptionChange(evt) {
-  return browser.storage.local.set({
-    [evt.target.id]: evt.target.checked,
+  await browser.storage.local.set({
+    [id]: checked,
   });
 }
 
@@ -66,18 +67,30 @@ window.addEventListener("DOMContentLoaded", async evt => {
       type: "initOptions",
     });
 
-  createCheckboxesWithOptions('gesture', initLegacyOptions['gesture'] && await hasAllUrlsPermission(), handleLegacyOptionChange);
-  createCheckboxesWithOptions('url2qr', initLegacyOptions['url2qr'], handleLegacyOptionChange);
+  createCheckboxesWithOptions("url2qr", initLegacyOptions.url2qr, "option.url2qr", handleLegacyOptionChange);
 
   const initStorageOptions = await browser.storage.local.get({
     "clearHistory.enabled": true, // defaults display to true
+    "gesture.enabled": false, // defaults display to false
   });
-  createCheckboxesWithOptions('clearHistory.enabled', initStorageOptions['clearHistory.enabled'], handleStorageOptionChange);
+
+  createCheckboxesWithOptions("gesture.enabled", initStorageOptions["gesture.enabled"] && await hasAllUrlsPermission(), "option.gesture", handleStorageOptionChange);
+  createCheckboxesWithOptions("clearHistory.enabled", initStorageOptions["clearHistory.enabled"], "option.clearHistory.enabled", handleStorageOptionChange);
 
   // Keep gesture option in sync if <all_urls> gets revoked while options is open.
   browser.permissions.onRemoved.addListener(async (permissions) => {
     if (permissions && Array.isArray(permissions.origins) && permissions.origins.includes("<all_urls>")) {
       const gestureEl = document.getElementById("gesture");
+      if (gestureEl) {
+        gestureEl.checked = false;
+      }
+    }
+  });
+
+  // Keep gesture option in sync if <all_urls> gets revoked while options is open.
+  browser.permissions.onRemoved.addListener(async (permissions) => {
+    if (permissions && Array.isArray(permissions.origins) && permissions.origins.includes("<all_urls>")) {
+      const gestureEl = document.getElementById("gesture.enabled");
       if (gestureEl) {
         gestureEl.checked = false;
       }

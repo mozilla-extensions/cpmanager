@@ -4,17 +4,6 @@
       "description": "China Pack Manager",
       "events": [
         {
-          "name": "onGesturePrefChange",
-          "type": "function",
-          "parameters": [
-            {
-              "name": "enabled",
-              "type": "boolean",
-              "description": "The preference value"
-            }
-          ]
-        },
-        {
           "name": "onURL2QRPrefChange",
           "type": "function",
           "parameters": [
@@ -48,13 +37,6 @@
             }
           ],
           "async": "callback"
-        },
-        {
-          "name": "gestureEnabled",
-          "type": "function",
-          "description": "Is the gesture feature enabled?",
-          "parameters": [],
-          "async": true
         },
         {
           "name": "url2qrEnabled",

@@ -183,7 +183,6 @@ export var mozCNGuard = {
     try {
       let defBranch = Services.prefs.getDefaultBranch("");
 
-      defBranch.setBoolPref("extensions.cmimprove.gesture.enabled", false);
       defBranch.setBoolPref("extensions.cmimprove.url2qr.enabled", true);
     } catch (ex) {
       console.error(ex);

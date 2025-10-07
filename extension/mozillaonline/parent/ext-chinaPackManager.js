@@ -11,7 +11,6 @@ XPCOMUtils.defineLazyServiceGetter(this, "resProto",
   "nsISubstitutingProtocolHandler");
 
 const RESOURCE_HOST = "cpmanager-legacy";
-const GESTURE_PREF = "extensions.cmimprove.gesture.enabled";
 const URL2QR_PREF = "extensions.cmimprove.url2qr.enabled";
 
 if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
@@ -59,19 +58,12 @@ this.chinaPackManager = class extends ExtensionAPI {
     Services.obs.notifyObservers(null, "startupcache-invalidate");
     Services.obs.notifyObservers(null, "message-manager-flush-caches");
     Services.mm.broadcastAsyncMessage("AddonMessageManagerCachesFlush", null);
-
-    // Let's reset the gesture feature off when updating
-    Services.prefs.setBoolPref('extensions.cmimprove.gesture.enabled', false);
   }
 
   async sendLegacyMessage(message) {
     switch (message.type) {
       case "initOptions":
-        let initOptions = {};
-        for (let option of ["gesture", "url2qr"]) {
-          let prefKey = `extensions.cmimprove.${option}.enabled`;
-          initOptions[option] = Services.prefs.getBoolPref(prefKey, true);
-        }
+        let initOptions = { url2qr: Services.prefs.getBoolPref("extensions.cmimprove.url2qr.enabled", true) };
         return initOptions;
       case "trackingEnabled":
         return {
@@ -80,7 +72,7 @@ this.chinaPackManager = class extends ExtensionAPI {
       case "updateOptions":
         for (let option in message.detail) {
           // Only allow known options to be updated from the panel
-          if (["gesture", "url2qr"].includes(option)) {
+          if (["url2qr"].includes(option)) {
             let prefKey = `extensions.cmimprove.${option}.enabled`;
             Services.prefs.setBoolPref(prefKey, message.detail[option]);
           }
@@ -97,19 +89,6 @@ this.chinaPackManager = class extends ExtensionAPI {
     return {
       mozillaonline: {
         chinaPackManager: {
-          onGesturePrefChange: new ExtensionCommon.EventManager({
-            context,
-            name: "mozillaonline.chinaPackManager.onGesturePrefChange",
-            register: (fire, name) => {
-              const callback = () => {
-                fire.async(Services.prefs.getBoolPref(GESTURE_PREF)).catch(() => {});
-              };
-              Services.prefs.addObserver(GESTURE_PREF, callback);
-              return () => {
-                Services.prefs.removeObserver(GESTURE_PREF, callback);
-              };
-            },
-          }).api(),
           onURL2QRPrefChange: new ExtensionCommon.EventManager({
             context,
             name: "mozillaonline.chinaPackManager.onURL2QRPrefChange",
@@ -128,9 +107,6 @@ this.chinaPackManager = class extends ExtensionAPI {
           },
           async url2qrEnabled() {
             return Services.prefs.getBoolPref("extensions.cmimprove.url2qr.enabled", true);
-          },
-          async gestureEnabled() {
-            return Services.prefs.getBoolPref("extensions.cmimprove.gesture.enabled", true);
           },
         },
       },
