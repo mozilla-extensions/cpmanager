@@ -82,5 +82,11 @@ window.addEventListener("DOMContentLoaded", async evt => {
     if (permissions.origins.includes("<all_urls>")) {
       document.getElementById("gesture.enabled").checked = false;
     }
+   });
+  browser.permissions.onAdded.addListener(async (permissions) => {
+    if (!permissions.origins.includes("<all_urls>")) return;
+    let items = await browser.storage.local.get({ "gesture.enabled": false });
+    if (!items["gesture.enabled"]) return;
+    document.getElementById("gesture.enabled").checked = true;
   });
 });
