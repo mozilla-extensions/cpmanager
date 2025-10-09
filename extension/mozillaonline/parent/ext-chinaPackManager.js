@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global Services, ExtensionAPI, ExtensionCommon, XPCOMUtils */
+/* global Services, ExtensionAPI, ExtensionCommon, ChromeUtils, resProto */
 
 "use strict";
 
-XPCOMUtils.defineLazyServiceGetter(this, "resProto",
-  "@mozilla.org/network/protocol;1?name=resource",
-  "nsISubstitutingProtocolHandler");
+ChromeUtils.defineLazyGetter(this, "resProto", () => {
+  return Cc["@mozilla.org/network/protocol;1?name=resource"].getService(Ci.nsISubstitutingProtocolHandler);
+});
 
 const RESOURCE_HOST = "cpmanager-legacy";
 const URL2QR_PREF = "extensions.cmimprove.url2qr.enabled";
