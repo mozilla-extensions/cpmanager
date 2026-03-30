@@ -13,10 +13,6 @@ ChromeUtils.defineLazyGetter(this, "resProto", () => {
 const RESOURCE_HOST = "cpmanager-legacy";
 const URL2QR_PREF = "extensions.cmimprove.url2qr.enabled";
 
-if (Services.prefs.getCharPref("distribution.id", "").trim().toLowerCase() !== "mozillaonline") {
-  throw new Error("This extension is not supported for this distribution!");
-}
-
 this.chinaPackManager = class extends ExtensionAPI {
   onStartup() {
     let {extension} = this;
