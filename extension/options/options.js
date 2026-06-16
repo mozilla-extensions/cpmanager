@@ -81,6 +81,11 @@ window.addEventListener("DOMContentLoaded", async evt => {
   browser.permissions.onRemoved.addListener(async (permissions) => {
     if (permissions.origins.includes("<all_urls>")) {
       document.getElementById("gesture.enabled").checked = false;
+      // Keep the storage flag honest: setting .checked programmatically does
+      // not fire the change event, so without this the flag would still read
+      // "enabled" while the host permission (and thus the content script) is
+      // gone, leaving drag silently dead.
+      await browser.storage.local.set({ "gesture.enabled": false });
     }
    });
   browser.permissions.onAdded.addListener(async (permissions) => {
