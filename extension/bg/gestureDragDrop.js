@@ -2,10 +2,33 @@ let gestureStartX = -1;
 let gestureStartY = -1;
 
 const GESTURE_SCRIPT_ID = "gesture-script";
+const ALL_URLS_PERMISSION = { origins: ["<all_urls>"] };
+
+// The content script matches <all_urls>, which is an *optional* permission.
+// registerContentScripts() succeeds even without the host permission, but then
+// injects into no page at all and drag silently does nothing. The feature is
+// therefore only truly on when BOTH the option is enabled AND the permission is
+// granted.
+async function isGestureUsable() {
+  const data = await browser.storage.local.get({ "gesture.enabled": false });
+  if (!data["gesture.enabled"]) {
+    return false;
+  }
+  try {
+    return await browser.permissions.contains(ALL_URLS_PERMISSION);
+  } catch (e) {
+    console.error(`failed to check <all_urls> permission: ${e}`);
+    return false;
+  }
+}
 
 async function registerOrUnregisterScript(enabled) {
   try {
     if (enabled) {
+      // Drop any registration left over from a previous session/update so we
+      // always (re)register with the current parameters. unregisterContentScripts
+      // with an empty filter is a no-op when nothing is registered.
+      await browser.scripting.unregisterContentScripts({});
       await browser.scripting.registerContentScripts([{
         id: GESTURE_SCRIPT_ID,
         matches: ["<all_urls>"],
@@ -23,12 +46,34 @@ async function registerOrUnregisterScript(enabled) {
   }
 }
 
-browser.storage.local.get({"gesture.enabled": false}).then(data => registerOrUnregisterScript(data["gesture.enabled"]));
+async function syncScriptRegistration() {
+  await registerOrUnregisterScript(await isGestureUsable());
+}
 
+// Initial registration on startup.
+syncScriptRegistration();
+
+// React to the user toggling the option in the settings page.
 browser.storage.local.onChanged.addListener(changes => {
-  const change = changes["gesture.enabled"];
-  if (!change) return;
-  registerOrUnregisterScript(change.newValue);
+  if (!changes["gesture.enabled"]) {
+    return;
+  }
+  syncScriptRegistration();
+});
+
+// React to the <all_urls> permission being granted or revoked out-of-band
+// (e.g. by a browser update reinstalling the system add-on). Without this the
+// script can stay "registered" while injecting nowhere, or fail to come back
+// when the permission is re-granted.
+browser.permissions.onAdded.addListener(permissions => {
+  if (permissions.origins && permissions.origins.includes("<all_urls>")) {
+    syncScriptRegistration();
+  }
+});
+browser.permissions.onRemoved.addListener(permissions => {
+  if (permissions.origins && permissions.origins.includes("<all_urls>")) {
+    syncScriptRegistration();
+  }
 });
 
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
