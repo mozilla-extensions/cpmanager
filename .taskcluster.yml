@@ -6,7 +6,7 @@ policy:
 tasks:
     - $let:
           # XXX Set to `true` for private repos
-          privateRepo: true
+          privateRepo: false
           # XXX Use
           # `system` for system add-on,
           # `privileged` for AMO or self-hosted privileged add-on,
